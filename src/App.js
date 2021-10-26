@@ -1,5 +1,11 @@
 import './App.css'
 import Button from '@mui/material/Button'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+} from 'react-router-dom'
 import logo from './logo.svg'
 
 function App() {
@@ -14,6 +20,9 @@ function App() {
           {' '}
           and save to reload.
         </p>
+        <Route path="/about">
+          <About />
+        </Route>
         <a
           className="App-link"
           href="https://reactjs.org"
@@ -27,6 +36,10 @@ function App() {
       </header>
     </div>
   )
+}
+
+function About() {
+  return <h2>About</h2>
 }
 
 export default App
