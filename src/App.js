@@ -23,6 +23,7 @@ function App() {
           Learn React
         </a>
         <Button>Primary</Button>
+        <Button>1111111</Button>
       </header>
     </div>
   )
