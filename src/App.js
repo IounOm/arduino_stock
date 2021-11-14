@@ -1,11 +1,6 @@
 import './App.css'
 import Button from '@mui/material/Button'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-} from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import logo from './logo.svg'
 
 function App() {
