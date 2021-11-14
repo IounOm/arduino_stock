@@ -7,7 +7,7 @@
       "custom": "ignore"
     }],
     "semi": [2, "never"],
-    "no-unused-vars": "warn",
+    "no-unused-vars": 1,
     "max-len": "warn"
   }
 }

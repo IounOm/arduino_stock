@@ -1,40 +1,25 @@
-import './App.css'
-import Button from '@mui/material/Button'
-import { Route } from 'react-router-dom'
-import logo from './logo.svg'
+import React from 'react'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { AuthProvider } from './components/Auth'
+
+import Home from './pages/Home'
+import Dashboard from './components/DashBoard'
+import Login from './components/Login'
+import SignUp from './components/SignUp'
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit
-          {' '}
-          <code>src/App.js</code>
-          {' '}
-          and save to reload.
-        </p>
-        <Route path="/about">
-          <About />
-        </Route>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <Button>Primary</Button>
-        <Button>1111111</Button>
-      </header>
-    </div>
+    <AuthProvider>
+      <Router>
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/dashboard" component={Dashboard} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/signup" component={SignUp} />
+        </Switch>
+      </Router>
+    </AuthProvider>
   )
-}
-
-function About() {
-  return <h2>About</h2>
 }
 
 export default App
