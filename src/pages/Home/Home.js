@@ -15,23 +15,20 @@ function Home() {
 
   return (
     <>
-      <Paper elevation={0}>
-        <Header />
-        <Box>Home</Box>
-        {currentUser ? (
-          <>
-            <Box>You are logged in</Box>
-            <Link to="/dashboard">View Dashboard</Link>
-          </>
-        ) : (
-          <>
-            <Box>You are not logged in</Box>
-            <Link to="/login">Login</Link>
-            <Box> or </Box>
-            <Link to="/signup">Sign up</Link>
-          </>
-        )}
-      </Paper>
+      <Box>Home</Box>
+      {currentUser ? (
+        <>
+          <Box>You are logged in</Box>
+          <Link to="/dashboard">View Dashboard</Link>
+        </>
+      ) : (
+        <>
+          <Box>You are not logged in</Box>
+          <Link to="/login">Login</Link>
+          <Box> or </Box>
+          <Link to="/signup">Sign up</Link>
+        </>
+      )}
     </>
   )
 }

@@ -1,6 +1,12 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import {
+  BrowserRouter as Router, Route, Switch, Redirect,
+} from 'react-router-dom'
 import { AuthProvider } from './components/Auth'
+import AuthRoute from './utils/AuthRoute'
+
+import Header from './components/Header'
+import NotFoundPage from './components/NotFoundPage'
 
 import Home from './pages/Home'
 import Dashboard from './components/DashBoard'
@@ -12,10 +18,15 @@ function App() {
     <AuthProvider>
       <Router>
         <Switch>
-          <Route exact path="/" component={Home} />
-          <Route exact path="/dashboard" component={Dashboard} />
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/signup" component={SignUp} />
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+          <AuthRoute exact path="/home" layout={Header} component={Home} />
+          <AuthRoute exact path="/login" layout={Header} component={Login} />
+          <AuthRoute exact path="/signup" layout={Header} component={SignUp} />
+          <AuthRoute exact path="/dashboard" layout={Header} component={Dashboard} />
+          <Route path="/404" component={NotFoundPage} />
+          <Redirect to="/404" />
         </Switch>
       </Router>
     </AuthProvider>

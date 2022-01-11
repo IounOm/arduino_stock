@@ -12,14 +12,20 @@ function SignUp() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = () => {
     try {
+      console.log(5555555)
+      console.log(currentUser)
       firebaseConfig.auth().createUserWithEmailAndPassword(email, password)
       setCurrentUser(true)
+      console.log(44444444444)
     } catch (err) {
       alert(err)
     }
   }
+
+  console.log(email)
+  console.log(password)
 
   if (currentUser) {
     return <Redirect to="/dashboard" />
@@ -41,7 +47,7 @@ function SignUp() {
           onChange={(e) => setPassword(e.target.value)}
           value={password}
         />
-        <Button variant="outlined" onClick={(e) => handleSubmit(e)}>Submit</Button>
+        <Button variant="outlined" onClick={handleSubmit}>Submit</Button>
       </Box>
     </>
   )
