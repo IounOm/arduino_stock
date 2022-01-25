@@ -18,7 +18,7 @@ import { AuthContext } from '../Auth'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: '12px 24px',
+    padding: '8px 24px',
   },
   color: {
     color: '#fff',
@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Header(props) {
   const { children } = props
-  console.log(children)
   const { currentUser } = useContext(AuthContext) // check login
   const classes = useStyles()
   const top100Films = [
@@ -54,10 +53,11 @@ function Header(props) {
       <AppBar className={classes.root} position="sticky">
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Box>
-            {/* <img src="arduinoStockLogo2.png" alt="" width="210" height="40" /> */}
-            <Typography variant="h5" fontWeight="bold" color="#fff">
+            {/* <img src="/images/arduinoStock.png" alt="" width="50px" /> */}
+            <img src="/images/arduinoStock2.png" alt="" width="160px" />
+            {/* <Typography variant="h5" fontWeight="bold" color="#fff">
               ARDUINO STOCK
-            </Typography>
+            </Typography> */}
           </Box>
           <Autocomplete
             freeSolo

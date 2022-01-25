@@ -17,7 +17,7 @@ function AuthRoute(props) {
   let output = ''
 
   if (currentUser) {
-    output = <Loading />
+    output = <Layout><Component {...props} /></Layout>
   } else if (!currentUser && loginRequired) {
     output = <Redirect to="/login" />
   } else if (currentUser && !loginRequired) {
@@ -25,6 +25,16 @@ function AuthRoute(props) {
   } else if ((currentUser && loginRequired) || (!currentUser && !loginRequired)) {
     output = <Layout><Component {...props} /></Layout>
   }
+
+  // if (currentUser) {
+  //   output = <Loading />
+  // } else if (!currentUser && loginRequired) {
+  //   output = <Redirect to="/login" />
+  // } else if (currentUser && !loginRequired) {
+  //   output = <Redirect to="/" />
+  // } else if ((currentUser && loginRequired) || (!currentUser && !loginRequired)) {
+  //   output = <Layout><Component {...props} /></Layout>
+  // }
 
   useEffect(() => {
     console.log(currentUser)

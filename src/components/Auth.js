@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { Redirect } from 'react-router-dom'
 import firebaseConfig from '../config'
+import Loading from './Loading'
+import Header from './Header'
 
 export const AuthContext = React.createContext()
 
@@ -17,7 +20,7 @@ export function AuthProvider(props) {
   }, [])
 
   if (loading) {
-    return <p>Loading...</p>
+    return <Loading />
   }
 
   return (

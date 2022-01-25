@@ -1,35 +1,67 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 
+import _isEmpty from 'lodash/isEmpty'
+import _get from 'lodash/get'
+
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
+import InputLabel from '@mui/material/InputLabel'
+import InputAdornment from '@mui/material/InputAdornment'
+import FormControl from '@mui/material/FormControl'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import IconButton from '@mui/material/IconButton'
+import OutlinedInput from '@mui/material/OutlinedInput'
 
 import firebaseConfig from '../../config'
 
 function SignUp() {
   const [currentUser, setCurrentUser] = useState(null)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [errorEmail, setErrorEmail] = useState(false)
+  const [errorPassword, setErrorPassword] = useState(false)
+  const [values, setValues] = useState({
+    email: '',
+    password: '',
+    showPassword: false,
+  })
 
-  const handleSubmit = () => {
+  const handleChange = (prop) => (event) => {
+    setValues({ ...values, [prop]: event.target.value })
+  }
+
+  const handleClickShowPassword = () => {
+    setValues({
+      ...values,
+      showPassword: !values.showPassword,
+    })
+  }
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault()
+  }
+
+  const handleSubmit = async () => {
     try {
-      console.log(5555555)
-      console.log(currentUser)
-      firebaseConfig.auth().createUserWithEmailAndPassword(email, password)
-      setCurrentUser(true)
-      console.log(44444444444)
+      if (_isEmpty(values.email)) {
+        setErrorEmail(true)
+      } else if (_isEmpty(values.password)) {
+        setErrorPassword(true)
+      } else {
+        const myUser = await firebaseConfig.auth().createUserWithEmailAndPassword(values.email, values.password)
+        const uid = _get(myUser, 'user.uid')
+        // await firebase.firestore().collection('users').doc(uid).add(data)
+        setCurrentUser(true)
+      }
     } catch (err) {
       alert(err)
     }
   }
 
-  console.log(email)
-  console.log(password)
-
-  if (currentUser) {
-    return <Redirect to="/dashboard" />
-  }
+  // if (currentUser) {
+  //   return <Redirect to="/profile" />
+  // }
 
   return (
     <>
@@ -38,15 +70,33 @@ function SignUp() {
         <TextField
           variant="outlined"
           label="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
+          onChange={handleChange('email')}
+          error={values.email ? false : errorEmail}
+          value={values.email}
         />
-        <TextField
-          variant="outlined"
-          label="Password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
+        <FormControl variant="outlined" style={{ margin: '16px' }} fullWidth>
+          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+          <OutlinedInput
+            id="outlined-adornment-password"
+            type={values.showPassword ? 'text' : 'password'}
+            value={values.password}
+            onChange={handleChange('password')}
+            error={values.password ? false : errorPassword}
+            endAdornment={(
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            )}
+            label="Password"
+          />
+        </FormControl>
         <Button variant="outlined" onClick={handleSubmit}>Submit</Button>
       </Box>
     </>
