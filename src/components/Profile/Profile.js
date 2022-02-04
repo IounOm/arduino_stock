@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Redirect } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
+import { useSelector, useDispatch } from 'react-redux'
 
 import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
@@ -33,9 +34,10 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 
+import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../Header/Header'
 import { AuthContext } from '../Auth'
-import firebaseConfig from '../../config'
+import firebase from '../../config'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -115,8 +117,19 @@ const useStyles = makeStyles((theme) => ({
 
 function Profile() {
   const classes = useStyles()
+  const myUser = useSelector(getUser)
+  // const {
+  //   userName,
+  //   userEmail,
+  //   userPassword,
+  //   userImage,
+  //   userNote,
+  //   userTag,
+  // } = myUser
+  console.log('myUser', myUser)
   const { currentUser } = useContext(AuthContext)
-  console.log('currentUser', currentUser)
+  // const uid = _get(currentUser, 'user.uid')
+  // console.log('currentUid', uid)
   const [loading, setLoading] = useState(false)
   const [openTagEdit, setOpenTagEdit] = useState(false)
   const [values, setValues] = useState({
@@ -140,6 +153,14 @@ function Profile() {
   }
   const handleClose = () => {
     setOpenTagEdit(false)
+  }
+
+  const handleGetUser = async () => {
+    try {
+      // const user = await firebase.firestore().collection('users').doc(uid).get()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (

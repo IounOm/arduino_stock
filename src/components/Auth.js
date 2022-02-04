@@ -19,9 +19,9 @@ export function AuthProvider(props) {
     })
   }, [])
 
-  if (loading) {
-    return <Loading />
-  }
+  // if (loading) {
+  //   return <Loading />
+  // }
 
   return (
     <AuthContext.Provider value={{ currentUser }}>

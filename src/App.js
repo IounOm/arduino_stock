@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   BrowserRouter as Router, Route, Switch, Redirect,
 } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { AuthProvider } from './components/Auth'
 import AuthRoute from './utils/AuthRoute'
+import * as userAction from './redux/actions/user.action'
 
 import Header from './components/Header'
 import NotFoundPage from './components/NotFoundPage'
@@ -16,6 +18,12 @@ import SignUp from './components/SignUp'
 import Profile from './components/Profile'
 
 function App() {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(userAction.initAuthListener())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch])
   return (
     <AuthProvider>
       <Router>

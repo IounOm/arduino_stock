@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
+import { useSelector, useDispatch } from 'react-redux'
 
 import _isEmpty from 'lodash/isEmpty'
 import _get from 'lodash/get'
@@ -18,6 +19,9 @@ import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
 import OutlinedInput from '@mui/material/OutlinedInput'
+
+import { getUser } from '../../redux/selectors/user.selector'
+import * as userAction from '../../redux/actions/user.action'
 
 import firebase from '../../config'
 
@@ -64,6 +68,8 @@ const useStyles = makeStyles((theme) => ({
 
 function SignUp() {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const user = useSelector(getUser)
   const [currentUser, setCurrentUser] = useState(null)
   const [values, setValues] = useState({
     name: '',
@@ -100,16 +106,19 @@ function SignUp() {
         setValues({ ...values, errorPassword: true })
       } else {
         const myUser = await firebase.auth().createUserWithEmailAndPassword(values.email, values.password)
-        const uid = _get(myUser, 'user.uid')
+        const uId = _get(myUser, 'user.uid')
         const passNum = values.password.length
-        await firebase.firestore().collection('users').doc(uid).set({
+        await firebase.firestore().collection('users').doc(uId).set({
           image: '',
           name: values.name,
           note: '',
           email: values.email,
           password: _repeat('*', passNum),
           tag: [],
+          uid: uId,
         })
+        // dispatch(userAction.loginSuccess(uId))
+        // dispatch(userAction.addUserData(values.name, values.email, _repeat('*', passNum)))
         setCurrentUser(true)
       }
     } catch (err) {
@@ -118,7 +127,7 @@ function SignUp() {
   }
 
   if (currentUser) {
-    return <Redirect to="/home" />
+    return <Redirect to="/profile" />
   }
 
   return (
@@ -129,7 +138,7 @@ function SignUp() {
         </Box>
         <Box className={classes.card} mt={4}>
           <Typography variant="h5" fontWeight="bold" color="primary">
-            SIGN IN
+            SIGN UP
           </Typography>
           <TextField
             variant="outlined"

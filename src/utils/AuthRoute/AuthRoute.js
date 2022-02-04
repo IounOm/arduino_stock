@@ -1,6 +1,10 @@
 import React, { useEffect, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { Route, Redirect } from 'react-router-dom'
+import {
+  useSelector,
+} from 'react-redux'
+import { getUser } from '../../redux/selectors/user.selector'
 import Loading from '../../components/Loading'
 
 import { AuthContext } from '../../components/Auth'
@@ -13,6 +17,7 @@ function AuthRoute(props) {
   } = props
 
   const { currentUser } = useContext(AuthContext)
+  // const user = useSelector(getUser)
 
   let output = ''
 
@@ -22,17 +27,20 @@ function AuthRoute(props) {
     output = <Redirect to="/login" />
   } else if (currentUser && !loginRequired) {
     output = <Redirect to="/" />
-  } else if ((currentUser && loginRequired) || (!currentUser && !loginRequired)) {
+  } else if ((currentUser && loginRequired) || (currentUser && !loginRequired)) {
+    output = <Layout><Component {...props} /></Layout>
+  } else if (!currentUser) {
     output = <Layout><Component {...props} /></Layout>
   }
 
-  // if (currentUser) {
+  // if (user.loading) {
   //   output = <Loading />
-  // } else if (!currentUser && loginRequired) {
+  //   // output = <Layout><Component {...props} /></Layout>
+  // } else if (!user.isLogin && loginRequired) {
   //   output = <Redirect to="/login" />
-  // } else if (currentUser && !loginRequired) {
+  // } else if (user.isLogin && !loginRequired) {
   //   output = <Redirect to="/" />
-  // } else if ((currentUser && loginRequired) || (!currentUser && !loginRequired)) {
+  // } else if ((user.isLogin && loginRequired) || (!user.isLogin && !loginRequired)) {
   //   output = <Layout><Component {...props} /></Layout>
   // }
 
