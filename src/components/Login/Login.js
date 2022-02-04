@@ -22,7 +22,7 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 
 import Header from '../Header/Header'
 import { AuthContext } from '../Auth'
-import firebaseConfig from '../../config'
+import firebase from '../../config'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -91,7 +91,7 @@ function Login() {
     event.preventDefault()
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async () => {
     try {
       if (_isEmpty(email)) {
         setErrorEmail(true)
@@ -99,7 +99,7 @@ function Login() {
         setErrorPassword(true)
       } else {
         setLoading(true)
-        await firebaseConfig.auth().signInWithEmailAndPassword(email, values.password)
+        await firebase.auth().signInWithEmailAndPassword(email, values.password)
         setLoading(false)
       }
     } catch (err) {
@@ -159,7 +159,7 @@ function Login() {
               {'Do not have an account yet ? '}
               <Link href="/signup" underline="none">Create one.</Link>
             </Typography>
-            <Button variant="outlined" color="primary" onClick={(e) => handleSubmit(e)}>Submit</Button>
+            <Button variant="outlined" color="primary" onClick={handleSubmit}>Submit</Button>
           </Box>
 
         </Box>

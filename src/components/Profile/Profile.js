@@ -1,8 +1,10 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Redirect } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 
 import _isEmpty from 'lodash/isEmpty'
+import _map from 'lodash/map'
+import _get from 'lodash/get'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -11,6 +13,7 @@ import Grid from '@mui/material/Grid'
 import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
 import Link from '@mui/material/Link'
+import Chip from '@mui/material/Chip'
 // import theme from '../../Theme/theme'
 import InputLabel from '@mui/material/InputLabel'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -21,6 +24,14 @@ import IconButton from '@mui/material/IconButton'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import Divider from '@mui/material/Divider'
 import Hidden from '@mui/material/Hidden'
+import Tooltip from '@mui/material/Tooltip'
+import Autocomplete from '@mui/material/Autocomplete'
+import Stack from '@mui/material/Stack'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 
 import Header from '../Header/Header'
 import { AuthContext } from '../Auth'
@@ -74,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    width: '100%',
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
     },
@@ -94,6 +106,11 @@ const useStyles = makeStyles((theme) => ({
       width: '100%',
     },
   },
+  tagCard: {
+    border: '2px solid #e8e8e8',
+    borderRadius: '10px',
+    padding: '8px',
+  },
 }))
 
 function Profile() {
@@ -101,21 +118,28 @@ function Profile() {
   const { currentUser } = useContext(AuthContext)
   console.log('currentUser', currentUser)
   const [loading, setLoading] = useState(false)
+  const [openTagEdit, setOpenTagEdit] = useState(false)
   const [values, setValues] = useState({
     image: '',
-    username: '',
+    name: '',
     note: '',
     email: '',
     password: '',
-    tag: [{ name: '', note: '' }],
+    tag: [{ name: 'tag1', note: 'my tag eiei' }],
     showPassword: false,
     errorEmail: false,
     errorPassword: false,
   })
-  console.log(values)
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value })
+  }
+
+  const handleClickTagEdit = () => {
+    setOpenTagEdit(true)
+  }
+  const handleClose = () => {
+    setOpenTagEdit(false)
   }
 
   return (
@@ -165,15 +189,16 @@ function Profile() {
                 variant="outlined"
                 fullWidth
                 label="Username"
-                onChange={handleChange('username')}
-                value={values.username}
+                onChange={handleChange('name')}
+                value={values.name}
                 style={{ marginTop: '16px' }}
               />
               <TextField
                 fullWidth
                 label="Say something about yourself"
-                placeholder="Placeholder"
                 multiline
+                rows={3}
+                defaultValue=""
                 style={{ marginTop: '16px' }}
               />
               <Box className={classes.btSave}>
@@ -186,15 +211,54 @@ function Profile() {
           </Box>
           <Box className={classes.profile}>
             <Divider />
-            <Typography variant="h4" mt={2}>Tag Management</Typography>
-            <TextField
-              variant="outlined"
-              fullWidth
-              label="Tags"
-              onChange={handleChange('tag')}
-              value={values.tag}
-              style={{ marginTop: '16px' }}
-            />
+            <Box className={classes.title} mt={2}>
+              <Typography variant="h4">Tag Management</Typography>
+              <Button variant="outlined" onClick={handleClickTagEdit}>Add</Button>
+            </Box>
+            <Box className={classes.tagCard} mt={2}>
+              <Grid container spacing={1}>
+                {_map(values.tag, (data) => (
+                  <Grid item>
+                    <Tooltip title={_get(data, 'note')} arrow>
+                      <Chip
+                        label={_get(data, 'name')}
+                        onClick={[]}
+                        onDelete={[]}
+                      />
+                    </Tooltip>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+            <Dialog open={openTagEdit} onClose={handleClose}>
+              <DialogTitle>Add Tag</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  create your tag For filtering your project and the tags
+                  you added will be searchable on the home page.
+                </DialogContentText>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  label="Tag Name"
+                  // type="email"
+                  fullWidth
+                  // variant="standard"
+                />
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  label="Note"
+                  // type="email"
+                  fullWidth
+                  // variant="standard"
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleClose}>Save</Button>
+              </DialogActions>
+            </Dialog>
           </Box>
         </Box>
       </Box>

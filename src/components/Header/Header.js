@@ -11,8 +11,10 @@ import Autocomplete from '@mui/material/Autocomplete'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import IconButton from '@mui/material/IconButton'
+import Hidden from '@mui/material/Hidden'
 
 import SearchIcon from '@mui/icons-material/Search'
+import MenuIcon from '@mui/icons-material/Menu'
 
 import { AuthContext } from '../Auth'
 
@@ -59,36 +61,43 @@ function Header(props) {
               ARDUINO STOCK
             </Typography> */}
           </Box>
-          <Autocomplete
-            freeSolo
-            sx={{
-              width: 300,
-              display: 'inline-block',
-              '& input': {
-                // width: 300,
-                // bgcolor: 'background.paper',
-                color: '#fff',
-                // color: (theme) => theme.palette.getContrastText(theme.palette.background.paper),
-              },
-            }}
-            options={top100Films.map((option) => option.title)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search Tag"
-                color="button"
-                className={classes.color}
-                // InputProps={{
-                //   className: classes.inputColor,
-                //   // endAdornment: <IconButton edge="end"><SearchIcon /></IconButton>,
-                // }}
-              />
-            )}
-          />
-          <Stack direction="row" spacing={2}>
-            <Button variant="text" style={{ color: '#fff', padding: '8px 16px' }}>Sign Up</Button>
-            <Button variant="text" style={{ color: '#fff', padding: '8px 16px' }}>Login</Button>
-          </Stack>
+          <Hidden smDown>
+            <Autocomplete
+              freeSolo
+              sx={{
+                width: 300,
+                display: 'inline-block',
+                '& input': {
+                  // width: 300,
+                  // bgcolor: 'background.paper',
+                  color: '#fff',
+                  // color: (theme) => theme.palette.getContrastText(theme.palette.background.paper),
+                },
+              }}
+              options={top100Films.map((option) => option.title)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Search Tag"
+                  color="button"
+                  className={classes.color}
+                  // InputProps={{
+                  //   className: classes.inputColor,
+                  //   // endAdornment: <IconButton edge="end"><SearchIcon /></IconButton>,
+                  // }}
+                />
+              )}
+            />
+            <Stack direction="row" spacing={2}>
+              <Button variant="text" style={{ color: '#fff', padding: '8px 16px' }}>Sign Up</Button>
+              <Button variant="text" style={{ color: '#fff', padding: '8px 16px' }}>Login</Button>
+            </Stack>
+          </Hidden>
+          <Hidden smUp>
+            <IconButton aria-label="delete" size="small" color="button">
+              <MenuIcon fontSize="large" />
+            </IconButton>
+          </Hidden>
         </Stack>
       </AppBar>
       {children}
