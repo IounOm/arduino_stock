@@ -15,7 +15,7 @@ import Dashboard from './components/DashBoard'
 import Loading from './components/Loading'
 import Login from './components/Login'
 import SignUp from './components/SignUp'
-import Profile from './components/Profile'
+import Profile from './pages/Profile'
 
 function App() {
   const dispatch = useDispatch()
@@ -37,6 +37,7 @@ function App() {
           <AuthRoute exact path="/dashboard" layout={Header} component={Dashboard} />
           <AuthRoute exact path="/loading" layout={Header} component={Loading} />
           <AuthRoute exact path="/profile" layout={Header} component={Profile} loginRequired />
+          <AuthRoute exact path="/profile/:id" layout={Header} component={Profile} loginRequired />
           <Route path="/404" component={NotFoundPage} />
           <Redirect to="/404" />
         </Switch>

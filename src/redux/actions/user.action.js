@@ -14,7 +14,7 @@ export function setLoading() {
   }
 }
 
-export function updateUserData(name, email, password, image, note, tag) {
+export function updateUserData(name, email, password, image, note, contact) {
   return {
     type: SET_USER_DATA,
     payload: {
@@ -23,7 +23,7 @@ export function updateUserData(name, email, password, image, note, tag) {
       password,
       image,
       note,
-      tag,
+      contact,
     },
   }
 }
@@ -69,7 +69,7 @@ export function initAuthListener() {
               .catch((e) => console.log(e))
             if (!_isEmpty(firestoreUser)) {
               dispatch(loginSuccess(_get(user, 'uid')))
-              dispatch(updateUserData(_get(firestoreUser, 'name') || '', _get(firestoreUser, 'email') || '', _get(firestoreUser, 'password') || '', _get(firestoreUser, 'image') || '', _get(firestoreUser, 'note') || '', _get(firestoreUser, 'tag') || []))
+              dispatch(updateUserData(_get(firestoreUser, 'name') || '', _get(firestoreUser, 'email') || '', _get(firestoreUser, 'password') || '', _get(firestoreUser, 'image') || '', _get(firestoreUser, 'note') || '', _get(firestoreUser, 'contact') || []))
             } else {
               dispatch(loginFail('Not found user login fail'))
             }

@@ -13,7 +13,12 @@ const initialState = {
   userPassword: '',
   userImage: '',
   userNote: '',
-  userTag: [],
+  userContact: {
+    website: '',
+    facebook: '',
+    twitter: '',
+    git: '',
+  },
   userId: '',
   errorMessage: [],
 }
@@ -34,7 +39,7 @@ function reducer(state = initialState, action) {
         userPassword: action.payload.password,
         userImage: action.payload.image,
         userNote: action.payload.note,
-        userTag: action.payload.tag,
+        userContact: action.payload.contact,
       }
     }
     case LOGIN_SUCCESS: {

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 
 import _isEmpty from 'lodash/isEmpty'
@@ -10,7 +10,7 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
-import Link from '@mui/material/Link'
+// import Link from '@mui/material/Link'
 // import theme from '../../Theme/theme'
 import InputLabel from '@mui/material/InputLabel'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -62,6 +62,9 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down('sm')]: {
       width: '90%',
     },
+  },
+  link: {
+    textDecoration: 'none',
   },
 }))
 
@@ -156,8 +159,12 @@ function Login() {
           </FormControl>
           <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="body1">
-              {'Do not have an account yet ? '}
-              <Link href="/signup" underline="none">Create one.</Link>
+              Do not have an account yet ?
+              <Link to="/signup" className={classes.link}>
+                <Button>
+                  Create one
+                </Button>
+              </Link>
             </Typography>
             <Button variant="outlined" color="primary" onClick={handleSubmit}>Submit</Button>
           </Box>

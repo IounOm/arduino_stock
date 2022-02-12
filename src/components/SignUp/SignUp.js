@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -8,7 +8,7 @@ import _get from 'lodash/get'
 import _repeat from 'lodash/repeat'
 
 import Box from '@mui/material/Box'
-import Link from '@mui/material/Link'
+// import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
@@ -64,6 +64,9 @@ const useStyles = makeStyles((theme) => ({
       width: '90%',
     },
   },
+  link: {
+    textDecoration: 'none',
+  },
 }))
 
 function SignUp() {
@@ -114,7 +117,12 @@ function SignUp() {
           note: '',
           email: values.email,
           password: _repeat('*', passNum),
-          tag: [],
+          contact: {
+            website: '',
+            facebook: '',
+            twitter: '',
+            git: '',
+          },
           uid: uId,
         })
         // dispatch(userAction.loginSuccess(uId))
@@ -128,6 +136,10 @@ function SignUp() {
 
   if (currentUser) {
     return <Redirect to="/profile" />
+  }
+
+  const handleLogin = () => {
+    <Redirect to="/login" />
   }
 
   return (
@@ -182,8 +194,12 @@ function SignUp() {
           </FormControl>
           <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="body1">
-              {'Do not have an account yet ? '}
-              <Link href="/signup" underline="none">Create one.</Link>
+              Have an account yet ?
+              <Link to="/login" className={classes.link}>
+                <Button>
+                  Sign In
+                </Button>
+              </Link>
             </Typography>
             <Button variant="outlined" color="primary" onClick={handleSubmit}>Submit</Button>
           </Box>

@@ -12,11 +12,12 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import IconButton from '@mui/material/IconButton'
 import Hidden from '@mui/material/Hidden'
+import Avatar from '@mui/material/Avatar'
 
 import SearchIcon from '@mui/icons-material/Search'
 import MenuIcon from '@mui/icons-material/Menu'
 
-import { AuthContext } from '../Auth'
+// import { AuthContext } from '../Auth'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Header(props) {
   const { children } = props
-  const { currentUser } = useContext(AuthContext) // check login
+  // const { currentUser } = useContext(AuthContext) // check login
   const classes = useStyles()
   const top100Films = [
     { title: 'The Shawshank Redemption', year: 1994 },
@@ -98,6 +99,10 @@ function Header(props) {
               <MenuIcon fontSize="large" />
             </IconButton>
           </Hidden>
+          {/* <Avatar
+            alt="Remy Sharp"
+            src="/static/images/avatar/1.jpg"
+          /> */}
         </Stack>
       </AppBar>
       {children}

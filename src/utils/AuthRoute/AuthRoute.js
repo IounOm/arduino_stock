@@ -17,19 +17,19 @@ function AuthRoute(props) {
   } = props
 
   const { currentUser } = useContext(AuthContext)
-  // const user = useSelector(getUser)
+  const user = useSelector(getUser)
 
   let output = ''
 
-  if (currentUser) {
+  if (user.loading) {
+    output = <Loading />
+  } else if (user.isLogin) {
     output = <Layout><Component {...props} /></Layout>
-  } else if (!currentUser && loginRequired) {
+  } else if (!user.isLogin && loginRequired) {
     output = <Redirect to="/login" />
-  } else if (currentUser && !loginRequired) {
+  } else if (user.isLogin && !loginRequired) {
     output = <Redirect to="/" />
-  } else if ((currentUser && loginRequired) || (currentUser && !loginRequired)) {
-    output = <Layout><Component {...props} /></Layout>
-  } else if (!currentUser) {
+  } else if ((user.isLogin && loginRequired) || (!user.isLogin && !loginRequired)) {
     output = <Layout><Component {...props} /></Layout>
   }
 
@@ -45,8 +45,8 @@ function AuthRoute(props) {
   // }
 
   useEffect(() => {
-    console.log(currentUser)
-  }, [currentUser])
+    console.log(user)
+  }, [user])
 
   return (
     <Route
