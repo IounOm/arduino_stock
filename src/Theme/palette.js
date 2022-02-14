@@ -1,13 +1,14 @@
 const palette = {
-  common: {
-    white: '#FFFFFF',
-    black: '#00040C',
+  search: {
+    main: '#FFFFFF',
+    contrastText: '#E4A04C',
   },
   button: {
     main: '#FFFFFF',
     contrastText: '#FFF',
   },
   primary: {
+    // main: '#2980B9',
     main: '#008184',
     contrastText: '#FFF',
   },

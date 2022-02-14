@@ -1,112 +1,225 @@
-import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Redirect, useHistory } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import { makeStyles } from '@mui/styles'
 import PropTypes from 'prop-types'
+import { styled, alpha } from '@mui/material/styles'
+
+import _map from 'lodash/map'
+import _kebabCase from 'lodash/kebabCase'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Autocomplete from '@mui/material/Autocomplete'
-import Typography from '@mui/material/Typography'
-import Stack from '@mui/material/Stack'
+import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import InputBase from '@mui/material/InputBase'
 import Hidden from '@mui/material/Hidden'
+import Badge from '@mui/material/Badge'
+import Button from '@mui/material/Button'
 import Avatar from '@mui/material/Avatar'
+import MenuItem from '@mui/material/MenuItem'
+import Menu from '@mui/material/Menu'
 
-import SearchIcon from '@mui/icons-material/Search'
 import MenuIcon from '@mui/icons-material/Menu'
+import SearchIcon from '@mui/icons-material/Search'
+import AccountCircle from '@mui/icons-material/AccountCircle'
+import MailIcon from '@mui/icons-material/Mail'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import MoreIcon from '@mui/icons-material/MoreVert'
 
-// import { AuthContext } from '../Auth'
+import { getUser } from '../../redux/selectors/user.selector'
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: '10px 0px 0px 10px',
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  // marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(3),
+    width: 'auto',
+  },
+}))
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(0)})`,
+    paddingRight: `calc(1em + ${theme.spacing(0)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
+}))
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: '8px 24px',
-  },
-  color: {
-    color: '#fff',
-    '&.MuiInputBase-root-MuiOutlinedInput-root': {
-      color: '#fff',
-    },
-  },
-  inputColor: {
-    color: '#fff',
-    '&.Mui-focused': {
-      color: '#fff',
-    },
+  searchIcon: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E4A04C',
+    borderRadius: '0px 10px 10px 0px',
+    marginRight: theme.spacing(2),
+    height: '39px',
+    width: '39px',
   },
 }))
 
 function Header(props) {
   const { children } = props
-  // const { currentUser } = useContext(AuthContext) // check login
   const classes = useStyles()
-  const top100Films = [
-    { title: 'The Shawshank Redemption', year: 1994 },
-    { title: 'The Godfather', year: 1972 },
-    { title: 'The Godfather: Part II', year: 1974 },
-    { title: 'The Dark Knight', year: 2008 },
-    { title: '12 Angry Men', year: 1957 },
-    { title: "Schindler's List", year: 1993 },
-    { title: 'Pulp Fiction', year: 1994 },
-  ]
+  const history = useHistory()
+  const myUser = useSelector(getUser)
+  const {
+    userName,
+    userEmail,
+    userPassword,
+    userImage,
+    userNote,
+    userContact,
+    userId,
+  } = myUser
+  const [anchorEl, setAnchorEl] = useState(null)
+  const userLists = ['Profile', 'Group Project', 'Logout']
+
+  const isMenuOpen = Boolean(anchorEl)
+
+  const handleClickUserList = (type) => {
+    if (type === 'Logout') {
+      console.log('logout')
+    } else {
+      setAnchorEl(null)
+      history.push(`/${_kebabCase(type)}`)
+    }
+  }
+
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
+
+  const menuId = 'munuDestop'
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+      PaperProps={{
+        sx: { mt: '8px' },
+      }}
+    >
+      {_map(userLists, (list) => (
+        <MenuItem
+          key={list}
+          onClick={() => handleClickUserList(list)}
+        >
+          {list}
+        </MenuItem>
+      ))}
+    </Menu>
+  )
 
   return (
-    <>
-      <AppBar className={classes.root} position="sticky">
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Box>
-            {/* <img src="/images/arduinoStock.png" alt="" width="50px" /> */}
-            <img src="/images/arduinoStock2.png" alt="" width="160px" />
-            {/* <Typography variant="h5" fontWeight="bold" color="#fff">
-              ARDUINO STOCK
-            </Typography> */}
-          </Box>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="fixed">
+        <Toolbar>
           <Hidden smDown>
-            <Autocomplete
-              freeSolo
-              sx={{
-                width: 300,
-                display: 'inline-block',
-                '& input': {
-                  // width: 300,
-                  // bgcolor: 'background.paper',
-                  color: '#fff',
-                  // color: (theme) => theme.palette.getContrastText(theme.palette.background.paper),
-                },
-              }}
-              options={top100Films.map((option) => option.title)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Search Tag"
-                  color="button"
-                  className={classes.color}
-                  // InputProps={{
-                  //   className: classes.inputColor,
-                  //   // endAdornment: <IconButton edge="end"><SearchIcon /></IconButton>,
-                  // }}
-                />
-              )}
-            />
-            <Stack direction="row" spacing={2}>
-              <Button variant="text" style={{ color: '#fff', padding: '8px 16px' }}>Sign Up</Button>
-              <Button variant="text" style={{ color: '#fff', padding: '8px 16px' }}>Login</Button>
-            </Stack>
-          </Hidden>
-          <Hidden smUp>
-            <IconButton aria-label="delete" size="small" color="button">
-              <MenuIcon fontSize="large" />
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              // sx={{ mr: 2 }}
+            >
+              <img src="/images/arduinoStock2.png" alt="arduinoStock" width="125px" />
             </IconButton>
           </Hidden>
-          {/* <Avatar
-            alt="Remy Sharp"
-            src="/static/images/avatar/1.jpg"
-          /> */}
-        </Stack>
+          <Hidden smUp>
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              sx={{ mr: 2 }}
+              onClick={() => history.push('/home')}
+            >
+              <img src="/images/arduinoStock.png" alt="arduinoStock" width="30px" />
+            </IconButton>
+          </Hidden>
+          <Search>
+            <StyledInputBase
+              placeholder="Search..."
+              inputProps={{
+                'aria-label': 'search',
+                // maxLength: 50,
+              }}
+            />
+          </Search>
+          <Box className={classes.searchIcon}>
+            <IconButton color="search" borderRadius="0" size="small">
+              <SearchIcon />
+            </IconButton>
+          </Box>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton
+              onClick={handleProfileMenuOpen}
+              sx={{ p: 0 }}
+              // edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+            >
+              <Avatar
+                alt=""
+                src={userImage}
+              />
+            </IconButton>
+          </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+              edge="end"
+            >
+              <Avatar
+                alt=""
+                src={userImage}
+                sx={{ width: 32, height: 32 }}
+              />
+            </IconButton>
+          </Box>
+        </Toolbar>
       </AppBar>
+      {renderMenu}
       {children}
-    </>
+    </Box>
   )
 }
 

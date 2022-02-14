@@ -66,8 +66,13 @@ const useStyles = makeStyles((theme) => ({
     // flexDirection: 'column',
     // alignItems: 'center',
     // justifyContent: 'center',
-    height: 'calc(100vh - 72px)',
+    marginTop: '64px',
+    height: 'calc(100vh - 64px)',
     padding: '0 120px 0 120px',
+    [theme.breakpoints.down('md')]: {
+      padding: '0 20px 0 20px',
+      height: '100%',
+    },
     [theme.breakpoints.down('sm')]: {
       padding: '0 16px 0 16px',
       height: 'auto',
@@ -101,6 +106,9 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    [theme.breakpoints.down('md')]: {
+      flexDirection: 'column',
+    },
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
     },
@@ -109,6 +117,9 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     width: '40%',
+    [theme.breakpoints.down('md')]: {
+      width: '100%',
+    },
     [theme.breakpoints.down('sm')]: {
       width: '100%',
     },
@@ -117,6 +128,9 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     width: '60%',
+    [theme.breakpoints.down('md')]: {
+      width: '100%',
+    },
     [theme.breakpoints.down('sm')]: {
       width: '100%',
     },
@@ -299,6 +313,8 @@ function Profile(props) {
               updateKey="image"
               defaultImg={userImage}
               alt=""
+              width="250px"
+              height="250px"
               loading={loading}
             />
           </Box>
@@ -341,11 +357,11 @@ function Profile(props) {
           </Box>
         </Box>
         <Box className={classes.pageRight} fullWidth>
-          <Hidden smUp>
-            <Divider />
-          </Hidden>
           <Box className={classes.profile}>
-            <Box className={classes.title}>
+            <Hidden mdUp>
+              <Divider />
+            </Hidden>
+            <Box className={classes.title} mt={2}>
               <Typography variant="h4">User Profile</Typography>
               {!editUser && (
                 <Button variant="outlined" onClick={handleClickUserEdit}>Edit</Button>

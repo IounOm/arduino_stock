@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 
 function UploadImage(props) {
   const {
-    collection, doc, updateKey, defaultImg, alt, loading,
+    collection, doc, updateKey, defaultImg, alt, loading, width, height,
   } = props
   const classes = useStyles()
   const db = firebase.firestore()
@@ -139,7 +139,8 @@ function UploadImage(props) {
           <Avatar
             alt={alt}
             src={imageURLs}
-            sx={{ width: 250, height: 250, fontSize: '80px' }}
+            className={classes.Image}
+            sx={{ width: `${width}`, height: `${height}`, fontSize: '80px' }}
             variant="rounded"
           />
           <Box mt={2}>
@@ -153,7 +154,7 @@ function UploadImage(props) {
             <Avatar
               alt={alt}
               src={imageURLs}
-              sx={{ width: 250, height: 250, fontSize: '80px' }}
+              sx={{ width: `${width}`, height: `${height}`, fontSize: '80px' }}
               variant="rounded"
             />
           </label>
@@ -175,6 +176,8 @@ UploadImage.propTypes = {
   updateKey: PropTypes.string.isRequired,
   defaultImg: PropTypes.string.isRequired,
   alt: PropTypes.string.isRequired,
+  width: PropTypes.string.isRequired,
+  height: PropTypes.string.isRequired,
   loading: PropTypes.bool,
 }
 
