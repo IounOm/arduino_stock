@@ -209,7 +209,7 @@ function Header(props) {
               edge="end"
             >
               <Avatar
-                alt="5555"
+                alt=""
                 src={userImage}
                 sx={{ width: 32, height: 32 }}
               />
