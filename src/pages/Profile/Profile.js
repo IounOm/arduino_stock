@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   profile: {
-    padding: '24px',
+    padding: '0 24px',
     [theme.breakpoints.down('sm')]: {
       width: '100%',
       padding: '16px 0 16px 0',
@@ -203,7 +203,7 @@ function Profile(props) {
   }
 
   const handleChange = (prop, key) => (event) => {
-    if (props) {
+    if (key) {
       setValues({
         ...values,
         [prop]: {
@@ -319,8 +319,10 @@ function Profile(props) {
             />
           </Box>
           <Box className={classes.profile}>
-            <Divider />
-            <Box className={classes.title} mt={2}>
+            <Box mt={2}>
+              <Divider />
+            </Box>
+            <Box className={classes.title} mt={1}>
               <Typography variant="h4">Account Settings</Typography>
               {!editAccount && (
                 <Button variant="outlined" onClick={handleClickAccountEdit}>Edit</Button>
@@ -361,7 +363,7 @@ function Profile(props) {
             <Hidden mdUp>
               <Divider />
             </Hidden>
-            <Box className={classes.title} mt={2}>
+            <Box className={classes.title} mt={1}>
               <Typography variant="h4">User Profile</Typography>
               {!editUser && (
                 <Button variant="outlined" onClick={handleClickUserEdit}>Edit</Button>
@@ -381,7 +383,7 @@ function Profile(props) {
                 fullWidth
                 label="Say something about yourself"
                 multiline
-                rows={3}
+                rows={1}
                 defaultValue=""
                 value={values.note}
                 onChange={handleChange('note')}
@@ -399,28 +401,57 @@ function Profile(props) {
             </Box>
           </Box>
           <Box className={classes.profile}>
-            <Divider />
-            <Box className={classes.title} mt={2}>
+            <Box mt={2}>
+              <Divider />
+            </Box>
+            <Box className={classes.title} mt={1}>
               <Typography variant="h4">Contact</Typography>
               {!editContact && (
                 <Button variant="outlined" onClick={handleClickContactEdit}>Edit</Button>
               )}
             </Box>
             <Box width="100%" fullWidth>
+              {(!values.contact.website
+              && !values.contact.facebook
+              && !values.contact.twitter
+              && !values.contact.git) && (
+                <Box mt={1}>
+                  <Typography variant="body">
+                    Add your social info, your bio and website.
+                    Let the community know what you are into!
+                  </Typography>
+                </Box>
+              )}
               {!editContact ? (
                 <Box display="flex" flexDirection="column" alignItems="start">
-                  <Button variant="text" startIcon={<LanguageIcon />} href={values.contact.website} target="_blank">
-                    {`${values.contact.website}`}
-                  </Button>
-                  <Button variant="text" startIcon={<FacebookIcon />} href={values.contact.facebook} target="_blank">
-                    {`${values.contact.facebook}`}
-                  </Button>
-                  <Button variant="text" startIcon={<TwitterIcon />} href={values.contact.twitter} target="_blank">
-                    {`${values.contact.twitter}`}
-                  </Button>
-                  <Button variant="text" startIcon={<GitHubIcon />} href={values.contact.git} target="_blank">
-                    {`${values.contact.git}`}
-                  </Button>
+                  {values.contact.website && (
+                    <>
+                      <Button variant="text" startIcon={<LanguageIcon />} href={values.contact.website} target="_blank">
+                        {`${values.contact.website}`}
+                      </Button>
+                    </>
+                  )}
+                  {values.contact.facebook && (
+                    <>
+                      <Button variant="text" startIcon={<FacebookIcon />} href={values.contact.facebook} target="_blank">
+                        {`${values.contact.facebook}`}
+                      </Button>
+                    </>
+                  )}
+                  {values.contact.twitter && (
+                    <>
+                      <Button variant="text" startIcon={<TwitterIcon />} href={values.contact.twitter} target="_blank">
+                        {`${values.contact.twitter}`}
+                      </Button>
+                    </>
+                  )}
+                  {values.contact.git && (
+                    <>
+                      <Button variant="text" startIcon={<GitHubIcon />} href={values.contact.git} target="_blank">
+                        {`${values.contact.git}`}
+                      </Button>
+                    </>
+                  )}
                 </Box>
               ) : (
                 <>

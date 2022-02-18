@@ -38,6 +38,9 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Avatar from '@mui/material/Avatar'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
+import Switch from '@mui/material/Switch'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -48,6 +51,7 @@ import AddIcon from '@mui/icons-material/Add'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import AddBoxIcon from '@mui/icons-material/AddBox'
+import PeopleIcon from '@mui/icons-material/People'
 
 import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
@@ -269,6 +273,15 @@ function GroupProject(props) {
   const handleCloseGroup = () => {
     setAddListOpen(false)
   }
+  const handleAddGroup = () => {
+
+  }
+  const handleEditGroup = () => {
+
+  }
+  const handleDeleteGroup = () => {
+
+  }
 
   useEffect(() => {
     handleQuery()
@@ -298,47 +311,50 @@ function GroupProject(props) {
     </Menu>
   )
 
+  const createGroup = (
+    <Dialog open={addListOpen} onClose={handleCloseGroup}>
+      <DialogTitle>Add List</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          create your List for store your project.
+        </DialogContentText>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Group Name"
+                  // type="email"
+          variant="standard"
+          fullWidth
+        />
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Description"
+                  // type="email"
+          variant="standard"
+          fullWidth
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseGroup}>Cancel</Button>
+        <Button onClick={handleCloseGroup}>Save</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
         <Box className={classes.pageLeft} fullWidth>
           <Box className={classes.listBox}>
             <Typography variant="h4" fontWeight="bold">
-              Project
+              Group
             </Typography>
             <IconButton onClick={handleOpenGroup} color="primary">
               <AddBoxIcon />
             </IconButton>
-            <Dialog open={addListOpen} onClose={handleCloseGroup}>
-              <DialogTitle>Add List</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  create your List for store your project.
-                </DialogContentText>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  label="Group Name"
-                  // type="email"
-                  variant="standard"
-                  fullWidth
-                />
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  label="Description"
-                  // type="email"
-                  variant="standard"
-                  fullWidth
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleCloseGroup}>Cancel</Button>
-                <Button onClick={handleCloseGroup}>Save</Button>
-              </DialogActions>
-            </Dialog>
           </Box>
-          {/* <Divider /> */}
+          <Divider />
           <Stack spacing={4} className={classes.listStack}>
             <Link to="/group-project" className={classes.link}>
               Personal Project
@@ -387,32 +403,42 @@ function GroupProject(props) {
             <Box display="flex" justifyContent="space-between">
               <Box>
                 <Typography variant="h4" fontWeight="bold">
-                  Personal Project
+                  My Project
                 </Typography>
               </Box>
-              <Box display="flex" justifyContent="center">
+              <Box display="flex" justifyContent="center" alignItems="center">
                 {/* <Button
                   variant="contained"
                   startIcon={<AddBoxIcon />}
                 >
-                  Project
+                  Create
                 </Button> */}
                 <IconButton color="primary">
                   <AddBoxIcon />
                 </IconButton>
-                <Box ml={2} />
+                <Box ml={1} />
+                <IconButton>
+                  <PeopleIcon />
+                </IconButton>
+                <Box ml={1} />
                 <IconButton onClick={handleProfileMenuOpen}>
                   <MoreVertIcon />
                 </IconButton>
               </Box>
             </Box>
-            <Typography variant="body">
-              This is my personal project
-            </Typography>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body">
+                See all your projects here.
+              </Typography>
+              {/* <FormGroup>
+                <FormControlLabel control={<Switch defaultChecked />} label="Active" />
+              </FormGroup> */}
+            </Box>
           </Box>
           <Divider />
         </Box>
         {renderMenu}
+        {createGroup}
       </Box>
     </Box>
   )

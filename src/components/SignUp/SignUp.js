@@ -39,9 +39,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 'calc(100vh - 72px)',
+    height: 'calc(100vh)',
     [theme.breakpoints.down('sm')]: {
       width: '90%',
+      height: 'calc(100vh - 56px)',
     },
   },
   card: {
@@ -123,10 +124,11 @@ function SignUp() {
             twitter: '',
             git: '',
           },
-          uid: uId,
         })
-        // dispatch(userAction.loginSuccess(uId))
-        // dispatch(userAction.addUserData(values.name, values.email, _repeat('*', passNum)))
+        await firebase.firestore().collection('groupProject').doc(uId).set({
+          name: 'My Project',
+          ref: [],
+        })
         setCurrentUser(true)
       }
     } catch (err) {

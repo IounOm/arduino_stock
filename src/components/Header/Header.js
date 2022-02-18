@@ -29,6 +29,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import MoreIcon from '@mui/icons-material/MoreVert'
 
 import { getUser } from '../../redux/selectors/user.selector'
+import * as userAction from '../../redux/actions/user.action'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -78,6 +79,7 @@ function Header(props) {
   const { children } = props
   const classes = useStyles()
   const history = useHistory()
+  const dispatch = useDispatch()
   const myUser = useSelector(getUser)
   const {
     userName,
@@ -95,7 +97,7 @@ function Header(props) {
 
   const handleClickUserList = (type) => {
     if (type === 'Logout') {
-      console.log('logout')
+      dispatch(userAction.logout())
     } else {
       setAnchorEl(null)
       history.push(`/${_kebabCase(type)}`)
@@ -152,6 +154,7 @@ function Header(props) {
               color="inherit"
               aria-label="open drawer"
               // sx={{ mr: 2 }}
+              onClick={() => history.push('/home')}
             >
               <img src="/images/arduinoStock2.png" alt="arduinoStock" width="125px" />
             </IconButton>

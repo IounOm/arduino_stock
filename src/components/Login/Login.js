@@ -38,9 +38,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 'calc(100vh - 72px)',
+    height: 'calc(100vh)',
     [theme.breakpoints.down('sm')]: {
       width: '90%',
+      height: 'calc(100vh - 56px)',
     },
   },
   card: {
