@@ -40,6 +40,7 @@ function App() {
           <AuthRoute exact path="/profile" layout={Header} component={Profile} loginRequired />
           {/* <AuthRoute exact path="/profile/:id" layout={Header} component={Profile} loginRequired /> */}
           <AuthRoute exact path="/group-project/" layout={Header} component={GroupProject} loginRequired />
+          <AuthRoute exact path="/group-project/:id" layout={Header} component={GroupProject} loginRequired />
           <Route path="/404" component={NotFoundPage} />
           <Redirect to="/404" />
         </Switch>

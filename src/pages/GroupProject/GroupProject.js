@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Redirect, Link } from 'react-router-dom'
+import { Redirect, Link, useHistory } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -8,6 +8,7 @@ import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
 import _get from 'lodash/get'
 import _forEach from 'lodash/forEach'
+import _filter from 'lodash/filter'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -37,6 +38,8 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Avatar from '@mui/material/Avatar'
 import MenuItem from '@mui/material/MenuItem'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemIcon from '@mui/material/ListItemIcon'
 import Menu from '@mui/material/Menu'
 import Switch from '@mui/material/Switch'
 import FormGroup from '@mui/material/FormGroup'
@@ -52,16 +55,17 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import PeopleIcon from '@mui/icons-material/People'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
+import InfoIcon from '@mui/icons-material/Info'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
 
 import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
 import UploadImage from '../../components/UploadImage/UploadImage'
 import { AuthContext } from '../../components/Auth'
 import firebase from '../../config'
-
-const Input = styled('input')({
-  display: 'none',
-})
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -89,28 +93,11 @@ const useStyles = makeStyles((theme) => ({
       marginTop: '56px',
     },
   },
-  profile: {
-    padding: '24px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%',
-      padding: '16px 0 16px 0',
-    },
-  },
   title: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  btSave: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'end',
-    marginTop: '16px',
-  },
-  btn: {
-    marginLeft: '16px',
   },
   paper: {
     display: 'flex',
@@ -158,11 +145,6 @@ const useStyles = makeStyles((theme) => ({
       padding: '0px',
     },
   },
-  tagCard: {
-    border: '2px solid #e8e8e8',
-    borderRadius: '10px',
-    padding: '8px',
-  },
   link: {
     textDecoration: 'none',
     fontSize: '22px',
@@ -199,9 +181,10 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 function GroupProject(props) {
-  const id = _get(props, 'computedMatch.params')
-  console.log('id', id)
+  const path = _get(props, 'computedMatch.params')
+  console.log('id', path.id)
   const classes = useStyles()
+  const history = useHistory()
   const myUser = useSelector(getUser)
   const {
     userName,
@@ -212,26 +195,35 @@ function GroupProject(props) {
     userContact,
     userId,
   } = myUser
-  console.log('myUser', myUser)
   const db = firebase.firestore()
   const [loading, setLoading] = useState(false)
-  const [addListOpen, setAddListOpen] = useState(false)
-  const [values, setValues] = useState({
-    image: '',
+  const [myProject, setMyProject] = useState([])
+  const [groupProject, setGroupProject] = useState([])
+  const [groupProjectData, setGroupProjectData] = useState({})
+  const [filterGroup, setFilterGroup] = useState(false)
+  const [error, setError] = useState({
+    addGroupName: false,
+    addGroupNote: false,
+    editGroupName: false,
+    editGroupNote: false,
+  })
+
+  // add group
+  const [addGroupOpen, setAddGroupOpen] = useState(false)
+  const [addGroup, setAddGroup] = useState({
     name: '',
     note: '',
-    email: '',
-    password: '',
-    contact: {
-      website: '',
-      facebook: '',
-      twitter: '',
-      git: '',
-    },
-    errorEmail: false,
-    errorPassword: false,
   })
-  console.log('values', values)
+
+  // edit group
+  const [editGroupOpen, setEditGroupOpen] = useState(false)
+  const [editGroup, setEditGroup] = useState({
+    name: '',
+    note: '',
+  })
+
+  // delete group
+  const [deleteGroupOpen, setDeleteGroupOpen] = useState(false)
 
   // menu
   const [anchorEl, setAnchorEl] = useState(null)
@@ -248,45 +240,153 @@ function GroupProject(props) {
   // query
   const handleQuery = async () => {
     setLoading(true)
-    await setValues({
-      image: userImage || '',
-      name: userName,
-      note: userNote || '',
-      email: userEmail,
-      password: userPassword,
-      contact: {
-        website: userContact.website || '',
-        facebook: userContact.facebook || '',
-        twitter: userContact.twitter || '',
-        git: userContact.git || '',
-      },
-      errorEmail: false,
-      errorPassword: false,
-    })
+    try {
+      const myOutput = []
+      const groupOutput = []
+      if (!path.id) {
+        const project = await firebase.firestore().collection('project')
+          .where('uid', '==', userId)
+          // .orderBy('updateAt', 'desc')
+          .get()
+        project.docs.forEach((doc) => {
+          myOutput.push({
+            id: doc.id,
+            ...doc.data(),
+          })
+        })
+      }
+      const groupData = await firebase.firestore().collection('groupProject')
+        .where('uid', '==', userId)
+        .orderBy('createAt', filterGroup ? 'desc' : 'asc')
+        .get()
+      groupData.docs.forEach((doc) => {
+        groupOutput.push({
+          id: doc.id,
+          ...doc.data(),
+        })
+      })
+      setMyProject(myOutput)
+      setGroupProject(groupOutput)
+    } catch (err) {
+      console.log(err)
+    }
     setLoading(false)
   }
 
+  console.log('myProject', myProject)
+  console.log('GroupProject', groupProject)
+
   // add Group
   const handleOpenGroup = () => {
-    setAddListOpen(true)
+    setAddGroupOpen(true)
   }
   const handleCloseGroup = () => {
-    setAddListOpen(false)
+    setAddGroupOpen(false)
+    setAddGroup({
+      name: '',
+      note: '',
+    })
+    setError({ ...error, addGroupName: false, addGroupNote: false })
   }
-  const handleAddGroup = () => {
-
+  const handleChangeGroup = (prop) => (event) => {
+    setAddGroup({ ...addGroup, [prop]: event.target.value })
   }
-  const handleEditGroup = () => {
-
+  const handleAddGroup = async () => {
+    try {
+      setLoading(true)
+      const DateCreate = new Date()
+      if (_isEmpty(addGroup.name)) {
+        setError({ ...error, addGroupName: true })
+      } else if (_isEmpty(addGroup.note)) {
+        setError({ ...error, addGroupNote: true })
+      } else {
+        await firebase.firestore().collection('groupProject').doc()
+          .set({
+            name: addGroup.name,
+            note: addGroup.note,
+            ref: [],
+            createAt: DateCreate,
+            updateAt: DateCreate,
+            uid: userId,
+          })
+        handleCloseGroup()
+        handleQuery()
+      }
+      setLoading(false)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+    }
   }
-  const handleDeleteGroup = () => {
+  // edit group
+  const handleOpenEditGroup = () => {
+    handleMenuClose()
+    setEditGroupOpen(true)
+  }
+  const handleCloseEditGroup = () => {
+    setEditGroupOpen(false)
+    setEditGroup({
+      name: '',
+      note: '',
+    })
+    setError({ ...error, editGroupName: false, editGroupNote: false })
+  }
+  const handleChangeEditGroup = (prop) => (event) => {
+    setEditGroup({ ...editGroup, [prop]: event.target.value })
+  }
+  const handleEditGroup = async () => {
+    setLoading(true)
+    const DateUpdate = new Date()
+    if (_isEmpty(editGroup.name)) {
+      setError({ ...error, editGroupName: true })
+    } else if (_isEmpty(editGroup.note)) {
+      setError({ ...error, editGroupNote: true })
+    } else {
+      await firebase.firestore().collection('groupProject').doc(path.id)
+        .update({
+          name: editGroup.name,
+          note: editGroup.note,
+          updateAt: DateUpdate,
+        })
+      handleCloseEditGroup()
+      handleQuery()
+    }
+    setLoading(false)
+  }
+  // TODO delete group
+  const handleOpenDeleteGroup = () => {
+    handleMenuClose()
+    setDeleteGroupOpen(true)
+  }
+  const handleCloseDeleteGroup = () => {
+    setDeleteGroupOpen(false)
+  }
+  const handleDeleteGroup = async () => {
+    await firebase.firestore().collection('groupProject').doc(path.id).delete()
+    handleCloseDeleteGroup()
+    handleQuery()
+    history.push('/group-project')
+  }
 
+  // filter group
+  const handleFilterGroup = () => {
+    setFilterGroup(!filterGroup)
   }
 
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myUser])
+  }, [myUser, filterGroup])
+
+  // filter groupData
+  useEffect(() => {
+    if (path.id) {
+      const getGroupData = _filter(groupProject, { id: path.id })
+      const groupData = getGroupData[0]
+      setGroupProjectData(groupData)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupProject, path.id])
 
   const renderMenu = (
     <Menu
@@ -306,23 +406,41 @@ function GroupProject(props) {
         sx: { mt: '8px' },
       }}
     >
-      <MenuItem onClick={handleMenuClose}>Edit Group</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Delete Group</MenuItem>
+      <MenuItem onClick={handleMenuClose}>
+        <ListItemIcon>
+          <PeopleIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Share</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={handleOpenEditGroup}>
+        <ListItemIcon>
+          <EditIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Edit</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={handleOpenDeleteGroup}>
+        <ListItemIcon>
+          <DeleteIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>Delete</ListItemText>
+      </MenuItem>
     </Menu>
   )
 
-  const createGroup = (
-    <Dialog open={addListOpen} onClose={handleCloseGroup}>
-      <DialogTitle>Add List</DialogTitle>
+  const renderCreateGroup = (
+    <Dialog open={addGroupOpen} onClose={handleCloseGroup}>
+      <DialogTitle>Add Group</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          create your List for store your project.
+          Create your group for store your project.
         </DialogContentText>
         <TextField
           autoFocus
           margin="dense"
           label="Group Name"
-                  // type="email"
+          onChange={handleChangeGroup('name')}
+          value={addGroup.name}
+          error={addGroup.name ? false : error.addGroupName}
           variant="standard"
           fullWidth
         />
@@ -330,14 +448,67 @@ function GroupProject(props) {
           autoFocus
           margin="dense"
           label="Description"
-                  // type="email"
+          onChange={handleChangeGroup('note')}
+          value={addGroup.note}
+          error={addGroup.note ? false : error.addGroupNote}
           variant="standard"
           fullWidth
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseGroup}>Cancel</Button>
-        <Button onClick={handleCloseGroup}>Save</Button>
+        <Button onClick={handleCloseGroup} color="secondary">Cancel</Button>
+        <Button onClick={handleAddGroup}>Save</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
+  const renderEditGroup = (
+    <Dialog open={editGroupOpen} onClose={handleCloseEditGroup}>
+      <DialogTitle>Edit Group</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Edit group name and description for your project.
+        </DialogContentText>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="New Group Name"
+          onChange={handleChangeEditGroup('name')}
+          value={editGroup.name}
+          error={editGroup.name ? false : error.editGroupName}
+          variant="standard"
+          fullWidth
+        />
+        <TextField
+          autoFocus
+          margin="dense"
+          label="New Description"
+          onChange={handleChangeEditGroup('note')}
+          value={editGroup.note}
+          error={editGroup.note ? false : error.editGroupNote}
+          variant="standard"
+          fullWidth
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseEditGroup} color="secondary">Cancel</Button>
+        <Button onClick={handleEditGroup}>Save</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
+  const renderDeleteGroup = (
+    <Dialog open={deleteGroupOpen} onClose={handleCloseDeleteGroup}>
+      <DialogTitle>Delete Group</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Deleting the group will cause you to lose all projects shared in this group.
+          But it will not delete the original project.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseDeleteGroup} color="secondary">Cancel</Button>
+        <Button onClick={handleDeleteGroup} color="error">Delete</Button>
       </DialogActions>
     </Dialog>
   )
@@ -350,95 +521,98 @@ function GroupProject(props) {
             <Typography variant="h4" fontWeight="bold">
               Group
             </Typography>
-            <IconButton onClick={handleOpenGroup} color="primary">
-              <AddBoxIcon />
-            </IconButton>
+            <Box display="flex">
+              <IconButton onClick={handleOpenGroup} color="primary">
+                <AddBoxIcon />
+              </IconButton>
+              <Box ml={1} />
+              <IconButton onClick={handleFilterGroup} color="primary">
+                {filterGroup ? (
+                  <ArrowDropUpIcon />
+                ) : (
+                  <ArrowDropDownIcon />
+                )}
+              </IconButton>
+            </Box>
           </Box>
           <Divider />
           <Stack spacing={4} className={classes.listStack}>
+            <Box />
             <Link to="/group-project" className={classes.link}>
-              Personal Project
+              My Project
             </Link>
-            <Link to="/group-project" className={classes.link}>
-              MDT490 1/2564
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              My Note
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              MDT490 1/2564 information of my technology
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              My Note
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              MDT490 1/2564
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              My Note
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              MDT490 1/2564 information of my technology
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              My Note
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              MDT490 1/2564
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              My Note
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              MDT490 1/2564 information of my technology
-            </Link>
-            <Link to="/group-project" className={classes.link}>
-              My Note
-            </Link>
+            {_map(groupProject, (data) => (
+              <Link to={`/group-project/${data.id}`} className={classes.link}>
+                {data.name}
+              </Link>
+            ))}
           </Stack>
           {/* <Divider /> */}
         </Box>
         <Box className={classes.pageRight} fullWidth>
-          <Box mb={2}>
-            <Box display="flex" justifyContent="space-between">
-              <Box>
-                <Typography variant="h4" fontWeight="bold">
-                  My Project
-                </Typography>
+          {!path.id ? (
+            <Box>
+              <Box display="flex" justifyContent="space-between" mb={2}>
+                <Box>
+                  <Typography variant="h4" fontWeight="bold">
+                    My Project
+                  </Typography>
+                </Box>
+                <Box display="flex" justifyContent="center" alignItems="center">
+                  <Button
+                    variant="contained"
+                    startIcon={<AddBoxIcon />}
+                  >
+                    Create
+                  </Button>
+                  {/* <IconButton color="primary">
+                    <AddBoxIcon />
+                  </IconButton> */}
+                </Box>
               </Box>
-              <Box display="flex" justifyContent="center" alignItems="center">
-                {/* <Button
-                  variant="contained"
-                  startIcon={<AddBoxIcon />}
-                >
-                  Create
-                </Button> */}
-                <IconButton color="primary">
-                  <AddBoxIcon />
-                </IconButton>
-                <Box ml={1} />
-                <IconButton>
-                  <PeopleIcon />
-                </IconButton>
-                <Box ml={1} />
-                <IconButton onClick={handleProfileMenuOpen}>
-                  <MoreVertIcon />
-                </IconButton>
-              </Box>
+              <Divider />
             </Box>
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="body">
-                See all your projects here.
-              </Typography>
-              {/* <FormGroup>
-                <FormControlLabel control={<Switch defaultChecked />} label="Active" />
-              </FormGroup> */}
+          ) : (
+            <Box>
+              {!loading && (
+                <>
+                  <Box display="flex" justifyContent="space-between" mb={2}>
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="h4" fontWeight="bold">
+                        {groupProjectData.name}
+                      </Typography>
+                      <Box ml={1} />
+                      <Tooltip title={groupProjectData.note}>
+                        <IconButton size="small">
+                          <InfoIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                    <Box display="flex" justifyContent="center" alignItems="center">
+                      <IconButton color="primary">
+                        <AddBoxIcon />
+                      </IconButton>
+                      <Box ml={1} />
+                      <IconButton onClick={handleProfileMenuOpen}>
+                        <MoreVertIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                  <Divider />
+                  {/* <Box display="flex" justifyContent="space-between" mt={2}>
+                    <Typography variant="body">
+                      {groupProjectData.note}
+                    </Typography>
+                  </Box> */}
+                </>
+              )}
             </Box>
-          </Box>
-          <Divider />
+          )}
         </Box>
         {renderMenu}
-        {createGroup}
+        {renderCreateGroup}
+        {renderEditGroup}
+        {renderDeleteGroup}
       </Box>
     </Box>
   )

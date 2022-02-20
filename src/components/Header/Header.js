@@ -20,6 +20,8 @@ import Button from '@mui/material/Button'
 import Avatar from '@mui/material/Avatar'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
+import ListItemText from '@mui/material/ListItemText'
+import ListItemIcon from '@mui/material/ListItemIcon'
 
 import MenuIcon from '@mui/icons-material/Menu'
 import SearchIcon from '@mui/icons-material/Search'
@@ -27,6 +29,9 @@ import AccountCircle from '@mui/icons-material/AccountCircle'
 import MailIcon from '@mui/icons-material/Mail'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import MoreIcon from '@mui/icons-material/MoreVert'
+import AccountBoxIcon from '@mui/icons-material/AccountBox'
+import MemoryIcon from '@mui/icons-material/Memory'
+import LogoutIcon from '@mui/icons-material/Logout'
 
 import { getUser } from '../../redux/selectors/user.selector'
 import * as userAction from '../../redux/actions/user.action'
@@ -91,13 +96,21 @@ function Header(props) {
     userId,
   } = myUser
   const [anchorEl, setAnchorEl] = useState(null)
-  const userLists = ['Profile', 'Group Project', 'Logout']
+  const userLists = [
+    { name: 'Profile', icon: <AccountBoxIcon fontSize="small" /> },
+    { name: 'Project', icon: <MemoryIcon fontSize="small" /> },
+    { name: 'Logout', icon: <LogoutIcon fontSize="small" /> },
+  ]
 
   const isMenuOpen = Boolean(anchorEl)
 
   const handleClickUserList = (type) => {
     if (type === 'Logout') {
+      setAnchorEl(null)
       dispatch(userAction.logout())
+    } else if (type === 'Project') {
+      setAnchorEl(null)
+      history.push('/group-project')
     } else {
       setAnchorEl(null)
       history.push(`/${_kebabCase(type)}`)
@@ -135,9 +148,12 @@ function Header(props) {
       {_map(userLists, (list) => (
         <MenuItem
           key={list}
-          onClick={() => handleClickUserList(list)}
+          onClick={() => handleClickUserList(list.name)}
         >
-          {list}
+          <ListItemIcon>
+            {list.icon}
+          </ListItemIcon>
+          <ListItemText>{list.name}</ListItemText>
         </MenuItem>
       ))}
     </Menu>

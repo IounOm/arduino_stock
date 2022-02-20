@@ -125,10 +125,6 @@ function SignUp() {
             git: '',
           },
         })
-        await firebase.firestore().collection('groupProject').doc(uId).set({
-          name: 'My Project',
-          ref: [],
-        })
         setCurrentUser(true)
       }
     } catch (err) {

@@ -79,7 +79,6 @@ function UploadImage(props) {
     fileReader.onload = () => {
       setImageURLs(URL.createObjectURL(userImages))
     }
-    console.log('fileReader', fileReader)
     fileReader.readAsDataURL(userImages)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userImages])
@@ -128,9 +127,6 @@ function UploadImage(props) {
     if (e.target.files.length < 1) return
     setUserImages(e.target.files[0])
   }
-
-  console.log('userImages', userImages)
-  console.log('imageURLs', imageURLs)
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">

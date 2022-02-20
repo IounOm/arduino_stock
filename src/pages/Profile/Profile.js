@@ -144,7 +144,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Profile(props) {
   const id = _get(props, 'computedMatch.params')
-  console.log('id', id)
+  // console.log('id', id)
   const classes = useStyles()
   const myUser = useSelector(getUser)
   const {
@@ -156,7 +156,6 @@ function Profile(props) {
     userContact,
     userId,
   } = myUser
-  console.log('myUser', myUser)
   const db = firebase.firestore()
   // const { currentUser } = useContext(AuthContext)
   // const uid = _get(currentUser, 'user.uid')
@@ -180,7 +179,6 @@ function Profile(props) {
     errorEmail: false,
     errorPassword: false,
   })
-  console.log('values', values)
 
   const handleQuery = async () => {
     setLoading(true)
