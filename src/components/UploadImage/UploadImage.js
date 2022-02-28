@@ -40,6 +40,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Avatar from '@mui/material/Avatar'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 
+import * as userAction from '../../redux/actions/user.action'
 import { getUser } from '../../redux/selectors/user.selector'
 import firebase from '../../config'
 
@@ -64,7 +65,18 @@ function UploadImage(props) {
   const {
     collection, doc, updateKey, defaultImg, alt, loading, width, height,
   } = props
+  const myUser = useSelector(getUser)
+  const {
+    userName,
+    userEmail,
+    userPassword,
+    userImage,
+    userNote,
+    userContact,
+    userId,
+  } = myUser
   const classes = useStyles()
+  const dispatch = useDispatch()
   const db = firebase.firestore()
   const storage = firebase.storage()
 
@@ -117,6 +129,7 @@ function UploadImage(props) {
           })
         },
       )
+      dispatch(userAction.updateUserData(userName, userEmail, userPassword, imageURLs, userNote, userContact))
     } catch (err) {
       console.log(err)
     }

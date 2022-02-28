@@ -17,6 +17,7 @@ import Login from './components/Login'
 import SignUp from './components/SignUp'
 import Profile from './pages/Profile'
 import GroupProject from './pages/GroupProject'
+import Project from './pages/Project'
 
 function App() {
   const dispatch = useDispatch()
@@ -39,8 +40,10 @@ function App() {
           <AuthRoute exact path="/loading" layout={Header} component={Loading} />
           <AuthRoute exact path="/profile" layout={Header} component={Profile} loginRequired />
           {/* <AuthRoute exact path="/profile/:id" layout={Header} component={Profile} loginRequired /> */}
-          <AuthRoute exact path="/group-project/" layout={Header} component={GroupProject} loginRequired />
+          {/* <AuthRoute exact path="/group-project" layout={Header} component={GroupProject} loginRequired /> */}
           <AuthRoute exact path="/group-project/:id" layout={Header} component={GroupProject} loginRequired />
+          <AuthRoute exact path="/project" layout={Header} component={GroupProject} loginRequired />
+          <AuthRoute exact path="/project/create" layout={Header} component={Project} loginRequired />
           <Route path="/404" component={NotFoundPage} />
           <Redirect to="/404" />
         </Switch>

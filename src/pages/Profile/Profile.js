@@ -46,6 +46,7 @@ import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
 import UploadImage from '../../components/UploadImage/UploadImage'
 import { AuthContext } from '../../components/Auth'
+import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
 
 const Input = styled('input')({
@@ -146,6 +147,7 @@ function Profile(props) {
   const id = _get(props, 'computedMatch.params')
   // console.log('id', id)
   const classes = useStyles()
+  const dispatch = useDispatch()
   const myUser = useSelector(getUser)
   const {
     userName,
@@ -240,6 +242,7 @@ function Profile(props) {
           git: values.contact.git,
         },
       })
+      dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact))
       setEditContact(false)
     } catch (err) {
       console.log(err)
@@ -264,6 +267,7 @@ function Profile(props) {
         name: values.name,
         note: values.note,
       })
+      dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact))
       setEditUser(false)
     } catch (err) {
       console.log(err)

@@ -8,10 +8,10 @@ const theme = createTheme({
   // html: {
   //   height: '100%',
   // },
-  shape: {
-    borderRadius: 8,
-    color: '#61dafb',
-  },
+  // shape: {
+  //   borderRadius: 8,
+  //   color: '#61dafb',
+  // },
   palette,
   typography,
   breakpoints,

@@ -1,7 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { Redirect, Link, useHistory } from 'react-router-dom'
+// import { createTheme } from '@mui/material/styles'
+// import createBreakpoints from '@material-ui/core/styles/createBreakpoints'
 import { makeStyles } from '@mui/styles'
-import { styled } from '@mui/material/styles'
+// import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
 
 import _isEmpty from 'lodash/isEmpty'
@@ -44,6 +46,8 @@ import Menu from '@mui/material/Menu'
 import Switch from '@mui/material/Switch'
 import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
+import Paper from '@mui/material/Paper'
+import Badge from '@mui/material/Badge'
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -64,8 +68,11 @@ import EditIcon from '@mui/icons-material/Edit'
 import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
 import UploadImage from '../../components/UploadImage/UploadImage'
+import CardProject from '../../components/CardProject/CardProject'
 import { AuthContext } from '../../components/Auth'
 import firebase from '../../config'
+
+// const breakpoints = createBreakpoints({})
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -111,14 +118,13 @@ const useStyles = makeStyles((theme) => ({
   pageLeft: {
     display: 'flex',
     flexDirection: 'column',
-    width: '18%',
-    marginRight: '40px',
+    width: '15%',
     height: 'calc(100vh - 232px)',
     [theme.breakpoints.up('sm')]: {
       position: 'fixed',
     },
     [theme.breakpoints.down('md')]: {
-      width: '28%',
+      width: '25%',
       height: 'calc(100vh - 152px)',
     },
     [theme.breakpoints.down('sm')]: {
@@ -132,11 +138,11 @@ const useStyles = makeStyles((theme) => ({
     // position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    marginLeft: '21%',
-    width: '82%',
+    marginLeft: '16%',
+    width: '85%',
     padding: '0 0 0 40px',
     [theme.breakpoints.down('md')]: {
-      width: '72%',
+      width: '75%',
       marginLeft: '31%',
     },
     [theme.breakpoints.down('sm')]: {
@@ -147,8 +153,9 @@ const useStyles = makeStyles((theme) => ({
   },
   link: {
     textDecoration: 'none',
-    fontSize: '22px',
+    fontSize: '20px',
     color: '#595959',
+    padding: '0 24px 0 0',
     '&:hover': {
       color: '#008184',
     },
@@ -157,6 +164,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: '16px',
   },
   listStack: {
@@ -177,6 +185,10 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: '10px',
       },
     },
+  },
+  gridProject: {
+    width: '100%',
+    justifyContent: 'space-between',
   },
 }))
 
@@ -291,6 +303,7 @@ function GroupProject(props) {
   const handleChangeGroup = (prop) => (event) => {
     setAddGroup({ ...addGroup, [prop]: event.target.value })
   }
+  // permission: 'personal', 'viewer', 'editor'
   const handleAddGroup = async () => {
     try {
       setLoading(true)
@@ -307,6 +320,7 @@ function GroupProject(props) {
             ref: [],
             createAt: DateCreate,
             updateAt: DateCreate,
+            permission: 'personal',
             uid: userId,
           })
         handleCloseGroup()
@@ -365,7 +379,7 @@ function GroupProject(props) {
     await firebase.firestore().collection('groupProject').doc(path.id).delete()
     handleCloseDeleteGroup()
     handleQuery()
-    history.push('/group-project')
+    history.push('/project')
   }
 
   // filter group
@@ -388,6 +402,8 @@ function GroupProject(props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupProject, path.id])
 
+  console.log('groupProjectData', groupProjectData)
+
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -407,10 +423,23 @@ function GroupProject(props) {
       }}
     >
       <MenuItem onClick={handleMenuClose}>
-        <ListItemIcon>
-          <PeopleIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText>Share</ListItemText>
+        {!loading && (
+          <>
+            <ListItemIcon>
+              <PeopleIcon
+                fontSize="small"
+                color={groupProjectData.permission !== 'personal' ? 'primary' : 'secondary'}
+              />
+            </ListItemIcon>
+            <ListItemText>
+              <Typography
+                color={groupProjectData.permission !== 'personal' ? 'primary' : 'secondary'}
+              >
+                Share
+              </Typography>
+            </ListItemText>
+          </>
+        )}
       </MenuItem>
       <MenuItem onClick={handleOpenEditGroup}>
         <ListItemIcon>
@@ -420,9 +449,11 @@ function GroupProject(props) {
       </MenuItem>
       <MenuItem onClick={handleOpenDeleteGroup}>
         <ListItemIcon>
-          <DeleteIcon fontSize="small" />
+          <DeleteIcon fontSize="small" color="error" />
         </ListItemIcon>
-        <ListItemText>Delete</ListItemText>
+        <ListItemText>
+          <Typography color="error">Delete</Typography>
+        </ListItemText>
       </MenuItem>
     </Menu>
   )
@@ -538,7 +569,7 @@ function GroupProject(props) {
           <Divider />
           <Stack spacing={4} className={classes.listStack}>
             <Box />
-            <Link to="/group-project" className={classes.link}>
+            <Link to="/project" className={classes.link}>
               My Project
             </Link>
             {_map(groupProject, (data) => (
@@ -552,16 +583,15 @@ function GroupProject(props) {
         <Box className={classes.pageRight} fullWidth>
           {!path.id ? (
             <Box>
-              <Box display="flex" justifyContent="space-between" mb={2}>
-                <Box>
-                  <Typography variant="h4" fontWeight="bold">
-                    My Project
-                  </Typography>
-                </Box>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="h4" fontWeight="bold">
+                  My Project
+                </Typography>
                 <Box display="flex" justifyContent="center" alignItems="center">
                   <Button
                     variant="contained"
                     startIcon={<AddBoxIcon />}
+                    onClick={() => history.push('/project/create')}
                   >
                     Create
                   </Button>
@@ -576,19 +606,30 @@ function GroupProject(props) {
             <Box>
               {!loading && (
                 <>
-                  <Box display="flex" justifyContent="space-between" mb={2}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                     <Box display="flex" alignItems="center">
-                      <Typography variant="h4" fontWeight="bold">
+                      <Typography
+                        variant="h4"
+                        fontWeight="bold"
+                        sx={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          '-webkit-line-clamp': '1',
+                          '-webkit-box-orient': 'vertical',
+                        }}
+                      >
                         {groupProjectData.name}
                       </Typography>
                       <Box ml={1} />
                       <Tooltip title={groupProjectData.note}>
                         <IconButton size="small">
-                          <InfoIcon />
+                          <InfoIcon fontSize="inherit" />
                         </IconButton>
                       </Tooltip>
                     </Box>
                     <Box display="flex" justifyContent="center" alignItems="center">
+                      <Box ml={1} />
                       <IconButton color="primary">
                         <AddBoxIcon />
                       </IconButton>
@@ -599,11 +640,22 @@ function GroupProject(props) {
                     </Box>
                   </Box>
                   <Divider />
-                  {/* <Box display="flex" justifyContent="space-between" mt={2}>
-                    <Typography variant="body">
-                      {groupProjectData.note}
-                    </Typography>
-                  </Box> */}
+                  <Box sx={{ flexGrow: 1 }} mt={2}>
+                    <Grid container spacing={2} className={classes.gridProject}>
+                      <Grid item lg={4} md={6} sm={12}>
+                        <CardProject />
+                      </Grid>
+                      <Grid item lg={4} md={6} sm={12}>
+                        <CardProject />
+                      </Grid>
+                      <Grid item lg={4} md={6} sm={12}>
+                        <CardProject />
+                      </Grid>
+                      <Grid item lg={4} md={6} sm={12}>
+                        <CardProject />
+                      </Grid>
+                    </Grid>
+                  </Box>
                 </>
               )}
             </Box>

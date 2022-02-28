@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { makeStyles } from '@mui/styles'
@@ -74,7 +74,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     backgroundColor: '#E4A04C',
     borderRadius: '0px 10px 10px 0px',
-    marginRight: theme.spacing(2),
     height: '39px',
     width: '39px',
   },
@@ -96,6 +95,8 @@ function Header(props) {
     userId,
   } = myUser
   const [anchorEl, setAnchorEl] = useState(null)
+  const [userData, setUserData] = useState()
+  const [loading, setLoading] = useState(false)
   const userLists = [
     { name: 'Profile', icon: <AccountBoxIcon fontSize="small" /> },
     { name: 'Project', icon: <MemoryIcon fontSize="small" /> },
@@ -104,13 +105,16 @@ function Header(props) {
 
   const isMenuOpen = Boolean(anchorEl)
 
+  const handleQuery = async () => {
+    setLoading(true)
+    await setUserData(userImage || '')
+    setLoading(false)
+  }
+
   const handleClickUserList = (type) => {
     if (type === 'Logout') {
       setAnchorEl(null)
       dispatch(userAction.logout())
-    } else if (type === 'Project') {
-      setAnchorEl(null)
-      history.push('/group-project')
     } else {
       setAnchorEl(null)
       history.push(`/${_kebabCase(type)}`)
@@ -124,6 +128,11 @@ function Header(props) {
   const handleMenuClose = () => {
     setAnchorEl(null)
   }
+
+  useEffect(() => {
+    handleQuery()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myUser])
 
   const menuId = 'munuDestop'
   const renderMenu = (
@@ -202,38 +211,42 @@ function Header(props) {
             </IconButton>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton
-              onClick={handleProfileMenuOpen}
-              sx={{ p: 0 }}
-              // edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-            >
-              <Avatar
-                alt=""
-                src={userImage}
-              />
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-              edge="end"
-            >
-              <Avatar
-                alt=""
-                src={userImage}
-                sx={{ width: 32, height: 32 }}
-              />
-            </IconButton>
-          </Box>
+          {!loading && (
+            <>
+              <Box sx={{ display: { xs: 'none', md: 'flex', marginLeft: '16px' } }}>
+                <IconButton
+                  onClick={handleProfileMenuOpen}
+                  sx={{ p: 0 }}
+                  // edge="end"
+                  aria-label="account of current user"
+                  aria-controls={menuId}
+                  aria-haspopup="true"
+                >
+                  <Avatar
+                    alt=""
+                    src={userData}
+                  />
+                </IconButton>
+              </Box>
+              <Box sx={{ display: { xs: 'flex', md: 'none', marginLeft: '16px' } }}>
+                <IconButton
+                  size="large"
+                  aria-label="show more"
+                  aria-controls={menuId}
+                  aria-haspopup="true"
+                  onClick={handleProfileMenuOpen}
+                  color="inherit"
+                  edge="end"
+                >
+                  <Avatar
+                    alt=""
+                    src={userData}
+                    sx={{ width: 32, height: 32 }}
+                  />
+                </IconButton>
+              </Box>
+            </>
+          )}
         </Toolbar>
       </AppBar>
       {renderMenu}
