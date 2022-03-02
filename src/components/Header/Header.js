@@ -81,8 +81,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Header(props) {
   const { children } = props
-  console.log(55555)
-  console.log(55555)
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
@@ -96,16 +94,6 @@ function Header(props) {
     userContact,
     userId,
   } = myUser
-  console.log(111111)
-  console.log(111111)
-  console.log(55555)
-  console.log(55555)
-  console.log(55555)
-  console.log(55555)
-  console.log(111111)
-  console.log(111111)
-  console.log(111111)
-  console.log(111111)
   const [anchorEl, setAnchorEl] = useState(null)
   const [userData, setUserData] = useState()
   const [loading, setLoading] = useState(false)
