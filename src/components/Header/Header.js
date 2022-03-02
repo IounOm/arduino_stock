@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Header(props) {
   const { children } = props
+  console.log(55555)
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
