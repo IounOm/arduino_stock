@@ -157,6 +157,7 @@ function Profile(props) {
     userNote,
     userContact,
     userId,
+    userType,
   } = myUser
   const db = firebase.firestore()
   // const { currentUser } = useContext(AuthContext)
@@ -242,7 +243,7 @@ function Profile(props) {
           git: values.contact.git,
         },
       })
-      dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact))
+      dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact, userType))
       setEditContact(false)
     } catch (err) {
       console.log(err)
@@ -267,7 +268,7 @@ function Profile(props) {
         name: values.name,
         note: values.note,
       })
-      dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact))
+      dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact, userType))
       setEditUser(false)
     } catch (err) {
       console.log(err)

@@ -74,6 +74,7 @@ function UploadImage(props) {
     userNote,
     userContact,
     userId,
+    userType,
   } = myUser
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -129,7 +130,7 @@ function UploadImage(props) {
           })
         },
       )
-      dispatch(userAction.updateUserData(userName, userEmail, userPassword, imageURLs, userNote, userContact))
+      dispatch(userAction.updateUserData(userName, userEmail, userPassword, imageURLs, userNote, userContact, userType))
     } catch (err) {
       console.log(err)
     }

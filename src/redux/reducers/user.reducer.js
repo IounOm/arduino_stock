@@ -20,6 +20,7 @@ const initialState = {
     git: '',
   },
   userId: '',
+  userType: '',
   errorMessage: [],
 }
 
@@ -40,6 +41,7 @@ function reducer(state = initialState, action) {
         userImage: action.payload.image,
         userNote: action.payload.note,
         userContact: action.payload.contact,
+        userType: action.payload.type,
       }
     }
     case LOGIN_SUCCESS: {
