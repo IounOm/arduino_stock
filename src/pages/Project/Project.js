@@ -206,14 +206,6 @@ function Project(props) {
     try {
       setLoading(true)
       const DateCreate = new Date()
-      await db.collection('project').doc()
-        .set({
-          article,
-          createAt: DateCreate,
-          updateAt: DateCreate,
-          publish,
-          uid: userId,
-        })
       if (pathname === 'project/create') {
         await db.collection('project').doc()
           .set({
@@ -259,14 +251,6 @@ function Project(props) {
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
-        {/* <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h4" fontWeight="bold">Create Project</Typography>
-          <Box display="flex" flexDirection="row">
-            <Button variant="outlined">Cancel</Button>
-            <Box ml={1} />
-            <Button variant="contained">Create</Button>
-          </Box>
-        </Box> */}
         {path.id && (
           <>
             {!loading && (
