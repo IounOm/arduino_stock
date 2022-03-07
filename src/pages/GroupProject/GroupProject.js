@@ -256,7 +256,7 @@ function GroupProject(props) {
       const myOutput = []
       const groupOutput = []
       if (!path.id) {
-        const project = await firebase.firestore().collection('project')
+        const project = await db.collection('project')
           .where('uid', '==', userId)
           // .orderBy('updateAt', 'desc')
           .get()
@@ -267,7 +267,7 @@ function GroupProject(props) {
           })
         })
       }
-      const groupData = await firebase.firestore().collection('groupProject')
+      const groupData = await db.collection('groupProject')
         .where('uid', '==', userId)
         .orderBy('createAt', filterGroup ? 'desc' : 'asc')
         .get()
@@ -313,7 +313,7 @@ function GroupProject(props) {
       } else if (_isEmpty(addGroup.note)) {
         setError({ ...error, addGroupNote: true })
       } else {
-        await firebase.firestore().collection('groupProject').doc()
+        await db.collection('groupProject').doc()
           .set({
             name: addGroup.name,
             note: addGroup.note,
@@ -356,7 +356,7 @@ function GroupProject(props) {
     } else if (_isEmpty(editGroup.note)) {
       setError({ ...error, editGroupNote: true })
     } else {
-      await firebase.firestore().collection('groupProject').doc(path.id)
+      await db.collection('groupProject').doc(path.id)
         .update({
           name: editGroup.name,
           note: editGroup.note,
@@ -376,7 +376,7 @@ function GroupProject(props) {
     setDeleteGroupOpen(false)
   }
   const handleDeleteGroup = async () => {
-    await firebase.firestore().collection('groupProject').doc(path.id).delete()
+    await db.collection('groupProject').doc(path.id).delete()
     handleCloseDeleteGroup()
     handleQuery()
     history.push('/project')

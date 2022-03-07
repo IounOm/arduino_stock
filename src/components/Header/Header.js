@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Redirect, useHistory } from 'react-router-dom'
+import { Redirect, useHistory, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { makeStyles } from '@mui/styles'
 import PropTypes from 'prop-types'
@@ -7,6 +7,7 @@ import { styled, alpha } from '@mui/material/styles'
 
 import _map from 'lodash/map'
 import _kebabCase from 'lodash/kebabCase'
+import _get from 'lodash/get'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -22,6 +23,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Switch from '@mui/material/Switch'
 
 import MenuIcon from '@mui/icons-material/Menu'
 import SearchIcon from '@mui/icons-material/Search'
@@ -32,6 +35,8 @@ import MoreIcon from '@mui/icons-material/MoreVert'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import MemoryIcon from '@mui/icons-material/Memory'
 import LogoutIcon from '@mui/icons-material/Logout'
+import PublishIcon from '@mui/icons-material/Publish'
+import DraftsIcon from '@mui/icons-material/Drafts'
 
 import { getUser } from '../../redux/selectors/user.selector'
 import * as userAction from '../../redux/actions/user.action'
@@ -68,6 +73,30 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }))
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .css-1t29gy6-MuiToolbar-root': {
+      paddingLeft: ({ pathname }) => `${pathname === '/project/create' ? '250px' : '24px'}`,
+      paddingRight: ({ pathname }) => `${pathname === '/project/create' ? '250px' : '24px'}`,
+    },
+    [theme.breakpoints.down('lg')]: {
+      '& .css-1t29gy6-MuiToolbar-root': {
+        paddingLeft: '24px !important',
+        paddingRight: '24px !important',
+      },
+    },
+    [theme.breakpoints.down('md')]: {
+      '& .css-1t29gy6-MuiToolbar-root': {
+        paddingLeft: '24px !important',
+        paddingRight: '24px !important',
+      },
+    },
+    [theme.breakpoints.down('sm')]: {
+      '& .css-1t29gy6-MuiToolbar-root': {
+        paddingLeft: '16px !important',
+        paddingRight: '16px !important',
+      },
+    },
+  },
   searchIcon: {
     display: 'flex',
     justifyContent: 'center',
@@ -77,11 +106,24 @@ const useStyles = makeStyles((theme) => ({
     height: '39px',
     width: '39px',
   },
+  buttonSave: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  appBar: {
+    padding: '0 100px',
+    [theme.breakpoints.up('sm')]: {
+      padding: '0px',
+    },
+  },
 }))
 
 function Header(props) {
   const { children } = props
-  const classes = useStyles()
+  const location = useLocation()
+  const { pathname } = location
+  const classes = useStyles({ pathname })
   const history = useHistory()
   const dispatch = useDispatch()
   const myUser = useSelector(getUser)
@@ -93,17 +135,44 @@ function Header(props) {
     userNote,
     userContact,
     userId,
+    save,
+    publish,
   } = myUser
   const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorElSave, setAnchorElSave] = useState(null)
   const [userData, setUserData] = useState()
   const [loading, setLoading] = useState(false)
+
+  // const [switchClick, setSwitchClick] = useState(false)
+  // const [saveProject, setSaveProject] = useState(false)
+
   const userLists = [
     { name: 'Profile', icon: <AccountBoxIcon fontSize="small" /> },
     { name: 'Project', icon: <MemoryIcon fontSize="small" /> },
     { name: 'Logout', icon: <LogoutIcon fontSize="small" /> },
   ]
 
+  const saveLists = [
+    { name: 'Draft', icon: <DraftsIcon fontSize="small" /> },
+    { name: 'Publish', icon: <PublishIcon fontSize="small" /> },
+  ]
+
   const isMenuOpen = Boolean(anchorEl)
+  const isSaveMenuOpen = Boolean(anchorElSave)
+
+  const handleClickSaveList = (type) => {
+    if (type === 'Draft') {
+      setAnchorElSave(null)
+      dispatch(userAction.saveProject(true))
+      dispatch(userAction.setProject(false))
+      // history.push('/project')
+    } else if (type === 'Publish') {
+      setAnchorElSave(null)
+      dispatch(userAction.saveProject(true))
+      dispatch(userAction.setProject(true))
+      // history.push('/project')
+    }
+  }
 
   const handleQuery = async () => {
     setLoading(true)
@@ -121,6 +190,7 @@ function Header(props) {
     }
   }
 
+  // userMenu
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
   }
@@ -129,12 +199,22 @@ function Header(props) {
     setAnchorEl(null)
   }
 
+  // saveMenu
+  const handleSaveMenuOpen = (event) => {
+    setAnchorElSave(event.currentTarget)
+  }
+
+  const handleSaveMenuClose = () => {
+    setAnchorElSave(null)
+  }
+
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myUser])
 
   const menuId = 'munuDestop'
+  const menuId1 = 'saveMunuDestop'
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -168,9 +248,49 @@ function Header(props) {
     </Menu>
   )
 
+  const renderSave = (
+    <Menu
+      anchorEl={anchorElSave}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      id={menuId1}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+      open={isSaveMenuOpen}
+      onClose={handleSaveMenuClose}
+      PaperProps={{
+        sx: { mt: '8px' },
+      }}
+    >
+      {_map(saveLists, (list) => (
+        <MenuItem
+          key={list}
+          onClick={() => handleClickSaveList(list.name)}
+        >
+          <ListItemIcon>
+            {list.icon}
+          </ListItemIcon>
+          <ListItemText>{list.name}</ListItemText>
+        </MenuItem>
+      ))}
+    </Menu>
+  )
+
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed">
+    <Box sx={{ flexGrow: 1 }} className={classes.root}>
+      <AppBar
+        position="fixed"
+        sx={{
+          color: 'black',
+          backgroundColor: `${location.pathname === '/project/create' ? '#fff' : 'primary'}`,
+          boxShadow: `${location.pathname === '/project/create' && '0 0 0 0'}`,
+        }}
+      >
         <Toolbar>
           <Hidden smDown>
             <IconButton
@@ -196,23 +316,43 @@ function Header(props) {
               <img src="/images/arduinoStock.png" alt="arduinoStock" width="30px" />
             </IconButton>
           </Hidden>
-          <Search>
-            <StyledInputBase
-              placeholder="Search..."
-              inputProps={{
-                'aria-label': 'search',
-                // maxLength: 50,
-              }}
-            />
-          </Search>
-          <Box className={classes.searchIcon}>
-            <IconButton color="search" borderRadius="0" size="small">
-              <SearchIcon />
-            </IconButton>
-          </Box>
+          {location.pathname !== '/project/create' && (
+            <>
+              <Search>
+                <StyledInputBase
+                  placeholder="Search..."
+                  inputProps={{
+                    'aria-label': 'search',
+                    // maxLength: 50,
+                  }}
+                />
+              </Search>
+              <Box className={classes.searchIcon}>
+                <IconButton color="search" borderRadius="0" size="small">
+                  <SearchIcon />
+                </IconButton>
+              </Box>
+            </>
+          )}
           <Box sx={{ flexGrow: 1 }} />
           {!loading && (
             <>
+              {location.pathname === '/project/create' && (
+                <>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSaveMenuOpen}
+                    className={classes.buttonSave}
+                    size="small"
+                    sx={{ borderRadius: '25px' }}
+                  >
+                    <Typography variant="subtitle1">
+                      Save
+                    </Typography>
+                  </Button>
+                </>
+              )}
               <Box sx={{ display: { xs: 'none', md: 'flex', marginLeft: '16px' } }}>
                 <IconButton
                   onClick={handleProfileMenuOpen}
@@ -250,6 +390,7 @@ function Header(props) {
         </Toolbar>
       </AppBar>
       {renderMenu}
+      {renderSave}
       {children}
     </Box>
   )

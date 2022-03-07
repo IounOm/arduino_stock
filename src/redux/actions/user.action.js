@@ -4,6 +4,8 @@ import _get from 'lodash/get'
 import firebase from '../../config'
 
 export const SET_LOADING = 'SET_LOADING'
+export const SET_PROJECT = 'SET_PROJECT'
+export const SAVE_PROJECT = 'SAVE_PROJECT'
 export const SET_USER_DATA = 'SET_USER_DATA'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export const LOGIN_FAIL = 'LOGIN_FAIL'
@@ -11,6 +13,24 @@ export const LOGIN_FAIL = 'LOGIN_FAIL'
 export function setLoading() {
   return {
     type: SET_LOADING,
+  }
+}
+
+export function setProject(publish) {
+  return {
+    type: SET_PROJECT,
+    payload: {
+      publish,
+    },
+  }
+}
+
+export function saveProject(save) {
+  return {
+    type: SAVE_PROJECT,
+    payload: {
+      save,
+    },
   }
 }
 

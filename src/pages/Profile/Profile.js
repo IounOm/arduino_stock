@@ -8,6 +8,8 @@ import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
 import _get from 'lodash/get'
 import _forEach from 'lodash/forEach'
+import _words from 'lodash/words'
+import _split from 'lodash/split'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -178,9 +180,19 @@ function Profile(props) {
       facebook: '',
       twitter: '',
       git: '',
+      websiteName: '',
+      facebookName: '',
+      twitterName: '',
+      gitName: '',
     },
     errorEmail: false,
     errorPassword: false,
+  })
+  const [contact, setContact] = useState({
+    websiteName: '',
+    facebookName: '',
+    twitterName: '',
+    gitName: '',
   })
 
   const handleQuery = async () => {
@@ -199,6 +211,12 @@ function Profile(props) {
       },
       errorEmail: false,
       errorPassword: false,
+    })
+    setContact({
+      websiteName: _split(userContact.website, '/'),
+      facebookName: _split(userContact.facebook, '/'),
+      twitterName: _split(userContact.twitter, '/'),
+      gitName: _split(userContact.git, '/'),
     })
     setLoading(false)
   }
@@ -249,6 +267,7 @@ function Profile(props) {
       console.log(err)
     }
   }
+  console.log('contact', contact)
 
   // edit userProfile
   const handleClickUserEdit = () => {
@@ -299,6 +318,7 @@ function Profile(props) {
     //   console.log(err)
     // }
   }
+  console.log('website', contact.websiteName[contact.websiteName.length - 1])
 
   useEffect(() => {
     handleQuery()
@@ -430,28 +450,28 @@ function Profile(props) {
                   {values.contact.website && (
                     <>
                       <Button variant="text" startIcon={<LanguageIcon />} href={values.contact.website} target="_blank">
-                        {`${values.contact.website}`}
+                        {contact.websiteName[contact.websiteName.length - 1] === '' ? contact.websiteName[contact.websiteName.length - 2] : contact.websiteName[contact.websiteName.length - 1]}
                       </Button>
                     </>
                   )}
                   {values.contact.facebook && (
                     <>
                       <Button variant="text" startIcon={<FacebookIcon />} href={values.contact.facebook} target="_blank">
-                        {`${values.contact.facebook}`}
+                        {contact.facebookName[contact.facebookName.length - 1] === '' ? contact.facebookName[contact.facebookName.length - 2] : contact.facebookName[contact.facebookName.length - 1]}
                       </Button>
                     </>
                   )}
                   {values.contact.twitter && (
                     <>
                       <Button variant="text" startIcon={<TwitterIcon />} href={values.contact.twitter} target="_blank">
-                        {`${values.contact.twitter}`}
+                        {contact.twitterName[contact.twitterName.length - 1] === '' ? contact.twitterName[contact.twitterName.length - 2] : contact.twitterName[contact.twitterName.length - 1]}
                       </Button>
                     </>
                   )}
                   {values.contact.git && (
                     <>
                       <Button variant="text" startIcon={<GitHubIcon />} href={values.contact.git} target="_blank">
-                        {`${values.contact.git}`}
+                        {contact.gitName[contact.gitName.length - 1] === '' ? contact.gitName[contact.gitName.length - 2] : contact.gitName[contact.gitName.length - 1]}
                       </Button>
                     </>
                   )}
@@ -505,55 +525,6 @@ function Profile(props) {
               </Box>
               )}
             </Box>
-            {/* <Divider />
-            <Box className={classes.title} mt={2}>
-              <Typography variant="h4">Tag Management</Typography>
-              <Button variant="outlined" onClick={handleClickContactEdit}>Add</Button>
-            </Box>
-            <Box className={classes.tagCard} mt={2}>
-              <Grid container spacing={1}>
-                {_map(values.tag, (data) => (
-                  <Grid item>
-                    <Tooltip title={_get(data, 'note')} arrow>
-                      <Chip
-                        label={_get(data, 'name')}
-                        onClick={[]}
-                        onDelete={[]}
-                      />
-                    </Tooltip>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-            <Dialog open={openContactEdit} onClose={handleCloseContactEdit}>
-              <DialogTitle>Add Tag</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  create your tag For filtering your project and the tags
-                  you added will be searchable on the home page.
-                </DialogContentText>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  label="Tag Name"
-                  // type="email"
-                  fullWidth
-                  // variant="standard"
-                />
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  label="Note"
-                  // type="email"
-                  fullWidth
-                  // variant="standard"
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleCloseContactEdit}>Cancel</Button>
-                <Button onClick={handleCloseContactEdit}>Save</Button>
-              </DialogActions>
-            </Dialog> */}
           </Box>
         </Box>
       </Box>

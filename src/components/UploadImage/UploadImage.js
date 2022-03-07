@@ -112,7 +112,7 @@ function UploadImage(props) {
   }
   const handleSaveImageEdit = () => {
     try {
-      const uploadTask = storage.ref(`${collection}/${userImages.name}`).put(userImages)
+      const uploadTask = storage.ref(`${collection}/${userId}/${userImages.name}`).put(userImages)
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -123,7 +123,7 @@ function UploadImage(props) {
           console.log(err)
         },
         () => {
-          storage.ref(collection).child(userImages.name).getDownloadURL().then((imgUrl) => {
+          storage.ref(`${collection}/${userId}`).child(userImages.name).getDownloadURL().then((imgUrl) => {
             db.collection(collection).doc(doc).update({
               [updateKey]: imgUrl,
             })

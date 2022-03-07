@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Redirect, Link, useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -70,7 +70,7 @@ import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
 import UploadImage from '../../components/UploadImage/UploadImage'
 import CardProject from '../../components/CardProject/CardProject'
-import { AuthContext } from '../../components/Auth'
+import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
 
 const useStyles = makeStyles((theme) => ({
@@ -89,12 +89,12 @@ const useStyles = makeStyles((theme) => ({
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
     marginTop: '64px',
-    padding: '80px 120px 80px 120px',
+    padding: '0px 120px 40px 120px',
     [theme.breakpoints.down('md')]: {
-      padding: '40px 40px 40px 40px',
+      padding: '0px 40px 20px 40px',
     },
     [theme.breakpoints.down('sm')]: {
-      padding: '16px 16px 16px 16px',
+      padding: '0px 16px 16px 16px',
       height: 'auto',
       marginTop: '56px',
     },
@@ -116,6 +116,13 @@ const useStyles = makeStyles((theme) => ({
   },
   richText: {
     margin: '0px 240.4px',
+    fontFamily: 'serif',
+    [theme.breakpoints.down('lg')]: {
+      margin: '0px 80px',
+    },
+    [theme.breakpoints.down('md')]: {
+      margin: '0px 40px',
+    },
     [theme.breakpoints.down('sm')]: {
       margin: '0px 10px',
     },
@@ -123,9 +130,15 @@ const useStyles = makeStyles((theme) => ({
   headerText: {
     display: 'flex',
     alignItems: 'center',
-    margin: '0px 250px 0 250px',
+    margin: '40px 250px 0 250px',
+    [theme.breakpoints.down('lg')]: {
+      margin: '40px 80px 0px 89.6px',
+    },
+    [theme.breakpoints.down('md')]: {
+      margin: '40px 40px 0px 49.6px',
+    },
     [theme.breakpoints.down('sm')]: {
-      margin: '0px 10px 0 19.6px',
+      margin: '20px 10px 0px 19.6px',
     },
   },
 }))
@@ -133,8 +146,12 @@ const useStyles = makeStyles((theme) => ({
 function Project(props) {
   const path = _get(props, 'computedMatch.params')
   console.log('id', path.id)
+  const location = useLocation()
+  const { pathname } = location
+  console.log('pathname', pathname)
   const classes = useStyles()
   const history = useHistory()
+  const dispatch = useDispatch()
   const myUser = useSelector(getUser)
   const {
     userName,
@@ -144,11 +161,101 @@ function Project(props) {
     userNote,
     userContact,
     userId,
+    save,
+    publish,
   } = myUser
   const db = firebase.firestore()
 
+  const [loading, setLoading] = useState(false)
+  const [article, setArticle] = useState('')
+  const [value, setValue] = useState({})
+  const [editDisable, setEditDisable] = useState(false)
+
+  console.log('save', save)
+  console.log('publish', publish)
+
   const date = new Date()
   const formattedDate = format(date, 'dd LLLL yyyy', { locale: enGB })
+
+  const handleQuery = async () => {
+    try {
+      setLoading(true)
+      if (path.id) {
+        await firebase.firestore().collection('project').doc(path.id).get()
+          .then((doc) => {
+            const data = doc.data()
+            setArticle(data.article)
+            data.uidRef.get().then((res) => {
+              setValue({
+                ...doc.data(),
+                uidRef: res.data(),
+              })
+            })
+          })
+      }
+      setLoading(false)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+    }
+  }
+
+  console.log('value', value)
+
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+      const DateCreate = new Date()
+      await db.collection('project').doc()
+        .set({
+          article,
+          createAt: DateCreate,
+          updateAt: DateCreate,
+          publish,
+          uid: userId,
+        })
+      if (pathname === 'project/create') {
+        await db.collection('project').doc()
+          .set({
+            article,
+            createAt: DateCreate,
+            updateAt: DateCreate,
+            publish,
+            uid: userId,
+            uidRef: `users/${userId}`,
+          })
+      } else {
+        await db.collection('project').doc(path.id)
+          .update({
+            article,
+            updateAt: DateCreate,
+            publish,
+          })
+      }
+      dispatch(userAction.saveProject(false))
+      dispatch(userAction.setProject(false))
+      setLoading(false)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+      dispatch(userAction.saveProject(false))
+      dispatch(userAction.setProject(false))
+    }
+  }
+
+  useEffect(() => {
+    handleQuery()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path.id])
+
+  useEffect(() => {
+    if (save === true) {
+      handleSave()
+      history.push('/project')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [save])
+
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
@@ -160,23 +267,34 @@ function Project(props) {
             <Button variant="contained">Create</Button>
           </Box>
         </Box> */}
-        <Box className={classes.headerText}>
-          <Avatar
-            alt={userName}
-            src={userImage}
-            sx={{ width: 48, height: 48 }}
-          />
-          <Box ml={2}>
-            <Typography variant="body2">
-              Boonyupin Santicharan
-            </Typography>
-            <Typography variant="body2" color="secondary" fontWeight="normal">
-              {`${formattedDate}`}
-            </Typography>
-          </Box>
-        </Box>
+        {path.id && (
+          <>
+            {!loading && (
+            <Box className={classes.headerText}>
+              <Avatar
+                alt={userName}
+                src={userImage}
+                sx={{ width: 48, height: 48 }}
+              />
+              <Box ml={2}>
+                <Typography variant="body2">
+                  {/* {value.uidRef.name} */}
+                  555555555
+                </Typography>
+                <Typography variant="body2" color="secondary" fontWeight="normal">
+                  {`${formattedDate}`}
+                </Typography>
+              </Box>
+            </Box>
+            )}
+          </>
+        )}
         <Box className={classes.richText}>
-          <RichText />
+          <RichText
+            disabled={editDisable}
+            handleOnChange={(data) => setArticle(data)}
+            value={article}
+          />
         </Box>
       </Box>
     </Box>
