@@ -1,7 +1,7 @@
 import {
   SET_LOADING,
-  SET_PROJECT,
   SAVE_PROJECT,
+  CREATE_ID,
   SET_USER_DATA,
   LOGIN_SUCCESS,
   LOGIN_FAIL,
@@ -25,7 +25,7 @@ const initialState = {
   userType: '',
   errorMessage: [],
   save: false,
-  publish: false,
+  docId: '',
 }
 
 function reducer(state = initialState, action) {
@@ -36,16 +36,16 @@ function reducer(state = initialState, action) {
         loading: true,
       }
     }
-    case SET_PROJECT: {
-      return {
-        ...state,
-        publish: action.payload.publish,
-      }
-    }
     case SAVE_PROJECT: {
       return {
         ...state,
         save: action.payload.save,
+      }
+    }
+    case CREATE_ID: {
+      return {
+        ...state,
+        docId: action.payload.save,
       }
     }
     case SET_USER_DATA: {

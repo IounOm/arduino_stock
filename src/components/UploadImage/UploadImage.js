@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 
 function UploadImage(props) {
   const {
-    collection, doc, updateKey, defaultImg, alt, loading, width, height,
+    collection, doc, updateKey, defaultImg, alt, loading, width, height, page,
   } = props
   const myUser = useSelector(getUser)
   const {
@@ -112,7 +112,7 @@ function UploadImage(props) {
   }
   const handleSaveImageEdit = () => {
     try {
-      const uploadTask = storage.ref(`${collection}/${userId}/${userImages.name}`).put(userImages)
+      const uploadTask = storage.ref(`${collection}/${doc}/${userImages.name}`).put(userImages)
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -123,7 +123,7 @@ function UploadImage(props) {
           console.log(err)
         },
         () => {
-          storage.ref(`${collection}/${userId}`).child(userImages.name).getDownloadURL().then((imgUrl) => {
+          storage.ref(`${collection}/${doc}`).child(userImages.name).getDownloadURL().then((imgUrl) => {
             db.collection(collection).doc(doc).update({
               [updateKey]: imgUrl,
             })
@@ -154,7 +154,7 @@ function UploadImage(props) {
             variant="rounded"
           />
           <Box mt={2}>
-            <Button onClick={handleClickImageEdit}>Change Profile Picture</Button>
+            <Button onClick={handleClickImageEdit}>Change Picture</Button>
           </Box>
         </>
       ) : (
@@ -189,6 +189,7 @@ UploadImage.propTypes = {
   width: PropTypes.string.isRequired,
   height: PropTypes.string.isRequired,
   loading: PropTypes.bool,
+  page: PropTypes.string.isRequired,
 }
 
 UploadImage.defaultProps = {

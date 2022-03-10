@@ -337,8 +337,10 @@ function Profile(props) {
               defaultImg={userImage}
               alt=""
               width="250px"
+              maxWidth="250px"
               height="250px"
               loading={loading}
+              page="profile"
             />
           </Box>
           <Box className={classes.profile}>

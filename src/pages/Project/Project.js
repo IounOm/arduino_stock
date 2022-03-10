@@ -64,6 +64,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 
+import uniqid from 'uniqid'
 import RichText from '../../components/RichText/RichText'
 
 import { getUser } from '../../redux/selectors/user.selector'
@@ -162,17 +163,51 @@ function Project(props) {
     userContact,
     userId,
     save,
-    publish,
   } = myUser
   const db = firebase.firestore()
 
   const [loading, setLoading] = useState(false)
-  const [article, setArticle] = useState('')
-  const [value, setValue] = useState({})
+  const [docId, setDocId] = useState('')
+  // const [article, setArticle] = useState('')
+  const [value, setValue] = useState({
+    article: '',
+    createAt: '',
+    publish: '',
+    uid: '',
+    uidRef: '',
+    updateAt: '',
+    image: '',
+    title: '',
+    subtitle: '',
+    tag: '',
+  })
+  const [saveValue, setSaveValue] = useState(false)
   const [editDisable, setEditDisable] = useState(false)
 
-  console.log('save', save)
-  console.log('publish', publish)
+  const [openSaveMenu, setOpenSaveMenu] = useState(false)
+  const [checkSwitch, setCheckSwitch] = useState(false)
+  // const [saveMenuData, setSaveMenuData] = useState({
+  //   image: '',
+  //   title: '',
+  //   subtitle: '',
+  //   tag: '',
+  // })
+  const [errorSave, setErrorSave] = useState({
+    image: false,
+    title: false,
+    subtitle: false,
+    tag: false,
+  })
+
+  console.log('uniqid', uniqid())
+
+  const tag = [
+    { value: 'Entertainment', label: 'Entertainment' },
+    { value: 'Instrument', label: 'Instrument' },
+    { value: 'Iot', label: 'Iot' },
+    { value: 'Machine', label: 'Machine' },
+    { value: 'Other', label: 'Other' },
+  ]
 
   const date = new Date()
   const formattedDate = format(date, 'dd LLLL yyyy', { locale: enGB })
@@ -184,7 +219,7 @@ function Project(props) {
         await firebase.firestore().collection('project').doc(path.id).get()
           .then((doc) => {
             const data = doc.data()
-            setArticle(data.article)
+            setValue({ ...value, article: data.article })
             data.uidRef.get().then((res) => {
               setValue({
                 ...doc.data(),
@@ -206,33 +241,65 @@ function Project(props) {
     try {
       setLoading(true)
       const DateCreate = new Date()
-      if (pathname === 'project/create') {
+      if (!path.id) {
         await db.collection('project').doc()
           .set({
-            article,
+            article: value.article,
             createAt: DateCreate,
             updateAt: DateCreate,
-            publish,
+            publish: false,
             uid: userId,
-            uidRef: `users/${userId}`,
+            uidRef: db.doc(`users/${userId}`),
+            image: '',
+            title: '',
+            subtitle: '',
+            tag: '',
           })
       } else {
         await db.collection('project').doc(path.id)
           .update({
-            article,
+            article: value.article,
             updateAt: DateCreate,
-            publish,
+            publish: false,
           })
       }
       dispatch(userAction.saveProject(false))
-      dispatch(userAction.setProject(false))
       setLoading(false)
     } catch (err) {
       console.log(err)
       setLoading(false)
       dispatch(userAction.saveProject(false))
-      dispatch(userAction.setProject(false))
     }
+  }
+
+  // menuSave
+  const handleOpenSave = async () => {
+    setOpenSaveMenu(true)
+  }
+  const handleCloseSave = () => {
+    setOpenSaveMenu(false)
+    setValue({
+      ...value,
+      image: '',
+      title: '',
+      subtitle: '',
+      tag: '',
+    })
+    setErrorSave({
+      image: false,
+      title: false,
+      subtitle: false,
+      tag: false,
+    })
+    dispatch(userAction.saveProject(false))
+  }
+  const handleChange = (prop) => (event) => {
+    setValue({ ...value, [prop]: event.target.value })
+  }
+
+  const handleChangeSwitch = () => {
+    setCheckSwitch(!checkSwitch)
+    setValue({ ...value, publish: !checkSwitch })
   }
 
   useEffect(() => {
@@ -242,11 +309,95 @@ function Project(props) {
 
   useEffect(() => {
     if (save === true) {
-      handleSave()
-      history.push('/project')
+      // handleSave()
+      handleOpenSave()
+      // history.push('/project')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [save])
+
+  const renderMunuSave = (
+    <Dialog open={openSaveMenu} onClose={handleCloseSave}>
+      <DialogTitle display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h6">Project Preview</Typography>
+        <FormControlLabel
+          control={(
+            <Switch
+              checked={checkSwitch}
+              onChange={handleChangeSwitch}
+            />
+          )}
+          label={checkSwitch ? 'Publish' : 'Draft'}
+          labelPlacement="start"
+        />
+      </DialogTitle>
+      <DialogContent>
+        <UploadImage
+          collection="project"
+          doc={userId}
+          updateKey="image"
+          defaultImg=""
+          alt=""
+          width="280px"
+          maxWidth="500px"
+          height="200px"
+          loading={loading}
+          page="createProject"
+        />
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Write a preview title"
+          onChange={handleChange('title')}
+          value={value.title}
+          error={value.title ? false : errorSave.title}
+          InputProps={{ style: { fontSize: 24, fontWeight: 'bold' } }}
+          variant="standard"
+          fullWidth
+        />
+        <TextField
+          autoFocus
+          // multiline
+          // rows={1}
+          margin="dense"
+          label="Write a preview Subtitle"
+          onChange={handleChange('subtitle')}
+          value={value.subtitle}
+          error={value.subtitle ? false : errorSave.subtitle}
+          variant="standard"
+          fullWidth
+        />
+        <Box mt={2} />
+        <DialogContentText>
+          Add this information for affecting how your story appears public. Like your Arduino Stock homepage, profile page and project page. It not affect the internal content of your project.
+        </DialogContentText>
+        <Box mt={2} />
+        <TextField
+          select
+          margin="dense"
+          label="Add a tag"
+          value={value.tag}
+          onChange={handleChange('tag')}
+          error={value.tag ? false : errorSave.tag}
+          variant="outlined"
+          fullWidth
+        >
+          {tag.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+        <DialogContentText>
+          Add or change tags so readers know what your story is about
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseSave} color="secondary">Cancel</Button>
+        <Button onClick={handleSave}>Save</Button>
+      </DialogActions>
+    </Dialog>
+  )
 
   return (
     <Box className={classes.box}>
@@ -276,10 +427,12 @@ function Project(props) {
         <Box className={classes.richText}>
           <RichText
             disabled={editDisable}
-            handleOnChange={(data) => setArticle(data)}
-            value={article}
+            handleOnChange={(data) => setValue({ ...value, article: data })}
+            value={value.article}
+            userId={userId}
           />
         </Box>
+        {renderMunuSave}
       </Box>
     </Box>
   )

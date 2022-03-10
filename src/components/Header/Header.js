@@ -160,18 +160,17 @@ function Header(props) {
   const isMenuOpen = Boolean(anchorEl)
   const isSaveMenuOpen = Boolean(anchorElSave)
 
-  const handleClickSaveList = (type) => {
-    if (type === 'Draft') {
-      setAnchorElSave(null)
-      dispatch(userAction.saveProject(true))
-      dispatch(userAction.setProject(false))
-      // history.push('/project')
-    } else if (type === 'Publish') {
-      setAnchorElSave(null)
-      dispatch(userAction.saveProject(true))
-      dispatch(userAction.setProject(true))
-      // history.push('/project')
-    }
+  const handleClickSaveList = () => {
+    // if (type === 'Draft') {
+    //   setAnchorElSave(null)
+    //   dispatch(userAction.saveProject(true))
+    //   // history.push('/project')
+    // } else if (type === 'Publish') {
+    //   setAnchorElSave(null)
+    //   dispatch(userAction.saveProject(true))
+    //   // history.push('/project')
+    // }
+    dispatch(userAction.saveProject(true))
   }
 
   const handleQuery = async () => {
@@ -200,13 +199,13 @@ function Header(props) {
   }
 
   // saveMenu
-  const handleSaveMenuOpen = (event) => {
-    setAnchorElSave(event.currentTarget)
-  }
+  // const handleSaveMenuOpen = (event) => {
+  //   setAnchorElSave(event.currentTarget)
+  // }
 
-  const handleSaveMenuClose = () => {
-    setAnchorElSave(null)
-  }
+  // const handleSaveMenuClose = () => {
+  //   setAnchorElSave(null)
+  // }
 
   useEffect(() => {
     handleQuery()
@@ -248,38 +247,38 @@ function Header(props) {
     </Menu>
   )
 
-  const renderSave = (
-    <Menu
-      anchorEl={anchorElSave}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'center',
-      }}
-      id={menuId1}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'center',
-      }}
-      open={isSaveMenuOpen}
-      onClose={handleSaveMenuClose}
-      PaperProps={{
-        sx: { mt: '8px' },
-      }}
-    >
-      {_map(saveLists, (list) => (
-        <MenuItem
-          key={list}
-          onClick={() => handleClickSaveList(list.name)}
-        >
-          <ListItemIcon>
-            {list.icon}
-          </ListItemIcon>
-          <ListItemText>{list.name}</ListItemText>
-        </MenuItem>
-      ))}
-    </Menu>
-  )
+  // const renderSave = (
+  //   <Menu
+  //     anchorEl={anchorElSave}
+  //     anchorOrigin={{
+  //       vertical: 'bottom',
+  //       horizontal: 'center',
+  //     }}
+  //     id={menuId1}
+  //     keepMounted
+  //     transformOrigin={{
+  //       vertical: 'top',
+  //       horizontal: 'center',
+  //     }}
+  //     open={isSaveMenuOpen}
+  //     onClose={handleSaveMenuClose}
+  //     PaperProps={{
+  //       sx: { mt: '8px' },
+  //     }}
+  //   >
+  //     {_map(saveLists, (list) => (
+  //       <MenuItem
+  //         key={list}
+  //         onClick={() => handleClickSaveList(list.name)}
+  //       >
+  //         <ListItemIcon>
+  //           {list.icon}
+  //         </ListItemIcon>
+  //         <ListItemText>{list.name}</ListItemText>
+  //       </MenuItem>
+  //     ))}
+  //   </Menu>
+  // )
 
   return (
     <Box sx={{ flexGrow: 1 }} className={classes.root}>
@@ -342,7 +341,7 @@ function Header(props) {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={handleSaveMenuOpen}
+                    onClick={handleClickSaveList}
                     className={classes.buttonSave}
                     size="small"
                     sx={{ borderRadius: '25px' }}
@@ -390,7 +389,7 @@ function Header(props) {
         </Toolbar>
       </AppBar>
       {renderMenu}
-      {renderSave}
+      {/* {renderSave} */}
       {children}
     </Box>
   )

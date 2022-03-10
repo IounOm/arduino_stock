@@ -1,8 +1,16 @@
-import React, { useState } from 'react'
+/* eslint-disable react/forbid-prop-types */
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { styled } from '@mui/material/styles'
 import { makeStyles } from '@mui/styles'
+import { format } from 'date-fns'
+import { enGB, th } from 'date-fns/locale'
+
+import _isEqual from 'lodash/isEqual'
+import _toInteger from 'lodash/toInteger'
+import _get from 'lodash/get'
+
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardMedia from '@mui/material/CardMedia'
@@ -45,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CardProject(props) {
   const {
-    values, loading,
+    values, loading, userId,
   } = props
   const classes = useStyles()
   const history = useHistory()
@@ -54,87 +62,111 @@ function CardProject(props) {
   // const handleExpandClick = () => {
   //   setExpanded(!expanded)
   // }
+  console.log('values card', values)
+
+  const formatUpdateAtDate = format(_toInteger(`${_get(values, 'createAt.seconds')}000`), 'dd LLLL yyyy')
+
+  const handleCheckId = () => {
+    if (_isEqual(values.uid, userId)) {
+      history.push('/profile')
+    } else {
+      history.push(`/profile/${values.uid}`)
+    }
+  }
 
   return (
-    <Card>
-      <CardHeader
-        avatar={(
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
-          </Avatar>
-        )}
-        action={(
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
-        )}
-        title="Shrimp and Chorizo Paella"
-        subheader="September 14, 2016"
-      />
-      <CardActionArea onClick={() => history.push()}>
-        <CardMedia
-          component="img"
-          height="194"
-          image="/public/images/arduino.jpg"
-          alt="Arduino Project"
+    <>
+      <Card>
+        <CardHeader
+          avatar={(
+            <IconButton
+              onClick={handleCheckId}
+              size="small"
+            >
+              <Avatar
+                sx={{ width: 42, height: 42 }}
+                aria-label="recipe"
+                src={values.uidRef.image}
+                alt=""
+              />
+            </IconButton>
+          )}
+          // action={(
+          //   <IconButton aria-label="settings">
+          //     <MoreVertIcon />
+          //   </IconButton>
+          // )}
+          title={values.uidRef.name}
+          subheader={formatUpdateAtDate}
+          // onClick={() => history.push(`/project/${values.id}`)}
         />
-        <CardContent sx={{ height: 110, maxHeight: 110 }}>
-          <Typography
-            variant="body1"
-            fontWeight="bold"
-            // className={classes.multiLineEllipsis}
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              '-webkit-line-clamp': '2',
-              '-webkit-box-orient': 'vertical',
-            }}
+        <CardActionArea onClick={() => history.push(`/project/view/${values.id}`)}>
+          <CardMedia
+            component="img"
+            height="194"
+            image="/public/images/arduino.jpg"
+            alt="Arduino Project"
+          />
+          <CardContent sx={{ height: 110, maxHeight: 110 }}>
+            <Typography
+              variant="body1"
+              fontWeight="bold"
+              // className={classes.multiLineEllipsis}
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                '-webkit-line-clamp': '2',
+                '-webkit-box-orient': 'vertical',
+              }}
+            >
+              How to monitor a beehive with Arduino Nano 33BLE (bluetooth)
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              // className={classes.multiLineEllipsis}
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                '-webkit-line-clamp': '3',
+                '-webkit-box-orient': 'vertical',
+              }}
+            >
+              This impressive paella is a perfect party dish and a fun meal to cook
+              together with your guests. Add 1 cup of frozen peas along with the mussels,
+              if you like.
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+        <CardActions disableSpacing sx={{ justifyContent: 'space-between' }}>
+          <Chip label="Entertainment" color="error" />
+          {/* <IconButton aria-label="add to favorites">
+            <FavoriteIcon />
+          </IconButton> */}
+          <Chip label={values.publish ? 'Publish' : 'Draft'} color={values.publish ? 'success' : 'secondary'} />
+          {/* <IconButton aria-label="share">
+            <ShareIcon />
+          </IconButton> */}
+          {/* <ExpandMore
+            expand={expanded}
+            onClick={handleExpandClick}
+            aria-expanded={expanded}
+            aria-label="show more"
           >
-            How to monitor a beehive with Arduino Nano 33BLE (bluetooth)
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            // className={classes.multiLineEllipsis}
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              '-webkit-line-clamp': '3',
-              '-webkit-box-orient': 'vertical',
-            }}
-          >
-            This impressive paella is a perfect party dish and a fun meal to cook
-            together with your guests. Add 1 cup of frozen peas along with the mussels,
-            if you like.
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-      <CardActions disableSpacing sx={{ justifyContent: 'space-between' }}>
-        <Chip label="Entertainment" />
-        {/* <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
-        </IconButton> */}
-        <IconButton aria-label="share">
-          <ShareIcon />
-        </IconButton>
-        {/* <ExpandMore
-          expand={expanded}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </ExpandMore> */}
-      </CardActions>
-    </Card>
+            <ExpandMoreIcon />
+          </ExpandMore> */}
+        </CardActions>
+      </Card>
+    </>
   )
 }
 
 CardProject.propTypes = {
   values: PropTypes.objectOf(PropTypes.any).isRequired,
   loading: PropTypes.bool,
+  userId: PropTypes.string.isRequired,
 }
 
 CardProject.defaultProps = {

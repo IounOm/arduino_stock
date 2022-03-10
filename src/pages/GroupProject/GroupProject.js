@@ -70,6 +70,7 @@ import Header from '../../components/Header/Header'
 import UploadImage from '../../components/UploadImage/UploadImage'
 import CardProject from '../../components/CardProject/CardProject'
 import { AuthContext } from '../../components/Auth'
+import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
 
 // const breakpoints = createBreakpoints({})
@@ -188,7 +189,7 @@ const useStyles = makeStyles((theme) => ({
   },
   gridProject: {
     width: '100%',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
   },
 }))
 
@@ -197,6 +198,7 @@ function GroupProject(props) {
   console.log('id', path.id)
   const classes = useStyles()
   const history = useHistory()
+  const dispatch = useDispatch()
   const myUser = useSelector(getUser)
   const {
     userName,
@@ -210,6 +212,7 @@ function GroupProject(props) {
   const db = firebase.firestore()
   const [loading, setLoading] = useState(false)
   const [myProject, setMyProject] = useState([])
+  const [myProjectData, setMyProjectData] = useState([])
   const [groupProject, setGroupProject] = useState([])
   const [groupProjectData, setGroupProjectData] = useState({})
   const [filterGroup, setFilterGroup] = useState(false)
@@ -261,9 +264,12 @@ function GroupProject(props) {
           // .orderBy('updateAt', 'desc')
           .get()
         project.docs.forEach((doc) => {
-          myOutput.push({
-            id: doc.id,
-            ...doc.data(),
+          doc.data().uidRef.get().then((res) => {
+            myOutput.push({
+              id: doc.id,
+              ...doc.data(),
+              uidRef: res.data(),
+            })
           })
         })
       }
@@ -398,11 +404,14 @@ function GroupProject(props) {
       const getGroupData = _filter(groupProject, { id: path.id })
       const groupData = getGroupData[0]
       setGroupProjectData(groupData)
+    } else {
+      setMyProjectData(myProject)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupProject, path.id])
-
+  }, [groupProject, path.id, myProject])
   console.log('groupProjectData', groupProjectData)
+  console.log('myProject', myProject)
+  console.log('myProjectData', myProjectData)
 
   const renderMenu = (
     <Menu
@@ -601,6 +610,19 @@ function GroupProject(props) {
                 </Box>
               </Box>
               <Divider />
+              <Box sx={{ flexGrow: 1 }} mt={2}>
+                <Grid container spacing={2} className={classes.gridProject}>
+                  {_map(myProjectData, (data) => (
+                    <Grid item lg={4} md={6} sm={12}>
+                      <CardProject
+                        values={data}
+                        loading={loading}
+                        userId={userId}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
             </Box>
           ) : (
             <Box>

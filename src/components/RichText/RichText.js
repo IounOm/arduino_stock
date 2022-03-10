@@ -18,7 +18,9 @@ import Editor from 'ckeditor5-custom-build/build/ckeditor'
 import firebase from '../../config'
 
 function RichText(props) {
-  const { disabled, handleOnChange, value } = props
+  const {
+    disabled, handleOnChange, value, userId,
+  } = props
   const editorConfiguration = {
     toolbar: {
       items: [
@@ -82,7 +84,7 @@ function RichText(props) {
           // const uploadTask = storage
           //   .child(file.name)
           //   .put(file, metadata)
-          const uploadTask = storage.ref(`project/${file.name}`).put(file)
+          const uploadTask = storage.ref(`project/${userId}/${file.name}`).put(file)
           uploadTask.on(
             'state_changed',
             (snapshot) => {
@@ -183,6 +185,7 @@ RichText.propTypes = {
   disabled: PropTypes.bool,
   handleOnChange: PropTypes.func,
   value: PropTypes.oneOfType([PropTypes.objectOf(PropTypes.any), PropTypes.string]),
+  userId: PropTypes.string.isRequired,
 }
 
 RichText.defaultProps = {
