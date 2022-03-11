@@ -124,13 +124,19 @@ function UploadImage(props) {
         },
         () => {
           storage.ref(`${collection}/${doc}`).child(userImages.name).getDownloadURL().then((imgUrl) => {
-            db.collection(collection).doc(doc).update({
-              [updateKey]: imgUrl,
-            })
+            if (page === 'createProject') {
+              dispatch(userAction.uploadImage(imgUrl))
+            } else {
+              db.collection(collection).doc(doc).update({
+                [updateKey]: imgUrl,
+              })
+            }
           })
         },
       )
-      dispatch(userAction.updateUserData(userName, userEmail, userPassword, imageURLs, userNote, userContact, userType))
+      if (page === 'profile') {
+        dispatch(userAction.updateUserData(userName, userEmail, userPassword, imageURLs, userNote, userContact, userType))
+      }
     } catch (err) {
       console.log(err)
     }

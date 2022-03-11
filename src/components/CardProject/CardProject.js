@@ -1,4 +1,3 @@
-/* eslint-disable react/forbid-prop-types */
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -11,6 +10,7 @@ import _isEqual from 'lodash/isEqual'
 import _toInteger from 'lodash/toInteger'
 import _get from 'lodash/get'
 
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardMedia from '@mui/material/CardMedia'
@@ -64,6 +64,7 @@ function CardProject(props) {
   // }
   console.log('values card', values)
 
+  // const formatUpdateAtDate = format(_toInteger(`${_get(values, 'createAt.seconds')}000`), 'dd LLLL yyyy')
   const formatUpdateAtDate = format(_toInteger(`${_get(values, 'createAt.seconds')}000`), 'dd LLLL yyyy')
 
   const handleCheckId = () => {
@@ -77,7 +78,7 @@ function CardProject(props) {
   return (
     <>
       <Card>
-        <CardHeader
+        {/* <CardHeader
           avatar={(
             <IconButton
               onClick={handleCheckId}
@@ -99,13 +100,13 @@ function CardProject(props) {
           title={values.uidRef.name}
           subheader={formatUpdateAtDate}
           // onClick={() => history.push(`/project/${values.id}`)}
-        />
+        /> */}
         <CardActionArea onClick={() => history.push(`/project/view/${values.id}`)}>
           <CardMedia
             component="img"
-            height="194"
-            image="/public/images/arduino.jpg"
-            alt="Arduino Project"
+            // height="194"
+            image={values.image}
+            alt="Arduino Project Image"
           />
           <CardContent sx={{ height: 110, maxHeight: 110 }}>
             <Typography
@@ -120,7 +121,7 @@ function CardProject(props) {
                 '-webkit-box-orient': 'vertical',
               }}
             >
-              How to monitor a beehive with Arduino Nano 33BLE (bluetooth)
+              {values.title}
             </Typography>
             <Typography
               variant="body2"
@@ -134,36 +135,35 @@ function CardProject(props) {
                 '-webkit-box-orient': 'vertical',
               }}
             >
-              This impressive paella is a perfect party dish and a fun meal to cook
-              together with your guests. Add 1 cup of frozen peas along with the mussels,
-              if you like.
+              {values.subtitle}
             </Typography>
           </CardContent>
         </CardActionArea>
-        <CardActions disableSpacing sx={{ justifyContent: 'space-between' }}>
+        <CardContent style={{ padding: '16px' }}>
+          <Box display="flex" alignItems="center">
+            <Avatar
+              alt=""
+              aria-label="recipe"
+              src={values.uidRef.image}
+              sx={{ width: 32, height: 32 }}
+            />
+            <Box display="flex" justifyContent="space-between" ml={1} width="100%">
+              <Typography variant="subtitle1">{values.uidRef.name}</Typography>
+              <Typography variant="subtitle2">{formatUpdateAtDate}</Typography>
+            </Box>
+          </Box>
+        </CardContent>
+        {/* <CardActions disableSpacing sx={{ justifyContent: 'space-between' }}>
           <Chip label="Entertainment" color="error" />
-          {/* <IconButton aria-label="add to favorites">
-            <FavoriteIcon />
-          </IconButton> */}
           <Chip label={values.publish ? 'Publish' : 'Draft'} color={values.publish ? 'success' : 'secondary'} />
-          {/* <IconButton aria-label="share">
-            <ShareIcon />
-          </IconButton> */}
-          {/* <ExpandMore
-            expand={expanded}
-            onClick={handleExpandClick}
-            aria-expanded={expanded}
-            aria-label="show more"
-          >
-            <ExpandMoreIcon />
-          </ExpandMore> */}
-        </CardActions>
+        </CardActions> */}
       </Card>
     </>
   )
 }
 
 CardProject.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
   values: PropTypes.objectOf(PropTypes.any).isRequired,
   loading: PropTypes.bool,
   userId: PropTypes.string.isRequired,

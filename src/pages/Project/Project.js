@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
 import { format } from 'date-fns'
 import { enGB, th } from 'date-fns/locale'
+import { customAlphabet } from 'nanoid'
 
 import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
@@ -64,7 +65,6 @@ import InfoIcon from '@mui/icons-material/Info'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 
-import uniqid from 'uniqid'
 import RichText from '../../components/RichText/RichText'
 
 import { getUser } from '../../redux/selectors/user.selector'
@@ -146,7 +146,9 @@ const useStyles = makeStyles((theme) => ({
 
 function Project(props) {
   const path = _get(props, 'computedMatch.params')
+  const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 20)
   console.log('id', path.id)
+  console.log('type', path.type)
   const location = useLocation()
   const { pathname } = location
   console.log('pathname', pathname)
@@ -163,8 +165,10 @@ function Project(props) {
     userContact,
     userId,
     save,
+    uploadImg,
   } = myUser
   const db = firebase.firestore()
+  // const storage = firebase.storage()
 
   const [loading, setLoading] = useState(false)
   const [docId, setDocId] = useState('')
@@ -172,7 +176,7 @@ function Project(props) {
   const [value, setValue] = useState({
     article: '',
     createAt: '',
-    publish: '',
+    publish: false,
     uid: '',
     uidRef: '',
     updateAt: '',
@@ -181,8 +185,16 @@ function Project(props) {
     subtitle: '',
     tag: '',
   })
+  let disableCKEditor = false
+  if (pathname === '/project/create') {
+    disableCKEditor = false
+  } else if (path.type === 'edit') {
+    disableCKEditor = false
+  } else {
+    disableCKEditor = true
+  }
   const [saveValue, setSaveValue] = useState(false)
-  const [editDisable, setEditDisable] = useState(false)
+  const [editDisable, setEditDisable] = useState(disableCKEditor)
 
   const [openSaveMenu, setOpenSaveMenu] = useState(false)
   const [checkSwitch, setCheckSwitch] = useState(false)
@@ -199,7 +211,7 @@ function Project(props) {
     tag: false,
   })
 
-  console.log('uniqid', uniqid())
+  console.log('docId', docId)
 
   const tag = [
     { value: 'Entertainment', label: 'Entertainment' },
@@ -211,6 +223,7 @@ function Project(props) {
 
   const date = new Date()
   const formattedDate = format(date, 'dd LLLL yyyy', { locale: enGB })
+  // const formattedDate = format(_toInteger(`${_get(data, 'updateAt.seconds')}000`), 'dd LLLL yyyy')
 
   const handleQuery = async () => {
     try {
@@ -228,6 +241,7 @@ function Project(props) {
             })
           })
       }
+      setDocId(nanoid())
       setLoading(false)
     } catch (err) {
       console.log(err)
@@ -235,6 +249,7 @@ function Project(props) {
     }
   }
 
+  console.log('uploadImg', uploadImg)
   console.log('value', value)
 
   const handleSave = async () => {
@@ -242,27 +257,33 @@ function Project(props) {
       setLoading(true)
       const DateCreate = new Date()
       if (!path.id) {
-        await db.collection('project').doc()
+        await db.collection('project').doc(docId)
           .set({
             article: value.article,
             createAt: DateCreate,
             updateAt: DateCreate,
-            publish: false,
+            publish: value.publish,
             uid: userId,
             uidRef: db.doc(`users/${userId}`),
-            image: '',
-            title: '',
-            subtitle: '',
-            tag: '',
+            image: uploadImg,
+            title: value.title,
+            subtitle: value.subtitle,
+            tag: value.tag,
           })
+        history.push('/project')
       } else {
         await db.collection('project').doc(path.id)
           .update({
             article: value.article,
             updateAt: DateCreate,
-            publish: false,
+            publish: value.publish,
+            title: value.title,
+            subtitle: value.subtitle,
+            tag: value.tag,
           })
+        history.push('/project')
       }
+      dispatch(userAction.uploadImage(''))
       dispatch(userAction.saveProject(false))
       setLoading(false)
     } catch (err) {
@@ -278,19 +299,19 @@ function Project(props) {
   }
   const handleCloseSave = () => {
     setOpenSaveMenu(false)
-    setValue({
-      ...value,
-      image: '',
-      title: '',
-      subtitle: '',
-      tag: '',
-    })
-    setErrorSave({
-      image: false,
-      title: false,
-      subtitle: false,
-      tag: false,
-    })
+    // setValue({
+    //   ...value,
+    //   image: '',
+    //   title: '',
+    //   subtitle: '',
+    //   tag: '',
+    // })
+    // setErrorSave({
+    //   image: false,
+    //   title: false,
+    //   subtitle: false,
+    //   tag: false,
+    // })
     dispatch(userAction.saveProject(false))
   }
   const handleChange = (prop) => (event) => {
@@ -334,15 +355,15 @@ function Project(props) {
       <DialogContent>
         <UploadImage
           collection="project"
-          doc={userId}
+          doc={!path.id ? docId : path.id}
           updateKey="image"
-          defaultImg=""
+          defaultImg={value.image || ''}
           alt=""
           width="280px"
           maxWidth="500px"
           height="200px"
           loading={loading}
-          page="createProject"
+          page={!path.id ? 'createProject' : 'editProject'}
         />
         <TextField
           autoFocus
@@ -402,7 +423,7 @@ function Project(props) {
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
-        {path.id && (
+        {(path.id && path.type !== 'edit') && (
           <>
             {!loading && (
             <Box className={classes.headerText}>
@@ -429,7 +450,7 @@ function Project(props) {
             disabled={editDisable}
             handleOnChange={(data) => setValue({ ...value, article: data })}
             value={value.article}
-            userId={userId}
+            docId={docId}
           />
         </Box>
         {renderMunuSave}

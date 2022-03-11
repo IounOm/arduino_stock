@@ -8,6 +8,7 @@ import { styled, alpha } from '@mui/material/styles'
 import _map from 'lodash/map'
 import _kebabCase from 'lodash/kebabCase'
 import _get from 'lodash/get'
+import _split from 'lodash/split'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -75,8 +76,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .css-1t29gy6-MuiToolbar-root': {
-      paddingLeft: ({ pathname }) => `${pathname === '/project/create' ? '250px' : '24px'}`,
-      paddingRight: ({ pathname }) => `${pathname === '/project/create' ? '250px' : '24px'}`,
+      paddingLeft: ({ pathname, pId }) => `${
+        (pathname === '/project/create'
+        || pathname === `/project/edit/${pId}`)
+          ? '250px' : '24px'
+      }`,
+      paddingRight: ({ pathname, pId }) => `${
+        (pathname === '/project/create'
+        || pathname === `/project/edit/${pId}`)
+          ? '250px' : '24px'
+      }`,
     },
     [theme.breakpoints.down('lg')]: {
       '& .css-1t29gy6-MuiToolbar-root': {
@@ -123,7 +132,10 @@ function Header(props) {
   const { children } = props
   const location = useLocation()
   const { pathname } = location
-  const classes = useStyles({ pathname })
+  const projectId = _split(pathname, '/', 4)
+  const pId = projectId[projectId.length - 1]
+  console.log('pathname55555', pId)
+  const classes = useStyles({ pathname, pId })
   const history = useHistory()
   const dispatch = useDispatch()
   const myUser = useSelector(getUser)
@@ -286,8 +298,16 @@ function Header(props) {
         position="fixed"
         sx={{
           color: 'black',
-          backgroundColor: `${location.pathname === '/project/create' ? '#fff' : 'primary'}`,
-          boxShadow: `${location.pathname === '/project/create' && '0 0 0 0'}`,
+          backgroundColor: `${
+            (location.pathname === '/project/create'
+            || location.pathname === `/project/edit/${pId}`)
+              ? '#fff' : 'primary'
+          }`,
+          boxShadow: `${
+            (location.pathname === '/project/create'
+            || location.pathname === `/project/edit/${pId}`)
+              && '0 0 0 0'
+          }`,
         }}
       >
         <Toolbar>
@@ -315,7 +335,8 @@ function Header(props) {
               <img src="/images/arduinoStock.png" alt="arduinoStock" width="30px" />
             </IconButton>
           </Hidden>
-          {location.pathname !== '/project/create' && (
+          {(location.pathname !== '/project/create'
+          && location.pathname !== `/project/edit/${pId}`) && (
             <>
               <Search>
                 <StyledInputBase
@@ -336,7 +357,8 @@ function Header(props) {
           <Box sx={{ flexGrow: 1 }} />
           {!loading && (
             <>
-              {location.pathname === '/project/create' && (
+              {(location.pathname === '/project/create'
+              || location.pathname === `/project/edit/${pId}`) && (
                 <>
                   <Button
                     variant="contained"

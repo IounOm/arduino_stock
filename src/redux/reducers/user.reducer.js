@@ -1,7 +1,7 @@
 import {
   SET_LOADING,
   SAVE_PROJECT,
-  CREATE_ID,
+  UPLOAD_IMAGE,
   SET_USER_DATA,
   LOGIN_SUCCESS,
   LOGIN_FAIL,
@@ -25,7 +25,7 @@ const initialState = {
   userType: '',
   errorMessage: [],
   save: false,
-  docId: '',
+  uploadImg: '',
 }
 
 function reducer(state = initialState, action) {
@@ -42,10 +42,10 @@ function reducer(state = initialState, action) {
         save: action.payload.save,
       }
     }
-    case CREATE_ID: {
+    case UPLOAD_IMAGE: {
       return {
         ...state,
-        docId: action.payload.save,
+        uploadImg: action.payload.uploadImg,
       }
     }
     case SET_USER_DATA: {

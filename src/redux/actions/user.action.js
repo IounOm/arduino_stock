@@ -5,7 +5,7 @@ import firebase from '../../config'
 
 export const SET_LOADING = 'SET_LOADING'
 export const SAVE_PROJECT = 'SAVE_PROJECT'
-export const CREATE_ID = 'CREATE_ID'
+export const UPLOAD_IMAGE = 'UPLOAD_IMAGE'
 export const SET_USER_DATA = 'SET_USER_DATA'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export const LOGIN_FAIL = 'LOGIN_FAIL'
@@ -25,11 +25,11 @@ export function saveProject(save) {
   }
 }
 
-export function createId(docId) {
+export function uploadImage(uploadImg) {
   return {
-    type: CREATE_ID,
+    type: UPLOAD_IMAGE,
     payload: {
-      docId,
+      uploadImg,
     },
   }
 }
