@@ -91,8 +91,8 @@ const useStyles = makeStyles((theme) => ({
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
     marginTop: '64px',
-    padding: '80px 120px 80px 120px',
-    [theme.breakpoints.down('md')]: {
+    padding: '40px 120px 40px 120px',
+    [theme.breakpoints.down('lg')]: {
       padding: '40px 40px 40px 40px',
     },
     [theme.breakpoints.down('sm')]: {
@@ -120,13 +120,13 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     width: '15%',
-    height: 'calc(100vh - 232px)',
+    height: 'calc(100vh - 152px)',
     [theme.breakpoints.up('sm')]: {
       position: 'fixed',
     },
     [theme.breakpoints.down('md')]: {
       width: '25%',
-      height: 'calc(100vh - 152px)',
+      // height: 'calc(100vh - 152px)',
     },
     [theme.breakpoints.down('sm')]: {
       width: 'auto',
@@ -142,9 +142,12 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '16%',
     width: '85%',
     padding: '0 0 0 40px',
+    [theme.breakpoints.down('lg')]: {
+      marginLeft: '18%',
+    },
     [theme.breakpoints.down('md')]: {
       width: '75%',
-      marginLeft: '31%',
+      marginLeft: '28%',
     },
     [theme.breakpoints.down('sm')]: {
       width: 'auto',
@@ -405,6 +408,7 @@ function GroupProject(props) {
       const groupData = getGroupData[0]
       setGroupProjectData(groupData)
     } else {
+      // TODO getProject from document groupProject
       setMyProjectData(myProject)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -565,7 +569,7 @@ function GroupProject(props) {
               <IconButton onClick={handleOpenGroup} color="primary">
                 <AddBoxIcon />
               </IconButton>
-              <Box ml={1} />
+              {/* <Box ml={1} /> */}
               <IconButton onClick={handleFilterGroup} color="primary">
                 {filterGroup ? (
                   <ArrowDropUpIcon />
@@ -613,13 +617,15 @@ function GroupProject(props) {
               <Box sx={{ flexGrow: 1 }} mt={2}>
                 <Grid container spacing={2} className={classes.gridProject}>
                   {_map(myProjectData, (data) => (
-                    <Grid item lg={4} md={6} sm={12}>
-                      <CardProject
-                        values={data}
-                        loading={loading}
-                        userId={userId}
-                      />
-                    </Grid>
+                    <>
+                      <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
+                        <CardProject
+                          values={data}
+                          loading={loading}
+                          userId={userId}
+                        />
+                      </Grid>
+                    </>
                   ))}
                 </Grid>
               </Box>
@@ -664,18 +670,17 @@ function GroupProject(props) {
                   <Divider />
                   <Box sx={{ flexGrow: 1 }} mt={2}>
                     <Grid container spacing={2} className={classes.gridProject}>
-                      <Grid item lg={4} md={6} sm={12}>
-                        <CardProject />
-                      </Grid>
-                      <Grid item lg={4} md={6} sm={12}>
-                        <CardProject />
-                      </Grid>
-                      <Grid item lg={4} md={6} sm={12}>
-                        <CardProject />
-                      </Grid>
-                      <Grid item lg={4} md={6} sm={12}>
-                        <CardProject />
-                      </Grid>
+                      {_map(myProjectData, (data) => (
+                        <>
+                          <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
+                            <CardProject
+                              values={data}
+                              loading={loading}
+                              userId={userId}
+                            />
+                          </Grid>
+                        </>
+                      ))}
                     </Grid>
                   </Box>
                 </>

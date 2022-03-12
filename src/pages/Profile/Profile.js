@@ -72,12 +72,18 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '64px',
     height: 'calc(100vh - 64px)',
     padding: '0 120px 0 120px',
+    [theme.breakpoints.down('lg')]: {
+      padding: '0 40px 0 40px',
+      // height: '100%',
+    },
     [theme.breakpoints.down('md')]: {
-      padding: '0 20px 0 20px',
+      marginTop: '84px',
+      padding: '20px',
       height: '100%',
     },
     [theme.breakpoints.down('sm')]: {
-      padding: '0 16px 0 16px',
+      marginTop: '56px',
+      padding: '16px',
       height: 'auto',
     },
   },
@@ -85,7 +91,11 @@ const useStyles = makeStyles((theme) => ({
     padding: '0 24px',
     [theme.breakpoints.down('sm')]: {
       width: '100%',
-      padding: '16px 0 16px 0',
+      padding: '16px 0',
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      padding: '8px 0',
     },
   },
   title: {
@@ -132,6 +142,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     width: '60%',
     [theme.breakpoints.down('md')]: {
+      marginTop: '16px',
       width: '100%',
     },
     [theme.breakpoints.down('sm')]: {
@@ -347,8 +358,8 @@ function Profile(props) {
             <Box mt={2}>
               <Divider />
             </Box>
-            <Box className={classes.title} mt={1}>
-              <Typography variant="h4">Account Settings</Typography>
+            <Box className={classes.title} mt={2}>
+              <Typography variant="h4">Account</Typography>
               {!editAccount && (
                 <Button variant="outlined" onClick={handleClickAccountEdit}>Edit</Button>
               )}
@@ -388,7 +399,7 @@ function Profile(props) {
             <Hidden mdUp>
               <Divider />
             </Hidden>
-            <Box className={classes.title} mt={1}>
+            <Box className={classes.title} mt={2}>
               <Typography variant="h4">User Profile</Typography>
               {!editUser && (
                 <Button variant="outlined" onClick={handleClickUserEdit}>Edit</Button>
@@ -429,7 +440,7 @@ function Profile(props) {
             <Box mt={2}>
               <Divider />
             </Box>
-            <Box className={classes.title} mt={1}>
+            <Box className={classes.title} mt={2}>
               <Typography variant="h4">Contact</Typography>
               {!editContact && (
                 <Button variant="outlined" onClick={handleClickContactEdit}>Edit</Button>

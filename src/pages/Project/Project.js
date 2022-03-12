@@ -404,7 +404,7 @@ function Project(props) {
           fullWidth
         >
           {tag.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem value={option.value}>
               {option.label}
             </MenuItem>
           ))}

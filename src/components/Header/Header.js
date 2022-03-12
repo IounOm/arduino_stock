@@ -150,8 +150,8 @@ function Header(props) {
     save,
     publish,
   } = myUser
-  const [anchorEl, setAnchorEl] = useState(null)
-  const [anchorElSave, setAnchorElSave] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(false)
+  const [anchorElSave, setAnchorElSave] = useState(false)
   const [userData, setUserData] = useState()
   const [loading, setLoading] = useState(false)
 
@@ -164,21 +164,21 @@ function Header(props) {
     { name: 'Logout', icon: <LogoutIcon fontSize="small" /> },
   ]
 
-  const saveLists = [
-    { name: 'Draft', icon: <DraftsIcon fontSize="small" /> },
-    { name: 'Publish', icon: <PublishIcon fontSize="small" /> },
-  ]
+  // const saveLists = [
+  //   { name: 'Draft', icon: <DraftsIcon fontSize="small" /> },
+  //   { name: 'Publish', icon: <PublishIcon fontSize="small" /> },
+  // ]
 
   const isMenuOpen = Boolean(anchorEl)
   const isSaveMenuOpen = Boolean(anchorElSave)
 
   const handleClickSaveList = () => {
     // if (type === 'Draft') {
-    //   setAnchorElSave(null)
+    //   setAnchorElSave(false)
     //   dispatch(userAction.saveProject(true))
     //   // history.push('/project')
     // } else if (type === 'Publish') {
-    //   setAnchorElSave(null)
+    //   setAnchorElSave(false)
     //   dispatch(userAction.saveProject(true))
     //   // history.push('/project')
     // }
@@ -193,10 +193,10 @@ function Header(props) {
 
   const handleClickUserList = (type) => {
     if (type === 'Logout') {
-      setAnchorEl(null)
+      setAnchorEl(false)
       dispatch(userAction.logout())
     } else {
-      setAnchorEl(null)
+      setAnchorEl(false)
       history.push(`/${_kebabCase(type)}`)
     }
   }
@@ -207,7 +207,7 @@ function Header(props) {
   }
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
+    setAnchorEl(false)
   }
 
   // saveMenu
@@ -216,7 +216,7 @@ function Header(props) {
   // }
 
   // const handleSaveMenuClose = () => {
-  //   setAnchorElSave(null)
+  //   setAnchorElSave(false)
   // }
 
   useEffect(() => {
@@ -247,7 +247,7 @@ function Header(props) {
     >
       {_map(userLists, (list) => (
         <MenuItem
-          key={list}
+          // key={list}
           onClick={() => handleClickUserList(list.name)}
         >
           <ListItemIcon>
