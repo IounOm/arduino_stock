@@ -147,8 +147,9 @@ const useStyles = makeStyles((theme) => ({
 function Project(props) {
   const path = _get(props, 'computedMatch.params')
   const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 20)
-  console.log('id', path.id)
-  console.log('type', path.type)
+  const projectId = path.id
+  const actionType = path.type
+  const groupId = path.gid
   const location = useLocation()
   const { pathname } = location
   console.log('pathname', pathname)
@@ -188,7 +189,7 @@ function Project(props) {
   let disableCKEditor = false
   if (pathname === '/project/create') {
     disableCKEditor = false
-  } else if (path.type === 'edit') {
+  } else if (actionType === 'edit') {
     disableCKEditor = false
   } else {
     disableCKEditor = true
@@ -228,8 +229,8 @@ function Project(props) {
   const handleQuery = async () => {
     try {
       setLoading(true)
-      if (path.id) {
-        await firebase.firestore().collection('project').doc(path.id).get()
+      if (projectId) {
+        await firebase.firestore().collection('project').doc(projectId).get()
           .then((doc) => {
             const data = doc.data()
             setValue({ ...value, article: data.article })
@@ -256,7 +257,7 @@ function Project(props) {
     try {
       setLoading(true)
       const DateCreate = new Date()
-      if (!path.id) {
+      if (!projectId && !groupId) {
         await db.collection('project').doc(docId)
           .set({
             article: value.article,
@@ -271,8 +272,8 @@ function Project(props) {
             tag: value.tag,
           })
         history.push('/project')
-      } else {
-        await db.collection('project').doc(path.id)
+      } else if (projectId && !groupId) {
+        await db.collection('project').doc(projectId)
           .update({
             article: value.article,
             updateAt: DateCreate,
@@ -281,7 +282,18 @@ function Project(props) {
             subtitle: value.subtitle,
             tag: value.tag,
           })
-        history.push('/project')
+        history.push(`/project/view/${projectId}`)
+      } else if (projectId && groupId) {
+        await db.collection('groupProject').doc(groupId).collection('project').doc(projectId)
+          .update({
+            article: value.article,
+            updateAt: DateCreate,
+            publish: value.publish,
+            title: value.title,
+            subtitle: value.subtitle,
+            tag: value.tag,
+          })
+        history.push(`/groupProject/${groupId}/project/view/${projectId}`)
       }
       dispatch(userAction.uploadImage(''))
       dispatch(userAction.saveProject(false))
@@ -326,7 +338,7 @@ function Project(props) {
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path.id])
+  }, [projectId])
 
   useEffect(() => {
     if (save === true) {
@@ -355,7 +367,7 @@ function Project(props) {
       <DialogContent>
         <UploadImage
           collection="project"
-          doc={!path.id ? docId : path.id}
+          doc={!projectId ? docId : projectId}
           updateKey="image"
           defaultImg={value.image || ''}
           alt=""
@@ -363,7 +375,7 @@ function Project(props) {
           maxWidth="500px"
           height="200px"
           loading={loading}
-          page={!path.id ? 'createProject' : 'editProject'}
+          page={!projectId ? 'createProject' : 'editProject'}
         />
         <TextField
           autoFocus
@@ -423,7 +435,7 @@ function Project(props) {
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
-        {(path.id && path.type !== 'edit') && (
+        {(projectId && actionType !== 'edit') && (
           <>
             {!loading && (
             <Box className={classes.headerText}>
@@ -450,7 +462,7 @@ function Project(props) {
             disabled={editDisable}
             handleOnChange={(data) => setValue({ ...value, article: data })}
             value={value.article}
-            docId={docId}
+            docId={!projectId ? docId : projectId}
           />
         </Box>
         {renderMunuSave}

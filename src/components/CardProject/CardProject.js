@@ -11,6 +11,7 @@ import _toInteger from 'lodash/toInteger'
 import _get from 'lodash/get'
 import _kebabCase from 'lodash/kebabCase'
 import _map from 'lodash/map'
+import _lowerCase from 'lodash/lowerCase'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -70,14 +71,19 @@ function CardProject(props) {
   const isMenuOpen = Boolean(anchorEl)
 
   const userLists = [
-    { name: 'Edit', icon: <EditIcon fontSize="small" /> },
-    { name: 'Delete', icon: <DeleteIcon fontSize="small" /> },
+    {
+      name: <Typography>Edit</Typography>,
+      icon: <EditIcon fontSize="small" />,
+    },
+    {
+      name: <Typography color="error">Delete</Typography>,
+      icon: <DeleteIcon fontSize="small" color="error" />,
+    },
   ]
 
   // const handleExpandClick = () => {
   //   setExpanded(!expanded)
   // }
-  console.log('values card', values)
 
   // const formatUpdateAtDate = format(_toInteger(`${_get(values, 'createAt.seconds')}000`), 'dd LLLL yyyy')
   const formatCreateAtDate = format(_toInteger(`${_get(values, 'createAt.seconds')}000`), 'dd LLLL yyyy')
@@ -98,7 +104,7 @@ function CardProject(props) {
     setAnchorEl(false)
   }
   const handleClickList = (type, projectId) => {
-    if (_kebabCase(type) === 'delete') {
+    if (_lowerCase(_get(type, 'props.children')) === 'delete') {
       setAnchorEl(false)
       console.log(`delete project id ${projectId}`)
     } else {

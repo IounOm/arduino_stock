@@ -41,7 +41,8 @@ function App() {
           <AuthRoute exact path="/profile" layout={Header} component={Profile} loginRequired />
           {/* <AuthRoute exact path="/profile/:id" layout={Header} component={Profile} loginRequired /> */}
           {/* <AuthRoute exact path="/group-project" layout={Header} component={GroupProject} loginRequired /> */}
-          <AuthRoute exact path="/group-project/:id" layout={Header} component={GroupProject} loginRequired />
+          <AuthRoute exact path="/group-project/:gid" layout={Header} component={GroupProject} loginRequired />
+          <AuthRoute exact path="/group-project/:gid/project/:type/:id" layout={Header} component={Project} loginRequired />
           <AuthRoute exact path="/project" layout={Header} component={GroupProject} loginRequired />
           <AuthRoute exact path="/project/create" layout={Header} component={Project} loginRequired />
           <AuthRoute exact path="/project/:type/:id" layout={Header} component={Project} loginRequired />

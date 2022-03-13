@@ -11,6 +11,7 @@ import _map from 'lodash/map'
 import _get from 'lodash/get'
 import _forEach from 'lodash/forEach'
 import _filter from 'lodash/filter'
+import _differenceBy from 'lodash/differenceBy'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -198,7 +199,8 @@ const useStyles = makeStyles((theme) => ({
 
 function GroupProject(props) {
   const path = _get(props, 'computedMatch.params')
-  console.log('id', path.id)
+  const groupId = path.gid
+  // console.log('id', groupId)
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
@@ -224,6 +226,7 @@ function GroupProject(props) {
     addGroupNote: false,
     editGroupName: false,
     editGroupNote: false,
+    addProject: false,
   })
 
   // add group
@@ -243,6 +246,11 @@ function GroupProject(props) {
   // delete group
   const [deleteGroupOpen, setDeleteGroupOpen] = useState(false)
 
+  // Add project
+  const [addProjectOpen, setAddProjectOpen] = useState(false)
+  const [addProject, setAddProject] = useState([])
+  const [addProjectData, setAddProjectData] = useState([])
+
   // menu
   const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpen = Boolean(anchorEl)
@@ -261,11 +269,23 @@ function GroupProject(props) {
     try {
       const myOutput = []
       const groupOutput = []
-      if (!path.id) {
+      if (!groupId) {
         const project = await db.collection('project')
           .where('uid', '==', userId)
           // .orderBy('updateAt', 'desc')
           .get()
+        project.docs.forEach((doc) => {
+          doc.data().uidRef.get().then((res) => {
+            myOutput.push({
+              id: doc.id,
+              ...doc.data(),
+              uidRef: res.data(),
+            })
+          })
+        })
+      } else if (groupId) {
+        console.log('ppppppppppppppppppppppppppppppppp')
+        const project = await db.collection('groupProject').doc(groupId).collection('project').get()
         project.docs.forEach((doc) => {
           doc.data().uidRef.get().then((res) => {
             myOutput.push({
@@ -300,6 +320,11 @@ function GroupProject(props) {
   // add Group
   const handleOpenGroup = () => {
     setAddGroupOpen(true)
+    // await db.collection('groupProject')
+    //   .doc('Hn6lcMC0e1dRuwAbCJjh')
+    //   .collection('project')
+    //   .doc()
+    //   .set(myProjectData[0])
   }
   const handleCloseGroup = () => {
     setAddGroupOpen(false)
@@ -365,7 +390,7 @@ function GroupProject(props) {
     } else if (_isEmpty(editGroup.note)) {
       setError({ ...error, editGroupNote: true })
     } else {
-      await db.collection('groupProject').doc(path.id)
+      await db.collection('groupProject').doc(groupId)
         .update({
           name: editGroup.name,
           note: editGroup.note,
@@ -385,12 +410,58 @@ function GroupProject(props) {
     setDeleteGroupOpen(false)
   }
   const handleDeleteGroup = async () => {
-    await db.collection('groupProject').doc(path.id).delete()
+    await db.collection('groupProject').doc(groupId).delete()
     handleCloseDeleteGroup()
     handleQuery()
     history.push('/project')
   }
 
+  // add project
+  const handleOpenAddProject = () => {
+    setAddProjectOpen(true)
+  }
+  const handleCloseAddProject = () => {
+    setAddProjectOpen(false)
+  }
+  const handleChangeProject = (event) => {
+    setAddProjectData(event.target.value)
+  }
+  // สำหรับการ filter ว่ามีโปรเจคไหนที่ใช้ไปเเล้วบ้างใน groupProject
+  const handleAddProjectFilter = async () => {
+    const getData = []
+    const project = await db.collection('project')
+      .where('uid', '==', userId)
+      // .orderBy('updateAt', 'desc')
+      .get()
+    project.docs.forEach((doc) => {
+      getData.push({
+        id: doc.id,
+        ...doc.data(),
+      })
+    })
+    const result = _differenceBy(getData, myProjectData, 'id')
+    setAddProject(result)
+  }
+  console.log('addProjectDataFilter', addProject)
+  console.log('addProjectData', addProjectData)
+  const handleSaveAddProject = async () => {
+    const outputData = addProjectData
+    if (_isEmpty(outputData)) {
+      setError({ ...error, addProject: true })
+    } else {
+      const docId = outputData.id
+      delete outputData.id
+      console.log('docId1', docId)
+      await db.collection('groupProject').doc(groupId)
+        .collection('project')
+        .doc(docId)
+        .set(outputData)
+      setAddProjectOpen(false)
+      handleQuery()
+    }
+    console.log('outputData', outputData)
+  }
+  console.log('error1', error)
   // filter group
   const handleFilterGroup = () => {
     setFilterGroup(!filterGroup)
@@ -399,20 +470,23 @@ function GroupProject(props) {
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myUser, filterGroup])
+  }, [myUser, filterGroup, groupId])
 
   // filter groupData
   useEffect(() => {
-    if (path.id) {
-      const getGroupData = _filter(groupProject, { id: path.id })
+    if (groupId) {
+      // สำหรับ filter groupProject ด้านซ้ายมือ
+      const getGroupData = _filter(groupProject, { id: groupId })
       const groupData = getGroupData[0]
       setGroupProjectData(groupData)
-    } else {
-      // TODO getProject from document groupProject
-      setMyProjectData(myProject)
+      // สำหรับ filter ว่าเราเคย add project ในกลุ่มนี้เเล้วบ้างไหม
+      handleAddProjectFilter()
     }
+    // สำหรับ set project data เพื่อเอาไปโชร์บนหน้าเว็ป
+    setMyProjectData(myProject)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupProject, path.id, myProject])
+  }, [groupProject, groupId, myProject])
+
   console.log('groupProjectData', groupProjectData)
   console.log('myProject', myProject)
   console.log('myProjectData', myProjectData)
@@ -458,7 +532,9 @@ function GroupProject(props) {
         <ListItemIcon>
           <EditIcon fontSize="small" />
         </ListItemIcon>
-        <ListItemText>Edit</ListItemText>
+        <ListItemText>
+          <Typography>Edit</Typography>
+        </ListItemText>
       </MenuItem>
       <MenuItem onClick={handleOpenDeleteGroup}>
         <ListItemIcon>
@@ -557,6 +633,38 @@ function GroupProject(props) {
     </Dialog>
   )
 
+  const renderAddProject = (
+    <Dialog open={addProjectOpen} onClose={handleCloseAddProject}>
+      <DialogTitle>Add Project</DialogTitle>
+      <DialogContent>
+        <TextField
+          select
+          margin="dense"
+          label="Project"
+          value={addProjectData}
+          onChange={handleChangeProject}
+          error={!_isEmpty(addProjectData) ? false : error.addProject}
+          variant="outlined"
+          fullWidth
+        >
+          {_map(addProject, (option) => (
+            <MenuItem value={option}>
+              {option.title}
+            </MenuItem>
+          ))}
+        </TextField>
+        <Box mt={1} />
+        <DialogContentText>
+          Select a project to add to this group. The added project will be copied from the project you made. If the project edit or delete from this group. It will not affect the main project.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseAddProject} color="secondary">Cancel</Button>
+        <Button onClick={handleSaveAddProject} color="primary">Add</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
@@ -594,7 +702,7 @@ function GroupProject(props) {
           {/* <Divider /> */}
         </Box>
         <Box className={classes.pageRight} fullWidth>
-          {!path.id ? (
+          {!groupId ? (
             <Box>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h4" fontWeight="bold">
@@ -658,7 +766,7 @@ function GroupProject(props) {
                     </Box>
                     <Box display="flex" justifyContent="center" alignItems="center">
                       <Box ml={1} />
-                      <IconButton color="primary">
+                      <IconButton color="primary" onClick={handleOpenAddProject}>
                         <AddBoxIcon />
                       </IconButton>
                       <Box ml={1} />
@@ -692,6 +800,7 @@ function GroupProject(props) {
         {renderCreateGroup}
         {renderEditGroup}
         {renderDeleteGroup}
+        {renderAddProject}
       </Box>
     </Box>
   )
