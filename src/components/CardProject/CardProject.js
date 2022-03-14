@@ -12,6 +12,7 @@ import _get from 'lodash/get'
 import _kebabCase from 'lodash/kebabCase'
 import _map from 'lodash/map'
 import _lowerCase from 'lodash/lowerCase'
+import _isEmpty from 'lodash/isEmpty'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -30,6 +31,11 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
@@ -61,11 +67,13 @@ const useStyles = makeStyles((theme) => ({
 
 function CardProject(props) {
   const {
-    values, loading, userId,
+    values, loading, userId, groupId, setLoading,
   } = props
   const classes = useStyles()
   const history = useHistory()
   const [anchorEl, setAnchorEl] = useState(false)
+  const [deleteMenuOpen, setDeleteMenuOpen] = useState(false)
+  const [deleteGroupMenuOpen, setDeleteGroupMenuOpen] = useState(false)
   // const [expanded, setExpanded] = useState(false)
 
   const isMenuOpen = Boolean(anchorEl)
@@ -99,17 +107,54 @@ function CardProject(props) {
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
   }
-
   const handleMenuClose = () => {
     setAnchorEl(false)
   }
-  const handleClickList = (type, projectId) => {
-    if (_lowerCase(_get(type, 'props.children')) === 'delete') {
+
+  // delete project
+  const handleOpenMenuDelete = (type) => {
+    if (type === 'project') {
+      setDeleteMenuOpen(true)
+    } else if (type === 'groupProject') {
+      setDeleteGroupMenuOpen(true)
+    }
+  }
+  const handleCloseMenuDelete = () => {
+    setDeleteMenuOpen(false)
+    setDeleteGroupMenuOpen(false)
+  }
+  const handleDeleteProject = (type) => {
+    setLoading(true)
+    try {
+      if (type === 'project') {
+        console.log(55555555555555)
+      } else if (type === 'groupProject') {
+        console.log(44444444444444)
+      }
+      setLoading(false)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+    }
+  }
+
+  const handleClickList = async (type, projectId) => {
+    if (_lowerCase(_get(type, 'props.children')) === 'delete' && groupId === 'null') {
+      // TODO open menu delete pop
       setAnchorEl(false)
+      handleOpenMenuDelete('project')
       console.log(`delete project id ${projectId}`)
-    } else {
+    } else if (_lowerCase(_get(type, 'props.children')) === 'delete' && groupId !== 'null') {
+      // TODO open menu delete pop
+      setAnchorEl(false)
+      handleOpenMenuDelete('groupProject')
+      console.log(`delete project id ${projectId} in groupProject ${groupId}`)
+    } else if (_lowerCase(_get(type, 'props.children')) === 'edit' && groupId === 'null') {
       setAnchorEl(false)
       history.push(`/project/edit/${projectId}`)
+    } else if (_lowerCase(_get(type, 'props.children')) === 'edit' && groupId !== 'null') {
+      setAnchorEl(false)
+      history.push(`/group-project/${groupId}/project/edit/${projectId}`)
     }
   }
 
@@ -146,6 +191,36 @@ function CardProject(props) {
         </MenuItem>
       ))}
     </Menu>
+  )
+
+  const renderDeleteProject = (
+    <Dialog open={deleteMenuOpen} onClose={handleCloseMenuDelete}>
+      <DialogTitle>Delete Project</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Deleting this project will cause you to lose it and you will not be able to recover this project again.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
+        <Button onClick={() => handleDeleteProject('project')} color="error">Delete</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
+  const renderDeleteGroupProject = (
+    <Dialog open={deleteGroupMenuOpen} onClose={handleCloseMenuDelete}>
+      <DialogTitle>Delete Project</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Deleting this project will cause you to lose it in this group. But it will not delete the original project.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
+        <Button onClick={() => handleDeleteProject('groupProject')} color="error">Delete</Button>
+      </DialogActions>
+    </Dialog>
   )
 
   return (
@@ -338,6 +413,8 @@ function CardProject(props) {
         </Box>
       </Hidden>
       {renderMenu}
+      {renderDeleteProject}
+      {renderDeleteGroupProject}
     </Box>
   )
 }
@@ -347,6 +424,8 @@ CardProject.propTypes = {
   values: PropTypes.objectOf(PropTypes.any).isRequired,
   loading: PropTypes.bool,
   userId: PropTypes.string.isRequired,
+  groupId: PropTypes.string.isRequired,
+  setLoading: PropTypes.func.isRequired,
 }
 
 CardProject.defaultProps = {

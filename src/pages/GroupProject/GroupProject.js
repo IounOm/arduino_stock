@@ -731,6 +731,8 @@ function GroupProject(props) {
                           values={data}
                           loading={loading}
                           userId={userId}
+                          groupId={groupId || 'null'}
+                          setLoading={setLoading}
                         />
                       </Grid>
                     </>
@@ -785,6 +787,8 @@ function GroupProject(props) {
                               values={data}
                               loading={loading}
                               userId={userId}
+                              groupId={groupId || 'null'}
+                              setLoading={setLoading}
                             />
                           </Grid>
                         </>

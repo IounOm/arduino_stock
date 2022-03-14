@@ -39,7 +39,7 @@ function App() {
           <AuthRoute exact path="/dashboard" layout={Header} component={Dashboard} />
           <AuthRoute exact path="/loading" layout={Header} component={Loading} />
           <AuthRoute exact path="/profile" layout={Header} component={Profile} loginRequired />
-          {/* <AuthRoute exact path="/profile/:id" layout={Header} component={Profile} loginRequired /> */}
+          <AuthRoute exact path="/profile/:id" layout={Header} component={Profile} loginRequired />
           {/* <AuthRoute exact path="/group-project" layout={Header} component={GroupProject} loginRequired /> */}
           <AuthRoute exact path="/group-project/:gid" layout={Header} component={GroupProject} loginRequired />
           <AuthRoute exact path="/group-project/:gid/project/:type/:id" layout={Header} component={Project} loginRequired />

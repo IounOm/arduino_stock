@@ -239,6 +239,7 @@ function Project(props) {
                 ...doc.data(),
                 uidRef: res.data(),
               })
+              setCheckSwitch(doc.data().publish)
             })
           })
       }
@@ -311,19 +312,6 @@ function Project(props) {
   }
   const handleCloseSave = () => {
     setOpenSaveMenu(false)
-    // setValue({
-    //   ...value,
-    //   image: '',
-    //   title: '',
-    //   subtitle: '',
-    //   tag: '',
-    // })
-    // setErrorSave({
-    //   image: false,
-    //   title: false,
-    //   subtitle: false,
-    //   tag: false,
-    // })
     dispatch(userAction.saveProject(false))
   }
   const handleChange = (prop) => (event) => {
@@ -345,6 +333,8 @@ function Project(props) {
       // handleSave()
       handleOpenSave()
       // history.push('/project')
+    } else {
+      handleCloseSave()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [save])
@@ -447,7 +437,7 @@ function Project(props) {
               <Box ml={2}>
                 <Typography variant="body2">
                   {/* {value.uidRef.name} */}
-                  555555555
+                  IounOm
                 </Typography>
                 <Typography variant="body2" color="secondary" fontWeight="normal">
                   {`${formattedDate}`}
