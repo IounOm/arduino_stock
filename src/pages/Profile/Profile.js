@@ -47,6 +47,7 @@ import TwitterIcon from '@mui/icons-material/Twitter'
 import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
 import UploadImage from '../../components/UploadImage/UploadImage'
+import CardProject from '../../components/CardProject/CardProject'
 import { AuthContext } from '../../components/Auth'
 import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
@@ -70,7 +71,10 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     marginTop: '64px',
-    height: 'calc(100vh - 64px)',
+    height: ({ id }) => `${_isEmpty(id) ? 'calc(100vh - 64px)' : 'auto'}`,
+    // height: 'calc(100vh - 64px)',
+    flexDirection: ({ id }) => `${_isEmpty(id) ? 'row' : 'column'}`,
+    marginBottom: ({ id }) => `${_isEmpty(id) ? '0px' : '32px'}`,
     padding: '0 120px 0 120px',
     [theme.breakpoints.down('lg')]: {
       padding: '0 40px 0 40px',
@@ -78,6 +82,7 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.down('md')]: {
       marginTop: '84px',
+      marginBottom: ({ id }) => `${_isEmpty(id) ? '0px' : '0px'}`,
       padding: '20px',
       height: '100%',
     },
@@ -157,9 +162,10 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 function Profile(props) {
-  const id = _get(props, 'computedMatch.params')
-  // console.log('id', id)
-  const classes = useStyles()
+  const path = _get(props, 'computedMatch.params')
+  const { id } = path
+  console.log('id1111', id)
+  const classes = useStyles({ id })
   const dispatch = useDispatch()
   const myUser = useSelector(getUser)
   const {
@@ -205,31 +211,80 @@ function Profile(props) {
     twitterName: '',
     gitName: '',
   })
+  const [projectData, setProjectData] = useState([])
 
   const handleQuery = async () => {
-    setLoading(true)
-    await setValues({
-      image: userImage || '',
-      name: userName,
-      note: userNote || '',
-      email: userEmail,
-      password: userPassword,
-      contact: {
-        website: userContact.website || '',
-        facebook: userContact.facebook || '',
-        twitter: userContact.twitter || '',
-        git: userContact.git || '',
-      },
-      errorEmail: false,
-      errorPassword: false,
-    })
-    setContact({
-      websiteName: _split(userContact.website, '/'),
-      facebookName: _split(userContact.facebook, '/'),
-      twitterName: _split(userContact.twitter, '/'),
-      gitName: _split(userContact.git, '/'),
-    })
-    setLoading(false)
+    try {
+      setLoading(true)
+      if (_isEmpty(id)) {
+        await setValues({
+          image: userImage || '',
+          name: userName,
+          note: userNote || '',
+          email: userEmail,
+          password: userPassword,
+          contact: {
+            website: userContact.website || '',
+            facebook: userContact.facebook || '',
+            twitter: userContact.twitter || '',
+            git: userContact.git || '',
+          },
+          errorEmail: false,
+          errorPassword: false,
+        })
+        setContact({
+          websiteName: _split(userContact.website, '/'),
+          facebookName: _split(userContact.facebook, '/'),
+          twitterName: _split(userContact.twitter, '/'),
+          gitName: _split(userContact.git, '/'),
+        })
+      } else {
+        const output = []
+        const getProject = await db.collection('project')
+          .where('uid', '==', id)
+          // .orderBy('updateAt', 'desc')
+          .get()
+        getProject.docs.forEach((doc) => {
+          doc.data().uidRef.get().then(async (res) => {
+            await output.push({
+              id: doc.id,
+              ...doc.data(),
+              uidRef: res.data(),
+            })
+          })
+        })
+        setProjectData(output)
+
+        await db.collection('users').doc(id).get().then((doc) => {
+          const data = doc.data()
+          setValues({
+            image: data.image || '',
+            name: data.name,
+            note: data.note || '',
+            email: data.email,
+            password: data.password,
+            contact: {
+              website: data.contact.website || '',
+              facebook: data.contact.facebook || '',
+              twitter: data.contact.twitter || '',
+              git: data.contact.git || '',
+            },
+            errorEmail: false,
+            errorPassword: false,
+          })
+          setContact({
+            websiteName: _split(data.contact.website, '/'),
+            facebookName: _split(data.contact.facebook, '/'),
+            twitterName: _split(data.contact.twitter, '/'),
+            gitName: _split(data.contact.git, '/'),
+          })
+        })
+      }
+      setLoading(false)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+    }
   }
 
   const handleChange = (prop, key) => (event) => {
@@ -278,7 +333,7 @@ function Profile(props) {
       console.log(err)
     }
   }
-  console.log('contact', contact)
+  // console.log('contact', contact)
 
   // edit userProfile
   const handleClickUserEdit = () => {
@@ -334,7 +389,9 @@ function Profile(props) {
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myUser])
+  }, [myUser, path, id])
+
+  console.log('projectData', projectData)
 
   return (
     <Box className={classes.box}>
@@ -345,15 +402,17 @@ function Profile(props) {
               collection="users"
               doc={userId}
               updateKey="image"
-              defaultImg={userImage}
+              defaultImg={_isEmpty(id) ? userImage : values.image}
               alt=""
               width="250px"
               maxWidth="250px"
               height="250px"
               loading={loading}
               page="profile"
+              disabled={!_isEmpty(id)}
             />
           </Box>
+          {_isEmpty(id) && (
           <Box className={classes.profile}>
             <Box mt={2}>
               <Divider />
@@ -393,6 +452,7 @@ function Profile(props) {
               </Box>
             )}
           </Box>
+          )}
         </Box>
         <Box className={classes.pageRight} fullWidth>
           <Box className={classes.profile}>
@@ -401,7 +461,7 @@ function Profile(props) {
             </Hidden>
             <Box className={classes.title} mt={2}>
               <Typography variant="h4">User Profile</Typography>
-              {!editUser && (
+              {!editUser && _isEmpty(id) && (
                 <Button variant="outlined" onClick={handleClickUserEdit}>Edit</Button>
               )}
             </Box>
@@ -442,7 +502,7 @@ function Profile(props) {
             </Box>
             <Box className={classes.title} mt={2}>
               <Typography variant="h4">Contact</Typography>
-              {!editContact && (
+              {!editContact && _isEmpty(id) && (
                 <Button variant="outlined" onClick={handleClickContactEdit}>Edit</Button>
               )}
             </Box>
@@ -541,6 +601,34 @@ function Profile(props) {
           </Box>
         </Box>
       </Box>
+      {!_isEmpty(id) && (
+        <>
+          <Box mt={2}>
+            <Divider />
+          </Box>
+          <Box>
+            <Grid container spacing={2} mt={2}>
+              {!loading && (
+                <>
+                  {_map(projectData, (data) => (
+                    <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
+                      <CardProject
+                        values={data}
+                        loading={loading}
+                        userId={id}
+                        groupId="null"
+                        setLoading={setLoading}
+                        handleQuery={handleQuery}
+                        actionType="view"
+                      />
+                    </Grid>
+                  ))}
+                </>
+              )}
+            </Grid>
+          </Box>
+        </>
+      )}
     </Box>
   )
 }

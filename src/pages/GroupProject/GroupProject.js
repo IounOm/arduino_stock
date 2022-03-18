@@ -284,7 +284,6 @@ function GroupProject(props) {
           })
         })
       } else if (groupId) {
-        console.log('ppppppppppppppppppppppppppppppppp')
         const project = await db.collection('groupProject').doc(groupId).collection('project').get()
         project.docs.forEach((doc) => {
           doc.data().uidRef.get().then((res) => {
@@ -733,6 +732,7 @@ function GroupProject(props) {
                           userId={userId}
                           groupId={groupId || 'null'}
                           setLoading={setLoading}
+                          handleQuery={handleQuery}
                         />
                       </Grid>
                     </>
@@ -789,6 +789,7 @@ function GroupProject(props) {
                               userId={userId}
                               groupId={groupId || 'null'}
                               setLoading={setLoading}
+                              handleQuery={handleQuery}
                             />
                           </Grid>
                         </>

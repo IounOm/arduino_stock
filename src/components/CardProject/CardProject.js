@@ -48,6 +48,8 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 
+import firebase from '../../config'
+
 // const ExpandMore = styled((props) => {
 //   const { expand, ...other } = props
 //   return <IconButton {...other} />
@@ -67,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CardProject(props) {
   const {
-    values, loading, userId, groupId, setLoading,
+    values, loading, userId, groupId, setLoading, handleQuery, actionType,
   } = props
   const classes = useStyles()
   const history = useHistory()
@@ -75,6 +77,8 @@ function CardProject(props) {
   const [deleteMenuOpen, setDeleteMenuOpen] = useState(false)
   const [deleteGroupMenuOpen, setDeleteGroupMenuOpen] = useState(false)
   // const [expanded, setExpanded] = useState(false)
+
+  const db = firebase.firestore()
 
   const isMenuOpen = Boolean(anchorEl)
 
@@ -123,14 +127,17 @@ function CardProject(props) {
     setDeleteMenuOpen(false)
     setDeleteGroupMenuOpen(false)
   }
-  const handleDeleteProject = (type) => {
+  console.log('values111', values)
+  const handleDeleteProject = async (type) => {
     setLoading(true)
     try {
       if (type === 'project') {
-        console.log(55555555555555)
+        await db.collection('project').doc(values.id).delete()
       } else if (type === 'groupProject') {
-        console.log(44444444444444)
+        await db.collection('groupProject').doc(groupId).collection('project').doc(values.id)
+          .delete()
       }
+      await handleQuery()
       setLoading(false)
     } catch (err) {
       console.log(err)
@@ -242,9 +249,13 @@ function CardProject(props) {
               </IconButton>
           )}
             action={(
-              <IconButton size="small" onClick={handleMenuOpen}>
-                <MoreVertIcon />
-              </IconButton>
+              <>
+                {actionType !== 'view' && (
+                  <IconButton size="small" onClick={handleMenuOpen}>
+                    <MoreVertIcon />
+                  </IconButton>
+                )}
+              </>
           )}
             className={classes.cardHeader}
             title={values.uidRef.name}
@@ -405,9 +416,11 @@ function CardProject(props) {
                 size="small"
               />
             </Box>
-            <IconButton size="small" onClick={handleMenuOpen}>
-              <MoreHorizIcon />
-            </IconButton>
+            {actionType !== 'view' && (
+              <IconButton size="small" onClick={handleMenuOpen}>
+                <MoreHorizIcon />
+              </IconButton>
+            )}
           </Box>
           <Divider />
         </Box>
@@ -426,10 +439,14 @@ CardProject.propTypes = {
   userId: PropTypes.string.isRequired,
   groupId: PropTypes.string.isRequired,
   setLoading: PropTypes.func.isRequired,
+  handleQuery: PropTypes.func,
+  actionType: PropTypes.string,
 }
 
 CardProject.defaultProps = {
   loading: false,
+  handleQuery: () => {},
+  actionType: 'edit',
 }
 
 export default CardProject

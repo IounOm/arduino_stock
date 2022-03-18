@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 
 function UploadImage(props) {
   const {
-    collection, doc, updateKey, defaultImg, alt, loading, width, height, page,
+    collection, doc, updateKey, defaultImg, alt, loading, width, height, page, disabled,
   } = props
   const myUser = useSelector(getUser)
   const {
@@ -99,7 +99,7 @@ function UploadImage(props) {
   useEffect(() => {
     setImageURLs(defaultImg)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading])
+  }, [loading, defaultImg])
 
   const handleClickImageEdit = () => {
     setEditImage(true)
@@ -159,9 +159,11 @@ function UploadImage(props) {
             sx={{ width: `${width}`, height: `${height}`, fontSize: '80px' }}
             variant="rounded"
           />
-          <Box mt={2}>
-            <Button onClick={handleClickImageEdit}>Change Picture</Button>
-          </Box>
+          {!disabled && (
+            <Box mt={2}>
+              <Button onClick={handleClickImageEdit}>Change Picture</Button>
+            </Box>
+          )}
         </>
       ) : (
         <>
@@ -196,10 +198,12 @@ UploadImage.propTypes = {
   height: PropTypes.string.isRequired,
   loading: PropTypes.bool,
   page: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
 }
 
 UploadImage.defaultProps = {
   loading: false,
+  disabled: false,
 }
 
 export default UploadImage
