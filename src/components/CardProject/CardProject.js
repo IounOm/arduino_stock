@@ -165,6 +165,14 @@ function CardProject(props) {
     }
   }
 
+  const handleClickView = () => {
+    if (groupId === 'null') {
+      history.push(`/project/view/${values.id}`)
+    } else {
+      history.push(`/group-project/${groupId}/project/view/${values.id}`)
+    }
+  }
+
   const menuId = 'munuCard'
 
   const renderMenu = (
@@ -261,7 +269,7 @@ function CardProject(props) {
             title={values.uidRef.name}
             subheader={formatCreateAtDate}
           />
-          <CardActionArea onClick={() => history.push(`/project/view/${values.id}`)}>
+          <CardActionArea onClick={handleClickView}>
             <CardMedia
               component="img"
               height="194"
@@ -339,7 +347,7 @@ function CardProject(props) {
               alignItems: 'center',
             }}
           >
-            <Box mt={1} onClick={() => history.push(`/project/view/${values.id}`)}>
+            <Box mt={1} onClick={handleClickView}>
               <Typography
                 variant="body1"
                 fontWeight="bold"

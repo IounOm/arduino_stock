@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 
 function UploadImage(props) {
   const {
-    collection, doc, updateKey, defaultImg, alt, loading, width, height, page, disabled,
+    collection, doc, updateKey, defaultImg, alt, loading, width, height, page, disabled, error,
   } = props
   const myUser = useSelector(getUser)
   const {
@@ -156,7 +156,12 @@ function UploadImage(props) {
             alt={alt}
             src={imageURLs}
             className={classes.Image}
-            sx={{ width: `${width}`, height: `${height}`, fontSize: '80px' }}
+            sx={{
+              width: `${width}`,
+              height: `${height}`,
+              fontSize: '80px',
+              border: `${error ? '2px solid red' : '0px'}`,
+            }}
             variant="rounded"
           />
           {!disabled && (
@@ -172,7 +177,12 @@ function UploadImage(props) {
             <Avatar
               alt={alt}
               src={imageURLs}
-              sx={{ width: `${width}`, height: `${height}`, fontSize: '80px' }}
+              sx={{
+                width: `${width}`,
+                height: `${height}`,
+                fontSize: '80px',
+                border: `${error ? '2px solid red' : '0px'}`,
+              }}
               variant="rounded"
             />
           </label>
@@ -199,11 +209,13 @@ UploadImage.propTypes = {
   loading: PropTypes.bool,
   page: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  error: PropTypes.bool,
 }
 
 UploadImage.defaultProps = {
   loading: false,
   disabled: false,
+  error: false,
 }
 
 export default UploadImage

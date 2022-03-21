@@ -12,6 +12,8 @@ import _map from 'lodash/map'
 import _get from 'lodash/get'
 import _forEach from 'lodash/forEach'
 import _filter from 'lodash/filter'
+import _toInteger from 'lodash/toInteger'
+import _lowerCase from 'lodash/lowerCase'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -131,6 +133,7 @@ const useStyles = makeStyles((theme) => ({
   headerText: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     margin: '40px 250px 0 250px',
     [theme.breakpoints.down('lg')]: {
       margin: '40px 80px 0px 89.6px',
@@ -142,6 +145,10 @@ const useStyles = makeStyles((theme) => ({
       margin: '20px 10px 0px 19.6px',
     },
   },
+  headerLeft: {
+    display: 'flex',
+    alignItems: 'center',
+  },
 }))
 
 function Project(props) {
@@ -150,6 +157,7 @@ function Project(props) {
   const projectId = path.id
   const actionType = path.type
   const groupId = path.gid
+  console.log('groupId', !_isEmpty(groupId))
   const location = useLocation()
   const { pathname } = location
   console.log('pathname', pathname)
@@ -186,16 +194,9 @@ function Project(props) {
     subtitle: '',
     tag: '',
   })
-  let disableCKEditor = false
-  if (pathname === '/project/create') {
-    disableCKEditor = false
-  } else if (actionType === 'edit') {
-    disableCKEditor = false
-  } else {
-    disableCKEditor = true
-  }
-  const [saveValue, setSaveValue] = useState(false)
-  const [editDisable, setEditDisable] = useState(disableCKEditor)
+
+  const [editDisable, setEditDisable] = useState(false)
+  const [Disable, setDisable] = useState(false)
 
   const [openSaveMenu, setOpenSaveMenu] = useState(false)
   const [checkSwitch, setCheckSwitch] = useState(false)
@@ -212,6 +213,21 @@ function Project(props) {
     tag: false,
   })
 
+  const [anchorEl, setAnchorEl] = useState(false)
+  const [deleteMenuOpen, setDeleteMenuOpen] = useState(false)
+  const [deleteGroupMenuOpen, setDeleteGroupMenuOpen] = useState(false)
+  const isMenuOpen = Boolean(anchorEl)
+  const userLists = [
+    {
+      name: <Typography>Edit</Typography>,
+      icon: <EditIcon fontSize="small" />,
+    },
+    {
+      name: <Typography color="error">Delete</Typography>,
+      icon: <DeleteIcon fontSize="small" color="error" />,
+    },
+  ]
+
   console.log('docId', docId)
 
   const tag = [
@@ -222,24 +238,52 @@ function Project(props) {
     { value: 'Other', label: 'Other' },
   ]
 
-  const date = new Date()
-  const formattedDate = format(date, 'dd LLLL yyyy', { locale: enGB })
-  // const formattedDate = format(_toInteger(`${_get(data, 'updateAt.seconds')}000`), 'dd LLLL yyyy')
+  const formatCreateAtDate = format(_toInteger(`${_get(value, 'createAt.seconds')}000`), 'dd LLLL yyyy')
+  // const formatUpdateAtDate = format(_toInteger(`${_get(value, 'updateAt.seconds')}000`), 'dd LLLL yyyy')
 
   const handleQuery = async () => {
     try {
       setLoading(true)
-      if (projectId) {
+      if (projectId && !groupId) {
         await firebase.firestore().collection('project').doc(projectId).get()
           .then((doc) => {
             const data = doc.data()
             setValue({ ...value, article: data.article })
             data.uidRef.get().then((res) => {
-              setValue({
-                ...doc.data(),
-                uidRef: res.data(),
-              })
-              setCheckSwitch(doc.data().publish)
+              if (actionType === 'edit' && doc.data().uid !== userId) {
+                history.push('/404')
+              } else {
+                if (actionType === 'view' && doc.data().uid !== userId) {
+                  setDisable(true)
+                }
+                setValue({
+                  ...doc.data(),
+                  uidRef: res.data(),
+                })
+                setCheckSwitch(doc.data().publish)
+              }
+            })
+          })
+      } else if (projectId && groupId) {
+        await firebase.firestore().collection('groupProject').doc(groupId).collection('project')
+          .doc(projectId)
+          .get()
+          .then((doc) => {
+            const data = doc.data()
+            setValue({ ...value, article: data.article })
+            data.uidRef.get().then((res) => {
+              if (actionType === 'edit' && doc.data().uid !== userId) {
+                history.push('/404')
+              } else {
+                if (actionType === 'view' && doc.data().uid !== userId) {
+                  setDisable(true)
+                }
+                setValue({
+                  ...doc.data(),
+                  uidRef: res.data(),
+                })
+                setCheckSwitch(doc.data().publish)
+              }
             })
           })
       }
@@ -258,7 +302,25 @@ function Project(props) {
     try {
       setLoading(true)
       const DateCreate = new Date()
-      if (!projectId && !groupId) {
+      if (_isEmpty(value.image)
+      || _isEmpty(value.title)
+      || _isEmpty(value.subtitle)
+      || _isEmpty(value.tag)) {
+        const errorOutput = {
+          image: false,
+          title: false,
+          subtitle: false,
+          tag: false,
+        }
+        Object.keys(value).forEach((key) => {
+          Object.keys(errorSave).forEach((errorKey) => {
+            if (key === errorKey && _isEmpty(value[key])) {
+              Object.assign(errorOutput, { [errorKey]: true })
+            }
+          })
+          setErrorSave(errorOutput)
+        })
+      } else if (!projectId && !groupId) {
         await db.collection('project').doc(docId)
           .set({
             article: value.article,
@@ -272,6 +334,8 @@ function Project(props) {
             subtitle: value.subtitle,
             tag: value.tag,
           })
+        dispatch(userAction.uploadImage(''))
+        dispatch(userAction.saveProject(false))
         history.push('/project')
       } else if (projectId && !groupId) {
         await db.collection('project').doc(projectId)
@@ -283,6 +347,8 @@ function Project(props) {
             subtitle: value.subtitle,
             tag: value.tag,
           })
+        dispatch(userAction.uploadImage(''))
+        dispatch(userAction.saveProject(false))
         history.push(`/project/view/${projectId}`)
       } else if (projectId && groupId) {
         await db.collection('groupProject').doc(groupId).collection('project').doc(projectId)
@@ -294,10 +360,12 @@ function Project(props) {
             subtitle: value.subtitle,
             tag: value.tag,
           })
-        history.push(`/groupProject/${groupId}/project/view/${projectId}`)
+        dispatch(userAction.uploadImage(''))
+        dispatch(userAction.saveProject(false))
+        history.push(`/group-project/${groupId}/project/view/${projectId}`)
       }
-      dispatch(userAction.uploadImage(''))
-      dispatch(userAction.saveProject(false))
+      // dispatch(userAction.uploadImage(''))
+      // dispatch(userAction.saveProject(false))
       setLoading(false)
     } catch (err) {
       console.log(err)
@@ -318,9 +386,63 @@ function Project(props) {
     setValue({ ...value, [prop]: event.target.value })
   }
 
+  // change switch publish
   const handleChangeSwitch = () => {
     setCheckSwitch(!checkSwitch)
     setValue({ ...value, publish: !checkSwitch })
+  }
+
+  // for edit / delete project menuItem
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+  const handleMenuClose = () => {
+    setAnchorEl(false)
+  }
+  const handleDeleteProject = async (type) => {
+    setLoading(true)
+    try {
+      if (type === 'project') {
+        await db.collection('project').doc(projectId).delete()
+      } else if (type === 'groupProject') {
+        await db.collection('groupProject').doc(groupId).collection('project').doc(projectId)
+          .delete()
+      }
+      history.goBack()
+      setLoading(false)
+    } catch (err) {
+      console.log(err)
+      setLoading(false)
+    }
+  }
+  // delete project
+  const handleOpenMenuDelete = (type) => {
+    if (type === 'project') {
+      setDeleteMenuOpen(true)
+    } else if (type === 'groupProject') {
+      setDeleteGroupMenuOpen(true)
+    }
+  }
+  const handleCloseMenuDelete = () => {
+    setDeleteMenuOpen(false)
+    setDeleteGroupMenuOpen(false)
+  }
+  const handleClickList = async (type) => {
+    if (_lowerCase(_get(type, 'props.children')) === 'delete' && _isEmpty(groupId)) {
+      setAnchorEl(false)
+      handleOpenMenuDelete('project')
+      console.log(`delete project id ${projectId}`)
+    } else if (_lowerCase(_get(type, 'props.children')) === 'delete' && !_isEmpty(groupId)) {
+      setAnchorEl(false)
+      handleOpenMenuDelete('groupProject')
+      console.log(`delete project id ${projectId} in groupProject ${groupId}`)
+    } else if (_lowerCase(_get(type, 'props.children')) === 'edit' && _isEmpty(groupId)) {
+      setAnchorEl(false)
+      history.push(`/project/edit/${projectId}`)
+    } else if (_lowerCase(_get(type, 'props.children')) === 'edit' && !_isEmpty(groupId)) {
+      setAnchorEl(false)
+      history.push(`/group-project/${groupId}/project/edit/${projectId}`)
+    }
   }
 
   useEffect(() => {
@@ -338,6 +460,24 @@ function Project(props) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [save])
+
+  useEffect(() => {
+    setValue({ ...value, image: uploadImg })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadImg])
+
+  useEffect(() => {
+    if (pathname === '/project/create') {
+      setEditDisable(false)
+    } else if (actionType === 'edit') {
+      setEditDisable(false)
+    } else {
+      setEditDisable(true)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path])
+
+  console.log('errorSave', errorSave)
 
   const renderMunuSave = (
     <Dialog open={openSaveMenu} onClose={handleCloseSave}>
@@ -366,6 +506,7 @@ function Project(props) {
           height="200px"
           loading={loading}
           page={!projectId ? 'createProject' : 'editProject'}
+          error={errorSave.image}
         />
         <TextField
           autoFocus
@@ -422,6 +563,71 @@ function Project(props) {
     </Dialog>
   )
 
+  const menuId = 'menuEdit'
+  const renderMenuEdit = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+      PaperProps={{
+        sx: { mt: '8px' },
+      }}
+    >
+      {_map(userLists, (list) => (
+        <MenuItem
+          // key={values.id}
+          onClick={() => handleClickList(list.name)}
+          // onClick={[]}
+        >
+          <ListItemIcon>
+            {list.icon}
+          </ListItemIcon>
+          <ListItemText>{list.name}</ListItemText>
+        </MenuItem>
+      ))}
+    </Menu>
+  )
+
+  const renderDeleteProject = (
+    <Dialog open={deleteMenuOpen} onClose={handleCloseMenuDelete}>
+      <DialogTitle>Delete Project</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Deleting this project will cause you to lose it and you will not be able to recover this project again.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
+        <Button onClick={() => handleDeleteProject('project')} color="error">Delete</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
+  const renderDeleteGroupProject = (
+    <Dialog open={deleteGroupMenuOpen} onClose={handleCloseMenuDelete}>
+      <DialogTitle>Delete Project</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Deleting this project will cause you to lose it in this group. But it will not delete the original project.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
+        <Button onClick={() => handleDeleteProject('groupProject')} color="error">Delete</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
@@ -429,20 +635,26 @@ function Project(props) {
           <>
             {!loading && (
             <Box className={classes.headerText}>
-              <Avatar
-                alt={userName}
-                src={userImage}
-                sx={{ width: 48, height: 48 }}
-              />
-              <Box ml={2}>
-                <Typography variant="body2">
-                  {/* {value.uidRef.name} */}
-                  IounOm
-                </Typography>
-                <Typography variant="body2" color="secondary" fontWeight="normal">
-                  {`${formattedDate}`}
-                </Typography>
+              <Box className={classes.headerLeft}>
+                <Avatar
+                  alt={value.uidRef.name}
+                  src={value.uidRef.image}
+                  sx={{ width: 48, height: 48 }}
+                />
+                <Box ml={2}>
+                  <Typography variant="body2">
+                    {value.uidRef.name}
+                  </Typography>
+                  <Typography variant="body2" color="secondary" fontWeight="normal">
+                    {formatCreateAtDate}
+                  </Typography>
+                </Box>
               </Box>
+              {Disable === false && (
+                <IconButton onClick={handleMenuOpen}>
+                  <MoreVertIcon />
+                </IconButton>
+              )}
             </Box>
             )}
           </>
@@ -456,6 +668,9 @@ function Project(props) {
           />
         </Box>
         {renderMunuSave}
+        {renderMenuEdit}
+        {renderDeleteProject}
+        {renderDeleteGroupProject}
       </Box>
     </Box>
   )

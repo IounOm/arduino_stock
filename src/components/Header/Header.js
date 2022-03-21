@@ -76,14 +76,20 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const useStyles = makeStyles((theme) => ({
   root: {
     '& .css-1t29gy6-MuiToolbar-root': {
-      paddingLeft: ({ pathname, pId }) => `${
+      paddingLeft: ({
+        pathname, pId, gId, gpId,
+      }) => `${
         (pathname === '/project/create'
-        || pathname === `/project/edit/${pId}`)
+        || pathname === `/project/edit/${pId}`
+        || pathname === `/group-project/${gId}/project/edit/${gpId}`)
           ? '250px' : '24px'
       }`,
-      paddingRight: ({ pathname, pId }) => `${
+      paddingRight: ({
+        pathname, pId, gId, gpId,
+      }) => `${
         (pathname === '/project/create'
-        || pathname === `/project/edit/${pId}`)
+        || pathname === `/project/edit/${pId}`
+        || pathname === `/group-project/${gId}/project/edit/${gpId}`)
           ? '250px' : '24px'
       }`,
     },
@@ -132,10 +138,21 @@ function Header(props) {
   const { children } = props
   const location = useLocation()
   const { pathname } = location
+
   const projectId = _split(pathname, '/', 4)
   const pId = projectId[projectId.length - 1]
   console.log('pathname55555', pId)
-  const classes = useStyles({ pathname, pId })
+
+  const groupId = _split(pathname, '/', 3)
+  const groupProjectId = _split(pathname, '/', 6)
+  const gId = projectId[groupId.length - 1]
+  const gpId = groupProjectId[groupProjectId.length - 1]
+  console.log('groupIdgroupId', gId)
+  console.log('projectId5555', gpId)
+
+  const classes = useStyles({
+    pathname, pId, gId, gpId,
+  })
   const history = useHistory()
   const dispatch = useDispatch()
   const myUser = useSelector(getUser)
@@ -299,13 +316,15 @@ function Header(props) {
         sx={{
           color: 'black',
           backgroundColor: `${
-            (location.pathname === '/project/create'
-            || location.pathname === `/project/edit/${pId}`)
+            (pathname === '/project/create'
+            || pathname === `/project/edit/${pId}`
+            || pathname === `/group-project/${gId}/project/edit/${gpId}`)
               ? '#fff' : 'primary'
           }`,
           boxShadow: `${
-            (location.pathname === '/project/create'
-            || location.pathname === `/project/edit/${pId}`)
+            (pathname === '/project/create'
+            || pathname === `/project/edit/${pId}`
+            || pathname === `/group-project/${gId}/project/edit/${gpId}`)
               && '0 0 0 0'
           }`,
         }}
@@ -335,8 +354,9 @@ function Header(props) {
               <img src="/images/arduinoStock.png" alt="arduinoStock" width="30px" />
             </IconButton>
           </Hidden>
-          {(location.pathname !== '/project/create'
-          && location.pathname !== `/project/edit/${pId}`) && (
+          {(pathname !== '/project/create'
+          && pathname !== `/project/edit/${pId}`
+          && pathname !== `/group-project/${gId}/project/edit/${gpId}`) && (
             <>
               <Search>
                 <StyledInputBase
@@ -357,8 +377,9 @@ function Header(props) {
           <Box sx={{ flexGrow: 1 }} />
           {!loading && (
             <>
-              {(location.pathname === '/project/create'
-              || location.pathname === `/project/edit/${pId}`) && (
+              {(pathname === '/project/create'
+              || pathname === `/project/edit/${pId}`
+              || pathname === `/group-project/${gId}/project/edit/${gpId}`) && (
                 <>
                   <Button
                     variant="contained"

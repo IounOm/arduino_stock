@@ -42,19 +42,22 @@ function NotFoundPage() {
     history.goBack()
   }
 
+  const handleClickHome = () => {
+    history.push('/home')
+  }
+
   return (
     <Box className={classes.root}>
       <Box className={classes.inner}>
-        {/* <Lottie
-          options={defaultOptions}
-          height={400}
-          width="100%"
-        /> */}
         <Typography fontSize={200} fontWeight="bold" lineHeight={0.8} color="#DE3535">404</Typography>
         <Typography fontSize={50} color="#DE3535">Page not found</Typography>
-        <Box mt={3}>
+        <Box mt={3} display="flex" flexDirection="column">
           <Button variant="outlined" size="medium" onClick={handleClick} color="button">
             back to previous page
+          </Button>
+          <Box mt={2} />
+          <Button variant="outlined" size="medium" onClick={handleClickHome} color="button">
+            back to home page
           </Button>
         </Box>
       </Box>

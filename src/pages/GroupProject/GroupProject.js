@@ -439,13 +439,18 @@ function GroupProject(props) {
       })
     })
     const result = _differenceBy(getData, myProjectData, 'id')
-    setAddProject(result)
+    // setAddProject(result)
+    if (_isEmpty(result)) {
+      setAddProject([{ title: 'No project', error: true }])
+    } else {
+      setAddProject(result)
+    }
   }
   console.log('addProjectDataFilter', addProject)
   console.log('addProjectData', addProjectData)
   const handleSaveAddProject = async () => {
     const outputData = addProjectData
-    if (_isEmpty(outputData)) {
+    if (_isEmpty(outputData) || outputData.error === true) {
       setError({ ...error, addProject: true })
     } else {
       const docId = outputData.id
