@@ -124,6 +124,7 @@ function SignUp() {
             twitter: '',
             git: '',
           },
+          type: 'user',
         })
         setCurrentUser(true)
       }

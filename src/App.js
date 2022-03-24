@@ -16,7 +16,9 @@ import Loading from './components/Loading'
 import Login from './components/Login'
 import SignUp from './components/SignUp'
 import Profile from './pages/Profile'
+import ProfileShare from './pages/ProfileShare'
 import GroupProject from './pages/GroupProject'
+import GroupProjectShare from './pages/GroupProjectShare'
 import Project from './pages/Project'
 
 function App() {
@@ -39,9 +41,10 @@ function App() {
           <AuthRoute exact path="/dashboard" layout={Header} component={Dashboard} />
           <AuthRoute exact path="/loading" layout={Header} component={Loading} />
           <AuthRoute exact path="/profile" layout={Header} component={Profile} loginRequired />
-          <AuthRoute exact path="/profile/:id" layout={Header} component={Profile} loginRequired />
+          <AuthRoute exact path="/profile/:id" layout={Header} component={ProfileShare} loginRequired />
           {/* <AuthRoute exact path="/group-project" layout={Header} component={GroupProject} loginRequired /> */}
           <AuthRoute exact path="/group-project/:gid" layout={Header} component={GroupProject} loginRequired />
+          <AuthRoute exact path="/group-project/:gid/share" layout={Header} component={GroupProjectShare} loginRequired />
           <AuthRoute exact path="/group-project/:gid/project/:type/:id" layout={Header} component={Project} loginRequired />
           <AuthRoute exact path="/project" layout={Header} component={GroupProject} loginRequired />
           <AuthRoute exact path="/project/create" layout={Header} component={Project} loginRequired />

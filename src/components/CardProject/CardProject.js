@@ -312,11 +312,13 @@ function CardProject(props) {
               label="Entertainment"
               onClick={[]}
             />
-            <Chip
-              label={values.publish ? 'Publish' : 'Draft'}
-              color={values.publish ? 'success' : 'secondary'}
-              variant="outlined"
-            />
+            {groupId === 'null' && (
+              <Chip
+                label={values.publish ? 'Publish' : 'Draft'}
+                color={values.publish ? 'success' : 'secondary'}
+                variant="outlined"
+              />
+            )}
           </CardActions>
         </Card>
       </Hidden>
@@ -417,12 +419,14 @@ function CardProject(props) {
             <Box display="flex" alignItems="center">
               <Chip label={values.tag} size="small" onClick={[]} />
               <Box ml={1} />
-              <Chip
-                label={values.publish ? 'Publish' : 'Draft'}
-                color={values.publish ? 'success' : 'secondary'}
-                variant="outlined"
-                size="small"
-              />
+              {groupId === 'null' && (
+                <Chip
+                  label={values.publish ? 'Publish' : 'Draft'}
+                  color={values.publish ? 'success' : 'secondary'}
+                  variant="outlined"
+                  size="small"
+                />
+              )}
             </Box>
             {actionType !== 'view' && (
               <IconButton size="small" onClick={handleMenuOpen}>

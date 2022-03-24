@@ -70,9 +70,10 @@ import EditIcon from '@mui/icons-material/Edit'
 import RichText from '../../components/RichText/RichText'
 
 import { getUser } from '../../redux/selectors/user.selector'
-import Header from '../../components/Header/Header'
+import Loading from '../../components/Loading'
 import UploadImage from '../../components/UploadImage/UploadImage'
-import CardProject from '../../components/CardProject/CardProject'
+// import CardProject from '../../components/CardProject/CardProject'
+import CommentBox from '../../components/CommentBox/CommentBox'
 import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
 
@@ -92,12 +93,15 @@ const useStyles = makeStyles((theme) => ({
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
     marginTop: '64px',
-    padding: '0px 120px 40px 120px',
+    padding: '40px 25% 40px 25%',
+    [theme.breakpoints.down('lg')]: {
+      padding: '40px 20% 40px 20%',
+    },
     [theme.breakpoints.down('md')]: {
-      padding: '0px 40px 20px 40px',
+      padding: '20px 15% 20px 15%',
     },
     [theme.breakpoints.down('sm')]: {
-      padding: '0px 16px 16px 16px',
+      padding: '16px 16px 16px 16px',
       height: 'auto',
       marginTop: '56px',
     },
@@ -118,32 +122,33 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   richText: {
-    margin: '0px 240.4px',
+    // margin: '0px 240.4px',
     fontFamily: 'serif',
-    [theme.breakpoints.down('lg')]: {
-      margin: '0px 80px',
-    },
-    [theme.breakpoints.down('md')]: {
-      margin: '0px 40px',
-    },
-    [theme.breakpoints.down('sm')]: {
-      margin: '0px 10px',
-    },
+    // [theme.breakpoints.down('lg')]: {
+    //   margin: '0px 80px',
+    // },
+    // [theme.breakpoints.down('md')]: {
+    //   margin: '0px 40px',
+    // },
+    // [theme.breakpoints.down('sm')]: {
+    //   margin: '0px 10px',
+    // },
   },
   headerText: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: '40px 250px 0 250px',
-    [theme.breakpoints.down('lg')]: {
-      margin: '40px 80px 0px 89.6px',
-    },
-    [theme.breakpoints.down('md')]: {
-      margin: '40px 40px 0px 49.6px',
-    },
-    [theme.breakpoints.down('sm')]: {
-      margin: '20px 10px 0px 19.6px',
-    },
+    margin: '0 0 0 9.6px',
+    // margin: '40px 250px 0 250px',
+    // [theme.breakpoints.down('lg')]: {
+    //   margin: '40px 80px 0px 89.6px',
+    // },
+    // [theme.breakpoints.down('md')]: {
+    //   margin: '40px 40px 0px 49.6px',
+    // },
+    // [theme.breakpoints.down('sm')]: {
+    //   margin: '20px 10px 0px 19.6px',
+    // },
   },
   headerLeft: {
     display: 'flex',
@@ -265,6 +270,13 @@ function Project(props) {
             })
           })
       } else if (projectId && groupId) {
+        let groupUserId = ''
+        let permission = ''
+        await firebase.firestore().collection('groupProject').doc(groupId).get()
+          .then((doc) => {
+            groupUserId = doc.data().uid
+            permission = doc.data().permission
+          })
         await firebase.firestore().collection('groupProject').doc(groupId).collection('project')
           .doc(projectId)
           .get()
@@ -272,10 +284,12 @@ function Project(props) {
             const data = doc.data()
             setValue({ ...value, article: data.article })
             data.uidRef.get().then((res) => {
-              if (actionType === 'edit' && doc.data().uid !== userId) {
+              if ((actionType === 'edit' && doc.data().uid !== userId && groupUserId !== userId)
+              || (actionType === 'edit' && doc.data().uid === userId && groupUserId !== userId && permission === 'viewer')) {
                 history.push('/404')
               } else {
-                if (actionType === 'view' && doc.data().uid !== userId) {
+                if ((actionType === 'view' && doc.data().uid !== userId && groupUserId !== userId)
+                || (actionType === 'view' && doc.data().uid === userId && groupUserId !== userId && permission === 'viewer')) {
                   setDisable(true)
                 }
                 setValue({
@@ -291,7 +305,7 @@ function Project(props) {
       setLoading(false)
     } catch (err) {
       console.log(err)
-      setLoading(false)
+      history.push('/404')
     }
   }
 
@@ -483,16 +497,18 @@ function Project(props) {
     <Dialog open={openSaveMenu} onClose={handleCloseSave}>
       <DialogTitle display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h6">Project Preview</Typography>
-        <FormControlLabel
-          control={(
-            <Switch
-              checked={checkSwitch}
-              onChange={handleChangeSwitch}
-            />
-          )}
-          label={checkSwitch ? 'Publish' : 'Draft'}
-          labelPlacement="start"
-        />
+        {!groupId && (
+          <FormControlLabel
+            control={(
+              <Switch
+                checked={checkSwitch}
+                onChange={handleChangeSwitch}
+              />
+            )}
+            label={checkSwitch ? 'Publish' : 'Draft'}
+            labelPlacement="start"
+          />
+        )}
       </DialogTitle>
       <DialogContent>
         <UploadImage
@@ -628,13 +644,54 @@ function Project(props) {
     </Dialog>
   )
 
+  console.log('loading', loading)
+
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
         {(projectId && actionType !== 'edit') && (
+          <Box className={classes.headerText}>
+            {!loading ? (
+              <>
+                <Box className={classes.headerLeft}>
+                  <Avatar
+                    alt={value.uidRef.name}
+                    src={value.uidRef.image}
+                    sx={{ width: 48, height: 48 }}
+                  />
+                  <Box ml={2}>
+                    <Typography variant="body2">
+                      {value.uidRef.name}
+                    </Typography>
+                    <Typography variant="body2" color="secondary" fontWeight="normal">
+                      {formatCreateAtDate}
+                    </Typography>
+                  </Box>
+                </Box>
+                {Disable === false && (
+                  <IconButton onClick={handleMenuOpen} size="small">
+                    <MoreVertIcon />
+                  </IconButton>
+                )}
+              </>
+            ) : (
+              <Loading />
+            )}
+          </Box>
+        )}
+        <Box className={classes.richText}>
+          <RichText
+            disabled={editDisable}
+            handleOnChange={(data) => setValue({ ...value, article: data })}
+            value={value.article}
+            docId={!projectId ? docId : projectId}
+          />
+        </Box>
+        {(projectId && actionType !== 'edit') && (
           <>
-            {!loading && (
-            <Box className={classes.headerText}>
+            <Divider />
+            <Typography variant="h6" fontWeight="bold">comments</Typography>
+            {/* <Box className={classes.headerText}>
               <Box className={classes.headerLeft}>
                 <Avatar
                   alt={value.uidRef.name}
@@ -651,22 +708,17 @@ function Project(props) {
                 </Box>
               </Box>
               {Disable === false && (
-                <IconButton onClick={handleMenuOpen}>
-                  <MoreVertIcon />
-                </IconButton>
+              <IconButton onClick={handleMenuOpen} size="small">
+                <MoreVertIcon />
+              </IconButton>
               )}
-            </Box>
-            )}
+            </Box> */}
+            <Divider />
+            <CommentBox
+              value={[]}
+            />
           </>
         )}
-        <Box className={classes.richText}>
-          <RichText
-            disabled={editDisable}
-            handleOnChange={(data) => setValue({ ...value, article: data })}
-            value={value.article}
-            docId={!projectId ? docId : projectId}
-          />
-        </Box>
         {renderMunuSave}
         {renderMenuEdit}
         {renderDeleteProject}

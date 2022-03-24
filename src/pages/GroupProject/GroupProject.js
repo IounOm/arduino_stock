@@ -5,6 +5,7 @@ import { Redirect, Link, useHistory } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 // import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
+import { format } from 'date-fns'
 
 import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
@@ -12,6 +13,9 @@ import _get from 'lodash/get'
 import _forEach from 'lodash/forEach'
 import _filter from 'lodash/filter'
 import _differenceBy from 'lodash/differenceBy'
+import _lowerCase from 'lodash/lowerCase'
+import _capitalize from 'lodash/capitalize'
+import _toInteger from 'lodash/toInteger'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -41,14 +45,16 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Avatar from '@mui/material/Avatar'
 import MenuItem from '@mui/material/MenuItem'
-import ListItemText from '@mui/material/ListItemText'
-import ListItemIcon from '@mui/material/ListItemIcon'
 import Menu from '@mui/material/Menu'
 import Switch from '@mui/material/Switch'
 import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Paper from '@mui/material/Paper'
 import Badge from '@mui/material/Badge'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -70,6 +76,7 @@ import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
 import UploadImage from '../../components/UploadImage/UploadImage'
 import CardProject from '../../components/CardProject/CardProject'
+import Loading from '../../components/Loading'
 import { AuthContext } from '../../components/Auth'
 import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
@@ -195,6 +202,14 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     // justifyContent: 'space-between',
   },
+  listItemDone: {
+    '&,&:focus': {
+      color: '#ffff',
+    },
+    '&:hover': {
+      color: '#008184',
+    },
+  },
 }))
 
 function GroupProject(props) {
@@ -229,6 +244,12 @@ function GroupProject(props) {
     addProject: false,
   })
 
+  const formatCreateAtDate = format(_toInteger(`${_get(groupProjectData, 'createAt.seconds')}000`), 'dd LLL yyyy')
+  const formatUpdateAtDate = format(_toInteger(`${_get(groupProjectData, 'updateAt.seconds')}000`), 'dd LLL yyyy')
+
+  // selected group
+  const [selectedGroup, setSelectedGroup] = useState(!groupId ? 'My Project' : groupId)
+
   // add group
   const [addGroupOpen, setAddGroupOpen] = useState(false)
   const [addGroup, setAddGroup] = useState({
@@ -251,6 +272,16 @@ function GroupProject(props) {
   const [addProject, setAddProject] = useState([])
   const [addProjectData, setAddProjectData] = useState([])
 
+  // share group
+  const [shareGroupOpen, setShareGroupOpen] = useState(false)
+  const [shareGroupPermission, setShareGroupPermission] = useState('')
+  const sharePermissionList = [
+    { permission: 'Personal' },
+    { permission: 'Viewer' },
+    { permission: 'Editor' },
+  ]
+  console.log('shareGroupPermission', shareGroupPermission)
+
   // menu
   const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpen = Boolean(anchorEl)
@@ -265,8 +296,8 @@ function GroupProject(props) {
 
   // query
   const handleQuery = async () => {
-    setLoading(true)
     try {
+      setLoading(true)
       const myOutput = []
       const groupOutput = []
       if (!groupId) {
@@ -284,6 +315,11 @@ function GroupProject(props) {
           })
         })
       } else if (groupId) {
+        await db.collection('groupProject').doc(groupId).get().then((doc) => {
+          if (doc.data().uid !== userId) {
+            history.push(`/group-project/${groupId}/share`)
+          }
+        })
         const project = await db.collection('groupProject').doc(groupId).collection('project').get()
         project.docs.forEach((doc) => {
           doc.data().uidRef.get().then((res) => {
@@ -307,10 +343,11 @@ function GroupProject(props) {
       })
       setMyProject(myOutput)
       setGroupProject(groupOutput)
+      setLoading(false)
     } catch (err) {
       console.log(err)
+      history.push('/404')
     }
-    setLoading(false)
   }
 
   console.log('myProject', myProject)
@@ -319,11 +356,6 @@ function GroupProject(props) {
   // add Group
   const handleOpenGroup = () => {
     setAddGroupOpen(true)
-    // await db.collection('groupProject')
-    //   .doc('Hn6lcMC0e1dRuwAbCJjh')
-    //   .collection('project')
-    //   .doc()
-    //   .set(myProjectData[0])
   }
   const handleCloseGroup = () => {
     setAddGroupOpen(false)
@@ -350,7 +382,6 @@ function GroupProject(props) {
           .set({
             name: addGroup.name,
             note: addGroup.note,
-            ref: [],
             createAt: DateCreate,
             updateAt: DateCreate,
             permission: 'personal',
@@ -400,7 +431,7 @@ function GroupProject(props) {
     }
     setLoading(false)
   }
-  // TODO delete group
+  // delete group
   const handleOpenDeleteGroup = () => {
     handleMenuClose()
     setDeleteGroupOpen(true)
@@ -430,6 +461,7 @@ function GroupProject(props) {
     const getData = []
     const project = await db.collection('project')
       .where('uid', '==', userId)
+      .where('publish', '==', true)
       // .orderBy('updateAt', 'desc')
       .get()
     project.docs.forEach((doc) => {
@@ -471,8 +503,40 @@ function GroupProject(props) {
     setFilterGroup(!filterGroup)
   }
 
+  // share group
+  const handleOpenShareGroup = () => {
+    handleMenuClose()
+    setShareGroupPermission(groupProjectData.permission)
+    setShareGroupOpen(true)
+  }
+  const handleCloseShareGroup = () => {
+    setShareGroupOpen(false)
+    setShareGroupPermission('')
+    setAnchorEl(null)
+  }
+  const handleChangeShareGroup = (event) => {
+    setShareGroupPermission(event.target.value)
+  }
+  const handleSaveShareGroup = async () => {
+    const DateUpdate = new Date()
+    await db.collection('groupProject').doc(groupId)
+      .update({
+        permission: _lowerCase(shareGroupPermission),
+        updateAt: DateUpdate,
+      })
+    handleCloseShareGroup()
+    handleQuery()
+  }
+
+  // onClick listStack
+  const handleClickListStack = (onClick) => {
+    history.push(onClick)
+  }
+
   useEffect(() => {
     handleQuery()
+    // onClick listStack
+    setSelectedGroup(groupId || 'My Project')
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myUser, filterGroup, groupId])
 
@@ -513,7 +577,7 @@ function GroupProject(props) {
         sx: { mt: '8px' },
       }}
     >
-      <MenuItem onClick={handleMenuClose}>
+      <MenuItem onClick={handleOpenShareGroup}>
         {!loading && (
           <>
             <ListItemIcon>
@@ -669,6 +733,75 @@ function GroupProject(props) {
     </Dialog>
   )
 
+  const renderShareProject = (
+    <Dialog open={shareGroupOpen} onClose={handleCloseShareGroup}>
+      <DialogTitle>Share Group</DialogTitle>
+      <DialogContent>
+        {!loading && (
+          <>
+            <TextField
+              select
+              margin="dense"
+              label="Permission"
+              value={shareGroupPermission}
+              onChange={handleChangeShareGroup}
+              SelectProps={{
+                renderValue: (value) => _capitalize(value),
+              }}
+              variant="outlined"
+              fullWidth
+            >
+              {_map(sharePermissionList, (option) => (
+                <MenuItem value={option.permission}>
+                  {option.permission}
+                </MenuItem>
+              ))}
+            </TextField>
+            {shareGroupPermission !== _lowerCase('personal') && (
+              <>
+                <Box mt={1} />
+                <Box display="flex">
+                  <TextField
+                    label="link"
+                    value={`http://localhost:3000/group-project/${groupId}/share`}
+                    variant="outlined"
+                    fullWidth
+                    disabled
+                  />
+                  <Box ml={1} />
+                  <Button
+                    onClick={() => navigator.clipboard.writeText(`http://localhost:3000/group-project/${groupId}/share`)}
+                    variant="outlined"
+                  >
+                    Copy
+                  </Button>
+                </Box>
+              </>
+            )}
+          </>
+        )}
+        <Box mt={1} />
+        <DialogContentText>
+          Select a permission from this group. the permission that selected will effect to your group.
+        </DialogContentText>
+        <Box mt={1} />
+        <DialogContentText>
+          Personal - Only you can see this group
+        </DialogContentText>
+        <DialogContentText>
+          Viewer - User can see this group
+        </DialogContentText>
+        <DialogContentText>
+          Editor - User can edit project in this group
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseShareGroup} color="secondary">Cancel</Button>
+        <Button onClick={handleSaveShareGroup} color="primary">Add</Button>
+      </DialogActions>
+    </Dialog>
+  )
+
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
@@ -692,7 +825,46 @@ function GroupProject(props) {
             </Box>
           </Box>
           <Divider />
-          <Stack spacing={4} className={classes.listStack}>
+          <List component="nav" aria-label="main mailbox folders" className={classes.listStack}>
+            <ListItemButton
+              // selected={selectedGroup === 'My Project'}
+              onClick={() => handleClickListStack('/project')}
+              sx={{ paddingLeft: '0' }}
+            >
+              <ListItemText primary={(
+                <Typography
+                  variant="h6"
+                  // className={classes.listItemDone}
+                  color={`${selectedGroup === 'My Project' ? 'primary' : 'secondary'}`}
+                >
+                  My Project
+                </Typography>
+              )}
+              />
+            </ListItemButton>
+            {_map(groupProject, (data) => (
+              <>
+                <Box mt={2} />
+                <ListItemButton
+                  // selected={selectedGroup === data.name}
+                  onClick={() => handleClickListStack(`/group-project/${data.id}`)}
+                  sx={{ paddingLeft: '0' }}
+                >
+                  <ListItemText primary={(
+                    <Typography
+                      variant="h6"
+                      // className={classes.listItemDone}
+                      color={`${selectedGroup === data.id ? 'primary' : 'secondary'}`}
+                    >
+                      {data.name}
+                    </Typography>
+                  )}
+                  />
+                </ListItemButton>
+              </>
+            ))}
+          </List>
+          {/* <Stack spacing={4} className={classes.listStack}>
             <Box />
             <Link to="/project" className={classes.link}>
               My Project
@@ -702,52 +874,59 @@ function GroupProject(props) {
                 {data.name}
               </Link>
             ))}
-          </Stack>
+          </Stack> */}
           {/* <Divider /> */}
         </Box>
         <Box className={classes.pageRight} fullWidth>
           {!groupId ? (
-            <Box>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h4" fontWeight="bold">
-                  My Project
-                </Typography>
-                <Box display="flex" justifyContent="center" alignItems="center">
-                  <Button
-                    variant="contained"
-                    startIcon={<AddBoxIcon />}
-                    onClick={() => history.push('/project/create')}
-                  >
-                    Create
-                  </Button>
-                  {/* <IconButton color="primary">
-                    <AddBoxIcon />
-                  </IconButton> */}
-                </Box>
-              </Box>
-              <Divider />
-              <Box sx={{ flexGrow: 1 }} mt={2}>
-                <Grid container spacing={2} className={classes.gridProject}>
-                  {_map(myProjectData, (data) => (
-                    <>
-                      <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
-                        <CardProject
-                          values={data}
-                          loading={loading}
-                          userId={userId}
-                          groupId={groupId || 'null'}
-                          setLoading={setLoading}
-                          handleQuery={handleQuery}
-                        />
-                      </Grid>
-                    </>
-                  ))}
-                </Grid>
-              </Box>
-            </Box>
+            <>
+              {!loading ? (
+                <>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h4" fontWeight="bold">
+                      My Project
+                    </Typography>
+                    <Box display="flex" justifyContent="center" alignItems="center">
+                      <Button
+                        variant="contained"
+                        startIcon={<AddBoxIcon />}
+                        onClick={() => history.push('/project/create')}
+                      >
+                        Create
+                      </Button>
+                      {/* <IconButton color="primary">
+                        <AddBoxIcon />
+                      </IconButton> */}
+                    </Box>
+                  </Box>
+                  <Divider />
+                  <Box sx={{ flexGrow: 1 }} mt={2}>
+                    <Grid container spacing={2} className={classes.gridProject}>
+                      {_map(myProjectData, (data) => (
+                        <>
+                          <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
+                            <CardProject
+                              values={data}
+                              loading={loading}
+                              userId={userId}
+                              groupId={groupId || 'null'}
+                              setLoading={setLoading}
+                              handleQuery={handleQuery}
+                              actionType="edit"
+                            />
+                          </Grid>
+                        </>
+                      ))}
+                    </Grid>
+                  </Box>
+                </>
+              ) : (
+                <Loading />
+              )}
+            </>
           ) : (
             <Box>
-              {!loading && (
+              {!loading ? (
                 <>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                     <Box display="flex" alignItems="center">
@@ -765,7 +944,45 @@ function GroupProject(props) {
                         {groupProjectData.name}
                       </Typography>
                       <Box ml={1} />
-                      <Tooltip title={groupProjectData.note}>
+                      <Tooltip
+                        title={(
+                          <Grid container spacing={1} maxWidth="250px">
+                            <Grid item xs={12}>
+                              <Typography variant="h6">Group data</Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Typography variant="body2">Group</Typography>
+                            </Grid>
+                            <Grid item xs={8}>
+                              <Typography variant="body2">{groupProjectData.name}</Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Typography variant="body2">Note</Typography>
+                            </Grid>
+                            <Grid item xs={8}>
+                              <Typography variant="body2">{groupProjectData.note}</Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Typography variant="body2">Permission</Typography>
+                            </Grid>
+                            <Grid item xs={8}>
+                              <Typography variant="body2">{_capitalize(groupProjectData.permission)}</Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Typography variant="body2">Created</Typography>
+                            </Grid>
+                            <Grid item xs={8}>
+                              <Typography variant="body2">{formatCreateAtDate}</Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Typography variant="body2">Updated</Typography>
+                            </Grid>
+                            <Grid item xs={8}>
+                              <Typography variant="body2">{formatUpdateAtDate}</Typography>
+                            </Grid>
+                          </Grid>
+                        )}
+                      >
                         <IconButton size="small">
                           <InfoIcon fontSize="inherit" />
                         </IconButton>
@@ -795,6 +1012,7 @@ function GroupProject(props) {
                               groupId={groupId || 'null'}
                               setLoading={setLoading}
                               handleQuery={handleQuery}
+                              actionType="edit"
                             />
                           </Grid>
                         </>
@@ -802,6 +1020,8 @@ function GroupProject(props) {
                     </Grid>
                   </Box>
                 </>
+              ) : (
+                <Loading />
               )}
             </Box>
           )}
@@ -811,6 +1031,7 @@ function GroupProject(props) {
         {renderEditGroup}
         {renderDeleteGroup}
         {renderAddProject}
+        {renderShareProject}
       </Box>
     </Box>
   )

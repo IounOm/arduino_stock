@@ -46,6 +46,7 @@ import TwitterIcon from '@mui/icons-material/Twitter'
 
 import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
+import Loading from '../../components/Loading'
 import UploadImage from '../../components/UploadImage/UploadImage'
 import CardProject from '../../components/CardProject/CardProject'
 import { AuthContext } from '../../components/Auth'
@@ -71,10 +72,10 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     marginTop: '64px',
-    height: ({ id }) => `${_isEmpty(id) ? 'calc(100vh - 64px)' : 'auto'}`,
+    height: 'calc(100vh - 64px)',
     // height: 'calc(100vh - 64px)',
-    flexDirection: ({ id }) => `${_isEmpty(id) ? 'row' : 'column'}`,
-    marginBottom: ({ id }) => `${_isEmpty(id) ? '0px' : '32px'}`,
+    flexDirection: 'row',
+    marginBottom: '0px',
     padding: '0 120px 0 120px',
     [theme.breakpoints.down('lg')]: {
       padding: '0 40px 0 40px',
@@ -82,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.down('md')]: {
       marginTop: '84px',
-      marginBottom: ({ id }) => `${_isEmpty(id) ? '0px' : '0px'}`,
+      marginBottom: '0px',
       padding: '20px',
       height: '100%',
     },
@@ -161,11 +162,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-function Profile(props) {
-  const path = _get(props, 'computedMatch.params')
-  const { id } = path
-  console.log('id1111', id)
-  const classes = useStyles({ id })
+function Profile() {
+  const classes = useStyles()
   const dispatch = useDispatch()
   const myUser = useSelector(getUser)
   const {
@@ -216,70 +214,27 @@ function Profile(props) {
   const handleQuery = async () => {
     try {
       setLoading(true)
-      if (_isEmpty(id)) {
-        await setValues({
-          image: userImage || '',
-          name: userName,
-          note: userNote || '',
-          email: userEmail,
-          password: userPassword,
-          contact: {
-            website: userContact.website || '',
-            facebook: userContact.facebook || '',
-            twitter: userContact.twitter || '',
-            git: userContact.git || '',
-          },
-          errorEmail: false,
-          errorPassword: false,
-        })
-        setContact({
-          websiteName: _split(userContact.website, '/'),
-          facebookName: _split(userContact.facebook, '/'),
-          twitterName: _split(userContact.twitter, '/'),
-          gitName: _split(userContact.git, '/'),
-        })
-      } else {
-        const output = []
-        const getProject = await db.collection('project')
-          .where('uid', '==', id)
-          // .orderBy('updateAt', 'desc')
-          .get()
-        getProject.docs.forEach((doc) => {
-          doc.data().uidRef.get().then(async (res) => {
-            await output.push({
-              id: doc.id,
-              ...doc.data(),
-              uidRef: res.data(),
-            })
-          })
-        })
-        setProjectData(output)
-
-        await db.collection('users').doc(id).get().then((doc) => {
-          const data = doc.data()
-          setValues({
-            image: data.image || '',
-            name: data.name,
-            note: data.note || '',
-            email: data.email,
-            password: data.password,
-            contact: {
-              website: data.contact.website || '',
-              facebook: data.contact.facebook || '',
-              twitter: data.contact.twitter || '',
-              git: data.contact.git || '',
-            },
-            errorEmail: false,
-            errorPassword: false,
-          })
-          setContact({
-            websiteName: _split(data.contact.website, '/'),
-            facebookName: _split(data.contact.facebook, '/'),
-            twitterName: _split(data.contact.twitter, '/'),
-            gitName: _split(data.contact.git, '/'),
-          })
-        })
-      }
+      await setValues({
+        image: userImage || '',
+        name: userName,
+        note: userNote || '',
+        email: userEmail,
+        password: userPassword,
+        contact: {
+          website: userContact.website || '',
+          facebook: userContact.facebook || '',
+          twitter: userContact.twitter || '',
+          git: userContact.git || '',
+        },
+        errorEmail: false,
+        errorPassword: false,
+      })
+      setContact({
+        websiteName: _split(userContact.website, '/'),
+        facebookName: _split(userContact.facebook, '/'),
+        twitterName: _split(userContact.twitter, '/'),
+        gitName: _split(userContact.git, '/'),
+      })
       setLoading(false)
     } catch (err) {
       console.log(err)
@@ -389,245 +344,220 @@ function Profile(props) {
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myUser, path, id])
+  }, [myUser])
 
   console.log('projectData', projectData)
 
   return (
     <Box className={classes.box}>
-      <Box className={classes.paper}>
-        <Box className={classes.pageLeft} fullWidth>
-          <Box className={classes.profile}>
-            <UploadImage
-              collection="users"
-              doc={userId}
-              updateKey="image"
-              defaultImg={_isEmpty(id) ? userImage : values.image}
-              alt=""
-              width="250px"
-              maxWidth="250px"
-              height="250px"
-              loading={loading}
-              page="profile"
-              disabled={!_isEmpty(id)}
-            />
-          </Box>
-          {_isEmpty(id) && (
-          <Box className={classes.profile}>
-            <Box mt={2}>
-              <Divider />
-            </Box>
-            <Box className={classes.title} mt={2}>
-              <Typography variant="h4">Account</Typography>
-              {!editAccount && (
-                <Button variant="outlined" onClick={handleClickAccountEdit}>Edit</Button>
-              )}
-            </Box>
-            <TextField
-              variant="outlined"
-              fullWidth
-              label="Email"
-              onChange={handleChange('email')}
-              onClick={() => editAccount && setValues({ ...values, email: '' })}
-              value={values.email}
-              style={{ marginTop: '16px' }}
-              disabled={!editAccount}
-            />
-            <TextField
-              variant="outlined"
-              fullWidth
-              label="Password"
-              onChange={handleChange('password')}
-              onClick={() => editAccount && setValues({ ...values, password: '' })}
-              value={values.password}
-              style={{ marginTop: '16px' }}
-              disabled={!editAccount}
-            />
-            {editAccount && (
-              <Box className={classes.btSave}>
-                <Button variant="outlined" color="primary" onClick={handleCloseAccountEdit}>Cancel</Button>
-                <Box className={classes.btn}>
-                  <Button variant="contained" color="primary" onClick={handleSaveAccountEdit}>Save</Button>
-                </Box>
-              </Box>
-            )}
-          </Box>
-          )}
-        </Box>
-        <Box className={classes.pageRight} fullWidth>
-          <Box className={classes.profile}>
-            <Hidden mdUp>
-              <Divider />
-            </Hidden>
-            <Box className={classes.title} mt={2}>
-              <Typography variant="h4">User Profile</Typography>
-              {!editUser && _isEmpty(id) && (
-                <Button variant="outlined" onClick={handleClickUserEdit}>Edit</Button>
-              )}
-            </Box>
-            <Box width="100%" fullWidth>
-              <TextField
-                variant="outlined"
-                fullWidth
-                label="Username"
-                onChange={handleChange('name')}
-                value={values.name}
-                style={{ marginTop: '16px' }}
-                disabled={!editUser}
-              />
-              <TextField
-                fullWidth
-                label="Say something about yourself"
-                multiline
-                rows={1}
-                defaultValue=""
-                value={values.note}
-                onChange={handleChange('note')}
-                style={{ marginTop: '16px' }}
-                disabled={!editUser}
-              />
-              {editUser && (
-              <Box className={classes.btSave}>
-                <Button variant="outlined" color="primary" onClick={handleCloseUserEdit}>Cancel</Button>
-                <Box className={classes.btn}>
-                  <Button variant="contained" color="primary" onClick={handleSaveUserEdit}>Save</Button>
-                </Box>
-              </Box>
-              )}
-            </Box>
-          </Box>
-          <Box className={classes.profile}>
-            <Box mt={2}>
-              <Divider />
-            </Box>
-            <Box className={classes.title} mt={2}>
-              <Typography variant="h4">Contact</Typography>
-              {!editContact && _isEmpty(id) && (
-                <Button variant="outlined" onClick={handleClickContactEdit}>Edit</Button>
-              )}
-            </Box>
-            <Box width="100%" fullWidth>
-              {(!values.contact.website
-              && !values.contact.facebook
-              && !values.contact.twitter
-              && !values.contact.git) && (
-                <Box mt={1}>
-                  <Typography variant="body">
-                    Add your social info, your bio and website.
-                    Let the community know what you are into!
-                  </Typography>
-                </Box>
-              )}
-              {!editContact ? (
-                <Box display="flex" flexDirection="column" alignItems="start">
-                  {values.contact.website && (
-                    <>
-                      <Button variant="text" startIcon={<LanguageIcon />} href={values.contact.website} target="_blank">
-                        {contact.websiteName[contact.websiteName.length - 1] === '' ? contact.websiteName[contact.websiteName.length - 2] : contact.websiteName[contact.websiteName.length - 1]}
-                      </Button>
-                    </>
-                  )}
-                  {values.contact.facebook && (
-                    <>
-                      <Button variant="text" startIcon={<FacebookIcon />} href={values.contact.facebook} target="_blank">
-                        {contact.facebookName[contact.facebookName.length - 1] === '' ? contact.facebookName[contact.facebookName.length - 2] : contact.facebookName[contact.facebookName.length - 1]}
-                      </Button>
-                    </>
-                  )}
-                  {values.contact.twitter && (
-                    <>
-                      <Button variant="text" startIcon={<TwitterIcon />} href={values.contact.twitter} target="_blank">
-                        {contact.twitterName[contact.twitterName.length - 1] === '' ? contact.twitterName[contact.twitterName.length - 2] : contact.twitterName[contact.twitterName.length - 1]}
-                      </Button>
-                    </>
-                  )}
-                  {values.contact.git && (
-                    <>
-                      <Button variant="text" startIcon={<GitHubIcon />} href={values.contact.git} target="_blank">
-                        {contact.gitName[contact.gitName.length - 1] === '' ? contact.gitName[contact.gitName.length - 2] : contact.gitName[contact.gitName.length - 1]}
-                      </Button>
-                    </>
-                  )}
-                </Box>
-              ) : (
-                <>
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    label="Website"
-                    onChange={handleChange('contact', 'website')}
-                    value={values.contact.website}
-                    style={{ marginTop: '16px' }}
-                    disabled={!editContact}
-                  />
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    label="Facebook"
-                    onChange={handleChange('contact', 'facebook')}
-                    value={values.contact.facebook}
-                    style={{ marginTop: '16px' }}
-                    disabled={!editContact}
-                  />
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    label="Twitter"
-                    onChange={handleChange('contact', 'twitter')}
-                    value={values.contact.twitter}
-                    style={{ marginTop: '16px' }}
-                    disabled={!editContact}
-                  />
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    label="Git"
-                    onChange={handleChange('contact', 'git')}
-                    value={values.contact.git}
-                    style={{ marginTop: '16px' }}
-                    disabled={!editContact}
-                  />
-                </>
-              )}
-              {editContact && (
-              <Box className={classes.btSave}>
-                <Button variant="outlined" color="primary" onClick={handleCloseContactEdit}>Cancel</Button>
-                <Box className={classes.btn}>
-                  <Button variant="contained" color="primary" onClick={handleSaveContactEdit}>Save</Button>
-                </Box>
-              </Box>
-              )}
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-      {!_isEmpty(id) && (
+      {!loading ? (
         <>
-          <Box mt={2}>
-            <Divider />
-          </Box>
-          <Box>
-            <Grid container spacing={2} mt={2}>
-              {!loading && (
-                <>
-                  {_map(projectData, (data) => (
-                    <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
-                      <CardProject
-                        values={data}
-                        loading={loading}
-                        userId={id}
-                        groupId="null"
-                        setLoading={setLoading}
-                        handleQuery={handleQuery}
-                        actionType="view"
+          <Box className={classes.paper}>
+            <Box className={classes.pageLeft} fullWidth>
+              <Box className={classes.profile}>
+                <UploadImage
+                  collection="users"
+                  doc={userId}
+                  updateKey="image"
+                  defaultImg={userImage}
+                  alt=""
+                  width="250px"
+                  maxWidth="250px"
+                  height="250px"
+                  loading={loading}
+                  page="profile"
+                />
+              </Box>
+              <Box className={classes.profile}>
+                <Box mt={2}>
+                  <Divider />
+                </Box>
+                <Box className={classes.title} mt={2}>
+                  <Typography variant="h4">Account</Typography>
+                  {!editAccount && (
+                    <Button variant="outlined" onClick={handleClickAccountEdit}>Edit</Button>
+                  )}
+                </Box>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  label="Email"
+                  onChange={handleChange('email')}
+                  onClick={() => editAccount && setValues({ ...values, email: '' })}
+                  value={values.email}
+                  style={{ marginTop: '16px' }}
+                  disabled={!editAccount}
+                />
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  label="Password"
+                  onChange={handleChange('password')}
+                  onClick={() => editAccount && setValues({ ...values, password: '' })}
+                  value={values.password}
+                  style={{ marginTop: '16px' }}
+                  disabled={!editAccount}
+                />
+                {editAccount && (
+                  <Box className={classes.btSave}>
+                    <Button variant="outlined" color="primary" onClick={handleCloseAccountEdit}>Cancel</Button>
+                    <Box className={classes.btn}>
+                      <Button variant="contained" color="primary" onClick={handleSaveAccountEdit}>Save</Button>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+            <Box className={classes.pageRight} fullWidth>
+              <Box className={classes.profile}>
+                <Hidden mdUp>
+                  <Divider />
+                </Hidden>
+                <Box className={classes.title} mt={2}>
+                  <Typography variant="h4">User Profile</Typography>
+                  {!editUser && (
+                    <Button variant="outlined" onClick={handleClickUserEdit}>Edit</Button>
+                  )}
+                </Box>
+                <Box width="100%" fullWidth>
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    label="Username"
+                    onChange={handleChange('name')}
+                    value={values.name}
+                    style={{ marginTop: '16px' }}
+                    disabled={!editUser}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Say something about yourself"
+                    multiline
+                    rows={1}
+                    defaultValue=""
+                    value={values.note}
+                    onChange={handleChange('note')}
+                    style={{ marginTop: '16px' }}
+                    disabled={!editUser}
+                  />
+                  {editUser && (
+                  <Box className={classes.btSave}>
+                    <Button variant="outlined" color="primary" onClick={handleCloseUserEdit}>Cancel</Button>
+                    <Box className={classes.btn}>
+                      <Button variant="contained" color="primary" onClick={handleSaveUserEdit}>Save</Button>
+                    </Box>
+                  </Box>
+                  )}
+                </Box>
+              </Box>
+              <Box className={classes.profile}>
+                <Box mt={2}>
+                  <Divider />
+                </Box>
+                <Box className={classes.title} mt={2}>
+                  <Typography variant="h4">Contact</Typography>
+                  {!editContact && (
+                    <Button variant="outlined" onClick={handleClickContactEdit}>Edit</Button>
+                  )}
+                </Box>
+                <Box width="100%" fullWidth>
+                  {(!values.contact.website
+                  && !values.contact.facebook
+                  && !values.contact.twitter
+                  && !values.contact.git) && (
+                    <Box mt={1}>
+                      <Typography variant="body">
+                        Add your social info, your bio and website.
+                        Let the community know what you are into!
+                      </Typography>
+                    </Box>
+                  )}
+                  {!editContact ? (
+                    <Box display="flex" flexDirection="column" alignItems="start">
+                      {values.contact.website && (
+                        <>
+                          <Button variant="text" startIcon={<LanguageIcon />} href={values.contact.website} target="_blank">
+                            {contact.websiteName[contact.websiteName.length - 1] === '' ? contact.websiteName[contact.websiteName.length - 2] : contact.websiteName[contact.websiteName.length - 1]}
+                          </Button>
+                        </>
+                      )}
+                      {values.contact.facebook && (
+                        <>
+                          <Button variant="text" startIcon={<FacebookIcon />} href={values.contact.facebook} target="_blank">
+                            {contact.facebookName[contact.facebookName.length - 1] === '' ? contact.facebookName[contact.facebookName.length - 2] : contact.facebookName[contact.facebookName.length - 1]}
+                          </Button>
+                        </>
+                      )}
+                      {values.contact.twitter && (
+                        <>
+                          <Button variant="text" startIcon={<TwitterIcon />} href={values.contact.twitter} target="_blank">
+                            {contact.twitterName[contact.twitterName.length - 1] === '' ? contact.twitterName[contact.twitterName.length - 2] : contact.twitterName[contact.twitterName.length - 1]}
+                          </Button>
+                        </>
+                      )}
+                      {values.contact.git && (
+                        <>
+                          <Button variant="text" startIcon={<GitHubIcon />} href={values.contact.git} target="_blank">
+                            {contact.gitName[contact.gitName.length - 1] === '' ? contact.gitName[contact.gitName.length - 2] : contact.gitName[contact.gitName.length - 1]}
+                          </Button>
+                        </>
+                      )}
+                    </Box>
+                  ) : (
+                    <>
+                      <TextField
+                        variant="outlined"
+                        fullWidth
+                        label="Website"
+                        onChange={handleChange('contact', 'website')}
+                        value={values.contact.website}
+                        style={{ marginTop: '16px' }}
+                        disabled={!editContact}
                       />
-                    </Grid>
-                  ))}
-                </>
-              )}
-            </Grid>
+                      <TextField
+                        variant="outlined"
+                        fullWidth
+                        label="Facebook"
+                        onChange={handleChange('contact', 'facebook')}
+                        value={values.contact.facebook}
+                        style={{ marginTop: '16px' }}
+                        disabled={!editContact}
+                      />
+                      <TextField
+                        variant="outlined"
+                        fullWidth
+                        label="Twitter"
+                        onChange={handleChange('contact', 'twitter')}
+                        value={values.contact.twitter}
+                        style={{ marginTop: '16px' }}
+                        disabled={!editContact}
+                      />
+                      <TextField
+                        variant="outlined"
+                        fullWidth
+                        label="Git"
+                        onChange={handleChange('contact', 'git')}
+                        value={values.contact.git}
+                        style={{ marginTop: '16px' }}
+                        disabled={!editContact}
+                      />
+                    </>
+                  )}
+                  {editContact && (
+                  <Box className={classes.btSave}>
+                    <Button variant="outlined" color="primary" onClick={handleCloseContactEdit}>Cancel</Button>
+                    <Box className={classes.btn}>
+                      <Button variant="contained" color="primary" onClick={handleSaveContactEdit}>Save</Button>
+                    </Box>
+                  </Box>
+                  )}
+                </Box>
+              </Box>
+            </Box>
           </Box>
         </>
+      ) : (
+        <Loading />
       )}
     </Box>
   )
