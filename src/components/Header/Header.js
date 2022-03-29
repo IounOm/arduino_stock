@@ -9,6 +9,7 @@ import _map from 'lodash/map'
 import _kebabCase from 'lodash/kebabCase'
 import _get from 'lodash/get'
 import _split from 'lodash/split'
+import _isEmpty from 'lodash/isEmpty'
 
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -166,10 +167,11 @@ function Header(props) {
     userId,
     save,
     publish,
+    isLogin,
   } = myUser
   const [anchorEl, setAnchorEl] = useState(false)
   const [anchorElSave, setAnchorElSave] = useState(false)
-  const [userData, setUserData] = useState()
+  const [userData, setUserData] = useState('')
   const [loading, setLoading] = useState(false)
 
   // const [switchClick, setSwitchClick] = useState(false)
@@ -204,7 +206,7 @@ function Header(props) {
 
   const handleQuery = async () => {
     setLoading(true)
-    await setUserData(userImage || '')
+    await setUserData(!_isEmpty(userId) ? userImage : '')
     setLoading(false)
   }
 
@@ -212,6 +214,7 @@ function Header(props) {
     if (type === 'Logout') {
       setAnchorEl(false)
       dispatch(userAction.logout())
+      history.push('/login')
     } else {
       setAnchorEl(false)
       history.push(`/${_kebabCase(type)}`)
@@ -399,7 +402,7 @@ function Header(props) {
                 <IconButton
                   onClick={handleProfileMenuOpen}
                   sx={{ p: 0 }}
-                  // edge="end"
+                      // edge="end"
                   aria-label="account of current user"
                   aria-controls={menuId}
                   aria-haspopup="true"

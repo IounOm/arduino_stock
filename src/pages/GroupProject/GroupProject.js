@@ -98,6 +98,7 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
+    minHeight: 'calc(100vh - 182px)',
     marginTop: '64px',
     padding: '40px 120px 40px 120px',
     [theme.breakpoints.down('lg')]: {
@@ -107,6 +108,7 @@ const useStyles = makeStyles((theme) => ({
       padding: '16px 16px 16px 16px',
       height: 'auto',
       marginTop: '56px',
+      minHeight: 'calc(100vh - 123px)',
     },
   },
   title: {
@@ -128,7 +130,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     width: '15%',
-    height: 'calc(100vh - 152px)',
+    height: 'calc(100vh - 172px)',
     [theme.breakpoints.up('sm')]: {
       position: 'fixed',
     },
@@ -644,8 +646,12 @@ function GroupProject(props) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseGroup} color="secondary">Cancel</Button>
-        <Button onClick={handleAddGroup}>Save</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseGroup} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={handleAddGroup} color="primary" variant="contained">Save</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -679,8 +685,12 @@ function GroupProject(props) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseEditGroup} color="secondary">Cancel</Button>
-        <Button onClick={handleEditGroup}>Save</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseEditGroup} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={handleEditGroup} color="primary" variant="contained">Save</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -695,8 +705,12 @@ function GroupProject(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDeleteGroup} color="secondary">Cancel</Button>
-        <Button onClick={handleDeleteGroup} color="error">Delete</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseDeleteGroup} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={handleDeleteGroup} color="error" variant="contained">Delete</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -727,8 +741,12 @@ function GroupProject(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseAddProject} color="secondary">Cancel</Button>
-        <Button onClick={handleSaveAddProject} color="primary">Add</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseAddProject} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={handleSaveAddProject} color="primary" variant="contained">Add</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -796,8 +814,12 @@ function GroupProject(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseShareGroup} color="secondary">Cancel</Button>
-        <Button onClick={handleSaveShareGroup} color="primary">Add</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseShareGroup} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={handleSaveShareGroup} color="primary" variant="contained">Add</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -844,23 +866,24 @@ function GroupProject(props) {
             </ListItemButton>
             {_map(groupProject, (data) => (
               <>
-                <Box mt={2} />
-                <ListItemButton
-                  // selected={selectedGroup === data.name}
-                  onClick={() => handleClickListStack(`/group-project/${data.id}`)}
-                  sx={{ paddingLeft: '0' }}
-                >
-                  <ListItemText primary={(
-                    <Typography
-                      variant="h6"
-                      // className={classes.listItemDone}
-                      color={`${selectedGroup === data.id ? 'primary' : 'secondary'}`}
-                    >
-                      {data.name}
-                    </Typography>
-                  )}
-                  />
-                </ListItemButton>
+                <Box mt={2}>
+                  <ListItemButton
+                    // selected={selectedGroup === data.name}
+                    onClick={() => handleClickListStack(`/group-project/${data.id}`)}
+                    sx={{ paddingLeft: '0' }}
+                  >
+                    <ListItemText primary={(
+                      <Typography
+                        variant="h6"
+                        // className={classes.listItemDone}
+                        color={`${selectedGroup === data.id ? 'primary' : 'secondary'}`}
+                      >
+                        {data.name}
+                      </Typography>
+                    )}
+                    />
+                  </ListItemButton>
+                </Box>
               </>
             ))}
           </List>

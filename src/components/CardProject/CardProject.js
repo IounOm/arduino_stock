@@ -217,8 +217,12 @@ function CardProject(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
-        <Button onClick={() => handleDeleteProject('project')} color="error">Delete</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseMenuDelete} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={() => handleDeleteProject('project')} color="error" variant="contained">Delete</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -232,8 +236,12 @@ function CardProject(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
-        <Button onClick={() => handleDeleteProject('groupProject')} color="error">Delete</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseMenuDelete} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={() => handleDeleteProject('groupProject')} color="error" variant="contained">Delete</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )

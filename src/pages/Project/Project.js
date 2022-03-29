@@ -50,6 +50,10 @@ import Switch from '@mui/material/Switch'
 import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Paper from '@mui/material/Paper'
+import CircularProgress from '@mui/material/CircularProgress'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -92,6 +96,7 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
+    minHeight: 'calc(100vh - 182px)',
     marginTop: '64px',
     padding: '40px 25% 40px 25%',
     [theme.breakpoints.down('lg')]: {
@@ -99,11 +104,13 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.down('md')]: {
       padding: '20px 15% 20px 15%',
+      minHeight: 'calc(100vh - 142px)',
     },
     [theme.breakpoints.down('sm')]: {
       padding: '16px 16px 16px 16px',
       height: 'auto',
       marginTop: '56px',
+      minHeight: 'calc(100vh - 123px)',
     },
   },
   title: {
@@ -138,7 +145,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: '0 0 0 9.6px',
+    padding: '0 9.6px',
     // margin: '40px 250px 0 250px',
     // [theme.breakpoints.down('lg')]: {
     //   margin: '40px 80px 0px 89.6px',
@@ -185,6 +192,7 @@ function Project(props) {
   // const storage = firebase.storage()
 
   const [loading, setLoading] = useState(false)
+  const [loadingComment, setLoadingComment] = useState(false)
   const [docId, setDocId] = useState('')
   // const [article, setArticle] = useState('')
   const [value, setValue] = useState({
@@ -199,6 +207,11 @@ function Project(props) {
     subtitle: '',
     tag: '',
   })
+  const [writeComment, setWriteComment] = useState('')
+  const [errorComment, setErrorComment] = useState(false)
+  const [comment, setComment] = useState([])
+  const [commentData, setCommentData] = useState([])
+  const [filterComment, setFilterComment] = useState(false)
 
   const [editDisable, setEditDisable] = useState(false)
   const [Disable, setDisable] = useState(false)
@@ -217,6 +230,7 @@ function Project(props) {
     subtitle: false,
     tag: false,
   })
+  console.log('comment1', comment)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [deleteMenuOpen, setDeleteMenuOpen] = useState(false)
@@ -256,7 +270,9 @@ function Project(props) {
             setValue({ ...value, article: data.article })
             data.uidRef.get().then((res) => {
               if (actionType === 'edit' && doc.data().uid !== userId) {
-                history.push('/404')
+                history.push('/404') // you cant edit other project
+              } else if (actionType === 'view' && doc.data().uid !== userId && doc.data().publish !== true) {
+                history.push('/404') // this project not publish
               } else {
                 if (actionType === 'view' && doc.data().uid !== userId) {
                   setDisable(true)
@@ -306,6 +322,47 @@ function Project(props) {
     } catch (err) {
       console.log(err)
       history.push('/404')
+    }
+  }
+
+  const handleQueryComment = async () => {
+    try {
+      setLoadingComment(true)
+      const output = []
+      if (projectId && !groupId) {
+        const comments = await db.collection('project').doc(projectId).collection('comment')
+          .orderBy('createAt', filterComment ? 'desc' : 'asc')
+          .get()
+        comments.docs.forEach((doc) => {
+          doc.data().uidRef.get().then((res) => {
+            output.push({
+              id: doc.id,
+              ...doc.data(),
+              uidRef: res.data(),
+            })
+            setComment([...output])
+          })
+        })
+      } else if (projectId && groupId) {
+        const comments = await db.collection('groupProject').doc(groupId).collection('project').doc(projectId)
+          .collection('comment')
+          .orderBy('createAt', filterComment ? 'desc' : 'asc')
+          .get()
+        comments.docs.forEach((doc) => {
+          doc.data().uidRef.get().then((res) => {
+            output.push({
+              id: doc.id,
+              ...doc.data(),
+              uidRef: res.data(),
+            })
+            setComment([...output])
+          })
+        })
+      }
+      setLoadingComment(false)
+    } catch (err) {
+      setLoadingComment(false)
+      console.log(err)
     }
   }
 
@@ -459,10 +516,59 @@ function Project(props) {
     }
   }
 
+  // write comment
+  const handleChangeComment = (event) => {
+    setWriteComment(event.target.value)
+  }
+  // filter comment
+  const handleFilterComment = () => {
+    setFilterComment(!filterComment)
+  }
+  const handleSaveComment = async () => {
+    try {
+      setLoadingComment(true)
+      const DateCreate = new Date()
+      if (_isEmpty(writeComment)) {
+        setErrorComment(true)
+      } else if (projectId && !groupId) {
+        await db.collection('project').doc(projectId).collection('comment').doc()
+          .set({
+            comment: writeComment,
+            createAt: DateCreate,
+            updateAt: DateCreate,
+            uid: userId,
+            uidRef: db.doc(`users/${userId}`),
+          })
+        handleQueryComment()
+      } else if (projectId && groupId) {
+        await db.collection('groupProject').doc(groupId).collection('project').doc(projectId)
+          .collection('comment')
+          .doc()
+          .set({
+            comment: writeComment,
+            createAt: DateCreate,
+            updateAt: DateCreate,
+            uid: userId,
+            uidRef: db.doc(`users/${userId}`),
+          })
+        handleQueryComment()
+      }
+      setWriteComment('')
+      setLoadingComment(false)
+    } catch (err) {
+      setLoadingComment(false)
+      console.log(err)
+    }
+  }
+
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId])
+  }, [projectId, groupId])
+  useEffect(() => {
+    handleQueryComment()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, groupId, filterComment])
 
   useEffect(() => {
     if (save === true) {
@@ -490,6 +596,11 @@ function Project(props) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path])
+
+  useEffect(() => {
+    setCommentData(comment)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [comment])
 
   console.log('errorSave', errorSave)
 
@@ -573,8 +684,12 @@ function Project(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseSave} color="secondary">Cancel</Button>
-        <Button onClick={handleSave}>Save</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseSave} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={handleSave} color="primary" variant="contained">Save</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -623,8 +738,12 @@ function Project(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
-        <Button onClick={() => handleDeleteProject('project')} color="error">Delete</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseMenuDelete} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={() => handleDeleteProject('project')} color="error" variant="contained">Delete</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
@@ -638,13 +757,19 @@ function Project(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseMenuDelete} color="secondary">Cancel</Button>
-        <Button onClick={() => handleDeleteProject('groupProject')} color="error">Delete</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseMenuDelete} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={() => handleDeleteProject('groupProject')} color="error" variant="contained">Delete</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
 
   console.log('loading', loading)
+  console.log('writeComment', writeComment)
+  console.log('commentData', commentData)
 
   return (
     <Box className={classes.box}>
@@ -675,7 +800,9 @@ function Project(props) {
                 )}
               </>
             ) : (
-              <Loading />
+              <Box display="flex" alignItems="center" justifyContent="center" pb={1}>
+                <CircularProgress />
+              </Box>
             )}
           </Box>
         )}
@@ -688,36 +815,80 @@ function Project(props) {
           />
         </Box>
         {(projectId && actionType !== 'edit') && (
-          <>
+          <Box display={{ margin: '0 9.6px' }}>
             <Divider />
-            <Typography variant="h6" fontWeight="bold">comments</Typography>
-            {/* <Box className={classes.headerText}>
-              <Box className={classes.headerLeft}>
-                <Avatar
-                  alt={value.uidRef.name}
-                  src={value.uidRef.image}
-                  sx={{ width: 48, height: 48 }}
-                />
-                <Box ml={2}>
-                  <Typography variant="body2">
-                    {value.uidRef.name}
+            <Box display="flex" justifyContent="space-between" alignItems="center" mt={2} mb={2}>
+              <Typography variant="h6" fontWeight="bold">{`comments${!_isEmpty(commentData) ? ` (${commentData.length})` : ''}`}</Typography>
+              {!_isEmpty(commentData) && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={filterComment ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                  onClick={handleFilterComment}
+                >
+                  <Typography variant="subtitle1">
+                    {filterComment ? 'Newest' : 'Oldest'}
                   </Typography>
-                  <Typography variant="body2" color="secondary" fontWeight="normal">
-                    {formatCreateAtDate}
-                  </Typography>
-                </Box>
-              </Box>
-              {Disable === false && (
-              <IconButton onClick={handleMenuOpen} size="small">
-                <MoreVertIcon />
-              </IconButton>
+                </Button>
               )}
-            </Box> */}
-            <Divider />
-            <CommentBox
-              value={[]}
-            />
-          </>
+            </Box>
+            <Card sx={{
+              // minWidth: 240,
+              boxShadow: '0px 0px 10px 1px #E0E0E0',
+            }}
+            >
+              <CardContent sx={{ padding: '16px !important' }}>
+                <Box className={classes.headerLeft}>
+                  <Avatar
+                    alt={userName}
+                    src={userImage}
+                    sx={{ width: 36, height: 36 }}
+                  />
+                  <Box ml={2}>
+                    <Typography variant="body2">
+                      {userName}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box mt={2}>
+                  <TextField
+                    fullWidth
+                    label="Share your thoughts"
+                    multiline
+                    rows={3}
+                    defaultValue=""
+                    variant="filled"
+                    // variant="outlined"
+                    value={writeComment}
+                    onChange={handleChangeComment}
+                    error={writeComment ? false : errorComment}
+                    // disabled={!editUser}
+                  />
+                </Box>
+                <Box mt={2} display="flex" justifyContent="end">
+                  <Button size="small" variant="contained" onClick={handleSaveComment}>
+                    <Typography variant="body2">
+                      Post
+                    </Typography>
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+            <Box mt={4} />
+            {!_isEmpty(commentData) && (
+              <Divider />
+            )}
+            {_map(commentData, (data) => (
+              <CommentBox
+                values={data}
+                loading={loadingComment}
+                handleQuery={handleQueryComment}
+                projectId={projectId}
+                groupId={groupId}
+                userId={userId}
+              />
+            ))}
+          </Box>
         )}
         {renderMunuSave}
         {renderMenuEdit}

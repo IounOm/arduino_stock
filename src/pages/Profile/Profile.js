@@ -72,25 +72,30 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     marginTop: '64px',
-    height: 'calc(100vh - 64px)',
+    // height: 'calc(100vh - 64px)',
+    minHeight: 'calc(100vh - 182px)',
     // height: 'calc(100vh - 64px)',
     flexDirection: 'row',
-    marginBottom: '0px',
-    padding: '0 120px 0 120px',
+    // marginBottom: '0px',
+    padding: '40px 12%',
+    // padding: '0 120px 0 120px',
     [theme.breakpoints.down('lg')]: {
       padding: '0 40px 0 40px',
       // height: '100%',
+      minHeight: 'calc(100vh - 102px)',
     },
     [theme.breakpoints.down('md')]: {
-      marginTop: '84px',
-      marginBottom: '0px',
-      padding: '20px',
+      // marginTop: '84px',
+      // marginBottom: '0px',
+      padding: '20px 10%',
       height: '100%',
+      minHeight: 'calc(100vh - 142px)',
     },
     [theme.breakpoints.down('sm')]: {
       marginTop: '56px',
       padding: '16px',
       height: 'auto',
+      minHeight: 'calc(100vh - 123px)',
     },
   },
   profile: {
@@ -433,7 +438,7 @@ function Profile() {
                     fullWidth
                     label="Say something about yourself"
                     multiline
-                    rows={1}
+                    rows={3}
                     defaultValue=""
                     value={values.note}
                     onChange={handleChange('note')}

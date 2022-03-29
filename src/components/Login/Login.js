@@ -40,10 +40,14 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 'calc(100vh)',
+    // height: 'calc(100vh)',
+    marginTop: '64px',
+    minHeight: 'calc(100vh - 102px)',
     [theme.breakpoints.down('sm')]: {
+      marginTop: '56px',
       width: '90%',
-      height: 'calc(100vh - 56px)',
+      // height: 'calc(100vh - 56px)',
+      minHeight: 'calc(100vh - 91px)',
     },
   },
   card: {
@@ -53,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     width: '500px',
     padding: '32px',
-    backgroundColor: '#FCFBFB',
+    backgroundColor: '#F9F9F9',
     borderRadius: '25px',
     [theme.breakpoints.down('sm')]: {
       width: '90%',

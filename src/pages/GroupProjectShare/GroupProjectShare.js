@@ -53,6 +53,7 @@ import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Paper from '@mui/material/Paper'
 import Badge from '@mui/material/Badge'
+import SwipeableDrawer from '@mui/material/SwipeableDrawer'
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -96,6 +97,7 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
+    minHeight: 'calc(100vh - 182px)',
     marginTop: '64px',
     padding: '40px 120px 40px 120px',
     [theme.breakpoints.down('lg')]: {
@@ -105,6 +107,7 @@ const useStyles = makeStyles((theme) => ({
       padding: '16px 16px 16px 16px',
       height: 'auto',
       marginTop: '56px',
+      minHeight: 'calc(100vh - 123px)',
     },
   },
   title: {
@@ -139,9 +142,10 @@ const useStyles = makeStyles((theme) => ({
     },
     [theme.breakpoints.down('sm')]: {
       width: 'auto',
-      // height: 'auto',
-      height: '200px',
+      height: 'auto',
+      // height: '200px',
       marginRight: '0px',
+      marginBottom: '16px',
     },
   },
   pageRight: {
@@ -234,7 +238,6 @@ function GroupProject(props) {
   const [groupProject, setGroupProject] = useState([])
   const [groupProjectData, setGroupProjectData] = useState({})
   const [groupOwner, setGroupOwner] = useState({})
-  const [filterGroup, setFilterGroup] = useState(false)
   const [error, setError] = useState({
     addGroupName: false,
     addGroupNote: false,
@@ -243,52 +246,21 @@ function GroupProject(props) {
     addProject: false,
   })
 
+  const [anchor, setAnchor] = useState(false)
+  const handleOpenAnchor = () => {
+    setAnchor(true)
+  }
+  const handleCloseAnchor = () => {
+    setAnchor(false)
+  }
+
   const formatCreateAtDate = format(_toInteger(`${_get(groupOwner, 'createAt.seconds')}000`), 'dd LLL yyyy')
   const formatUpdateAtDate = format(_toInteger(`${_get(groupOwner, 'updateAt.seconds')}000`), 'dd LLL yyyy')
-
-  // add group
-  const [addGroupOpen, setAddGroupOpen] = useState(false)
-  const [addGroup, setAddGroup] = useState({
-    name: '',
-    note: '',
-  })
-
-  // edit group
-  const [editGroupOpen, setEditGroupOpen] = useState(false)
-  const [editGroup, setEditGroup] = useState({
-    name: '',
-    note: '',
-  })
-
-  // delete group
-  const [deleteGroupOpen, setDeleteGroupOpen] = useState(false)
 
   // Add project
   const [addProjectOpen, setAddProjectOpen] = useState(false)
   const [addProject, setAddProject] = useState([])
   const [addProjectData, setAddProjectData] = useState([])
-
-  // share group
-  const [shareGroupOpen, setShareGroupOpen] = useState(false)
-  const [shareGroupPermission, setShareGroupPermission] = useState('')
-  const sharePermissionList = [
-    { permission: 'Personal' },
-    { permission: 'Viewer' },
-    { permission: 'Editor' },
-  ]
-  console.log('shareGroupPermission', shareGroupPermission)
-
-  // menu
-  const [anchorEl, setAnchorEl] = useState(null)
-  const isMenuOpen = Boolean(anchorEl)
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
 
   // query
   const handleQuery = async () => {
@@ -300,7 +272,7 @@ function GroupProject(props) {
         if (doc.data().uid === userId) {
           history.push(`/group-project/${groupId}`)
         } else if (doc.data().permission === 'personal') {
-          history.push('/404')
+          history.push('/404') // this is private group
         } else {
           groupOutput.push({
             id: doc.id,
@@ -321,22 +293,6 @@ function GroupProject(props) {
           })
         })
       })
-      // await db.collection('groupProject').doc(groupId).get().then((doc) => {
-      //   groupOutput.push({
-      //     id: doc.id,
-      //     ...doc.data(),
-      //   })
-      // })
-      // const groupData = await db.collection('groupProject')
-      //   .where('uid', '==', userId)
-      //   .orderBy('createAt', filterGroup ? 'desc' : 'asc')
-      //   .get()
-      // groupData.docs.forEach((doc) => {
-      //   groupOutput.push({
-      //     id: doc.id,
-      //     ...doc.data(),
-      //   })
-      // })
       setMyProject(myOutput)
       setGroupProject(groupOutput)
       setLoading(false)
@@ -345,103 +301,6 @@ function GroupProject(props) {
       history.push('/404')
     }
   }
-
-  console.log('myProject', myProject)
-  console.log('GroupProject', groupProject)
-  console.log('groupOwner', groupOwner)
-
-  // add Group
-  // const handleOpenGroup = () => {
-  //   setAddGroupOpen(true)
-  // }
-  // const handleCloseGroup = () => {
-  //   setAddGroupOpen(false)
-  //   setAddGroup({
-  //     name: '',
-  //     note: '',
-  //   })
-  //   setError({ ...error, addGroupName: false, addGroupNote: false })
-  // }
-  // const handleChangeGroup = (prop) => (event) => {
-  //   setAddGroup({ ...addGroup, [prop]: event.target.value })
-  // }
-  // // permission: 'personal', 'viewer', 'editor'
-  // const handleAddGroup = async () => {
-  //   try {
-  //     setLoading(true)
-  //     const DateCreate = new Date()
-  //     if (_isEmpty(addGroup.name)) {
-  //       setError({ ...error, addGroupName: true })
-  //     } else if (_isEmpty(addGroup.note)) {
-  //       setError({ ...error, addGroupNote: true })
-  //     } else {
-  //       await db.collection('groupProject').doc()
-  //         .set({
-  //           name: addGroup.name,
-  //           note: addGroup.note,
-  //           createAt: DateCreate,
-  //           updateAt: DateCreate,
-  //           permission: 'personal',
-  //           uid: userId,
-  //         })
-  //       handleCloseGroup()
-  //       handleQuery()
-  //     }
-  //     setLoading(false)
-  //   } catch (err) {
-  //     console.log(err)
-  //     setLoading(false)
-  //   }
-  // }
-  // edit group
-  // const handleOpenEditGroup = () => {
-  //   handleMenuClose()
-  //   setEditGroupOpen(true)
-  // }
-  // const handleCloseEditGroup = () => {
-  //   setEditGroupOpen(false)
-  //   setEditGroup({
-  //     name: '',
-  //     note: '',
-  //   })
-  //   setError({ ...error, editGroupName: false, editGroupNote: false })
-  // }
-  // const handleChangeEditGroup = (prop) => (event) => {
-  //   setEditGroup({ ...editGroup, [prop]: event.target.value })
-  // }
-  // const handleEditGroup = async () => {
-  //   setLoading(true)
-  //   const DateUpdate = new Date()
-  //   if (_isEmpty(editGroup.name)) {
-  //     setError({ ...error, editGroupName: true })
-  //   } else if (_isEmpty(editGroup.note)) {
-  //     setError({ ...error, editGroupNote: true })
-  //   } else {
-  //     await db.collection('groupProject').doc(groupId)
-  //       .update({
-  //         name: editGroup.name,
-  //         note: editGroup.note,
-  //         updateAt: DateUpdate,
-  //       })
-  //     handleCloseEditGroup()
-  //     handleQuery()
-  //   }
-  //   setLoading(false)
-  // }
-  // delete group
-  // const handleOpenDeleteGroup = () => {
-  //   handleMenuClose()
-  //   setDeleteGroupOpen(true)
-  // }
-  // const handleCloseDeleteGroup = () => {
-  //   setDeleteGroupOpen(false)
-  // }
-  // const handleDeleteGroup = async () => {
-  //   await db.collection('groupProject').doc(groupId).delete()
-  //   handleCloseDeleteGroup()
-  //   handleQuery()
-  //   history.push('/project')
-  // }
 
   // add project
   const handleOpenAddProject = () => {
@@ -475,8 +334,6 @@ function GroupProject(props) {
       setAddProject(result)
     }
   }
-  console.log('addProjectDataFilter', addProject)
-  console.log('addProjectData', addProjectData)
   const handleSaveAddProject = async () => {
     const outputData = addProjectData
     if (_isEmpty(outputData) || outputData.error === true) {
@@ -492,43 +349,12 @@ function GroupProject(props) {
       setAddProjectOpen(false)
       handleQuery()
     }
-    console.log('outputData', outputData)
   }
-  console.log('error1', error)
-  // filter group
-  // const handleFilterGroup = () => {
-  //   setFilterGroup(!filterGroup)
-  // }
-
-  // share group
-  // const handleOpenShareGroup = () => {
-  //   handleMenuClose()
-  //   setShareGroupPermission(groupProjectData.permission)
-  //   setShareGroupOpen(true)
-  // }
-  // const handleCloseShareGroup = () => {
-  //   setShareGroupOpen(false)
-  //   setShareGroupPermission('')
-  //   setAnchorEl(null)
-  // }
-  // const handleChangeShareGroup = (event) => {
-  //   setShareGroupPermission(event.target.value)
-  // }
-  // const handleSaveShareGroup = async () => {
-  //   const DateUpdate = new Date()
-  //   await db.collection('groupProject').doc(groupId)
-  //     .update({
-  //       permission: _lowerCase(shareGroupPermission),
-  //       updateAt: DateUpdate,
-  //     })
-  //   handleCloseShareGroup()
-  //   handleQuery()
-  // }
 
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myUser, filterGroup, groupId])
+  }, [myUser, groupId])
 
   // filter groupData
   useEffect(() => {
@@ -544,152 +370,6 @@ function GroupProject(props) {
     setMyProjectData(myProject)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupProject, groupId, myProject])
-
-  console.log('groupProjectData', groupProjectData)
-  console.log('myProject', myProject)
-  console.log('myProjectData', myProjectData)
-
-  // const renderMenu = (
-  //   <Menu
-  //     anchorEl={anchorEl}
-  //     anchorOrigin={{
-  //       vertical: 'bottom',
-  //       horizontal: 'center',
-  //     }}
-  //     keepMounted
-  //     transformOrigin={{
-  //       vertical: 'top',
-  //       horizontal: 'center',
-  //     }}
-  //     open={isMenuOpen}
-  //     onClose={handleMenuClose}
-  //     PaperProps={{
-  //       sx: { mt: '8px' },
-  //     }}
-  //   >
-  //     <MenuItem onClick={handleOpenShareGroup}>
-  //       {!loading && (
-  //         <>
-  //           <ListItemIcon>
-  //             <PeopleIcon
-  //               fontSize="small"
-  //               color={groupProjectData.permission !== 'personal' ? 'primary' : 'secondary'}
-  //             />
-  //           </ListItemIcon>
-  //           <ListItemText>
-  //             <Typography
-  //               color={groupProjectData.permission !== 'personal' ? 'primary' : 'secondary'}
-  //             >
-  //               Share
-  //             </Typography>
-  //           </ListItemText>
-  //         </>
-  //       )}
-  //     </MenuItem>
-  //     <MenuItem onClick={handleOpenEditGroup}>
-  //       <ListItemIcon>
-  //         <EditIcon fontSize="small" />
-  //       </ListItemIcon>
-  //       <ListItemText>
-  //         <Typography>Edit</Typography>
-  //       </ListItemText>
-  //     </MenuItem>
-  //     <MenuItem onClick={handleOpenDeleteGroup}>
-  //       <ListItemIcon>
-  //         <DeleteIcon fontSize="small" color="error" />
-  //       </ListItemIcon>
-  //       <ListItemText>
-  //         <Typography color="error">Delete</Typography>
-  //       </ListItemText>
-  //     </MenuItem>
-  //   </Menu>
-  // )
-
-  // const renderCreateGroup = (
-  //   <Dialog open={addGroupOpen} onClose={handleCloseGroup}>
-  //     <DialogTitle>Add Group</DialogTitle>
-  //     <DialogContent>
-  //       <DialogContentText>
-  //         Create your group for store your project.
-  //       </DialogContentText>
-  //       <TextField
-  //         autoFocus
-  //         margin="dense"
-  //         label="Group Name"
-  //         onChange={handleChangeGroup('name')}
-  //         value={addGroup.name}
-  //         error={addGroup.name ? false : error.addGroupName}
-  //         variant="standard"
-  //         fullWidth
-  //       />
-  //       <TextField
-  //         autoFocus
-  //         margin="dense"
-  //         label="Description"
-  //         onChange={handleChangeGroup('note')}
-  //         value={addGroup.note}
-  //         error={addGroup.note ? false : error.addGroupNote}
-  //         variant="standard"
-  //         fullWidth
-  //       />
-  //     </DialogContent>
-  //     <DialogActions>
-  //       <Button onClick={handleCloseGroup} color="secondary">Cancel</Button>
-  //       <Button onClick={handleAddGroup}>Save</Button>
-  //     </DialogActions>
-  //   </Dialog>
-  // )
-
-  // const renderEditGroup = (
-  //   <Dialog open={editGroupOpen} onClose={handleCloseEditGroup}>
-  //     <DialogTitle>Edit Group</DialogTitle>
-  //     <DialogContent>
-  //       <DialogContentText>
-  //         Edit group name and description for your project.
-  //       </DialogContentText>
-  //       <TextField
-  //         autoFocus
-  //         margin="dense"
-  //         label="New Group Name"
-  //         onChange={handleChangeEditGroup('name')}
-  //         value={editGroup.name}
-  //         error={editGroup.name ? false : error.editGroupName}
-  //         variant="standard"
-  //         fullWidth
-  //       />
-  //       <TextField
-  //         autoFocus
-  //         margin="dense"
-  //         label="New Description"
-  //         onChange={handleChangeEditGroup('note')}
-  //         value={editGroup.note}
-  //         error={editGroup.note ? false : error.editGroupNote}
-  //         variant="standard"
-  //         fullWidth
-  //       />
-  //     </DialogContent>
-  //     <DialogActions>
-  //       <Button onClick={handleCloseEditGroup} color="secondary">Cancel</Button>
-  //       <Button onClick={handleEditGroup}>Save</Button>
-  //     </DialogActions>
-  //   </Dialog>
-  // )
-
-  // const renderDeleteGroup = (
-  //   <Dialog open={deleteGroupOpen} onClose={handleCloseDeleteGroup}>
-  //     <DialogTitle>Delete Group</DialogTitle>
-  //     <DialogContent>
-  //       <DialogContentText>
-  //         Deleting the group will cause you to lose all projects shared in this group.
-  //         But it will not delete the original project.
-  //       </DialogContentText>
-  //     </DialogContent>
-  //     <DialogActions>
-  //       <Button onClick={handleCloseDeleteGroup} color="secondary">Cancel</Button>
-  //       <Button onClick={handleDeleteGroup} color="error">Delete</Button>
-  //     </DialogActions>
-  //   </Dialog>
-  // )
 
   const renderAddProject = (
     <Dialog open={addProjectOpen} onClose={handleCloseAddProject}>
@@ -717,184 +397,121 @@ function GroupProject(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseAddProject} color="secondary">Cancel</Button>
-        <Button onClick={handleSaveAddProject} color="primary">Add</Button>
+        <Box mb={1}>
+          <Button onClick={handleCloseAddProject} color="secondary" variant="outlined">Cancel</Button>
+        </Box>
+        <Box mr={2} mb={1}>
+          <Button onClick={handleSaveAddProject} color="primary" variant="contained">Add</Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )
 
-  // const renderShareProject = (
-  //   <Dialog open={shareGroupOpen} onClose={handleCloseShareGroup}>
-  //     <DialogTitle>Share Group</DialogTitle>
-  //     <DialogContent>
-  //       {!loading && (
-  //         <>
-  //           <TextField
-  //             select
-  //             margin="dense"
-  //             label="Permission"
-  //             value={shareGroupPermission}
-  //             onChange={handleChangeShareGroup}
-  //             SelectProps={{
-  //               renderValue: (value) => _capitalize(value),
-  //             }}
-  //             variant="outlined"
-  //             fullWidth
-  //           >
-  //             {_map(sharePermissionList, (option) => (
-  //               <MenuItem value={option.permission}>
-  //                 {option.permission}
-  //               </MenuItem>
-  //             ))}
-  //           </TextField>
-  //           {shareGroupPermission !== _lowerCase('personal') && (
-  //             <>
-  //               <Box mt={1} />
-  //               <Box display="flex">
-  //                 <TextField
-  //                   label="link"
-  //                   value={`http://localhost:3000/group-project/${groupId}/share`}
-  //                   variant="outlined"
-  //                   fullWidth
-  //                   disabled
-  //                 />
-  //                 <Box ml={1} />
-  //                 <Button
-  //                   onClick={() => navigator.clipboard.writeText(`http://localhost:3000/group-project/${groupId}/share`)}
-  //                   variant="outlined"
-  //                 >
-  //                   Copy
-  //                 </Button>
-  //               </Box>
-  //             </>
-  //           )}
-  //         </>
-  //       )}
-  //       <Box mt={1} />
-  //       <DialogContentText>
-  //         Select a permission from this group. the permission that selected will effect to your group.
-  //       </DialogContentText>
-  //       <Box mt={1} />
-  //       <DialogContentText>
-  //         Personal - Only you can see this group
-  //       </DialogContentText>
-  //       <DialogContentText>
-  //         Viewer - User can see this group
-  //       </DialogContentText>
-  //       <DialogContentText>
-  //         Editor - User can edit project in this group
-  //       </DialogContentText>
-  //     </DialogContent>
-  //     <DialogActions>
-  //       <Button onClick={handleCloseShareGroup} color="secondary">Cancel</Button>
-  //       <Button onClick={handleSaveShareGroup} color="primary">Add</Button>
-  //     </DialogActions>
-  //   </Dialog>
-  // )
-
   return (
     <Box className={classes.box}>
       <Box className={classes.paper}>
-        <Box className={classes.pageLeft} fullWidth>
-          <Box className={classes.listBox}>
-            <Typography variant="h4" fontWeight="bold">
-              Detail
-            </Typography>
-            {/* <Typography variant="h4" fontWeight="bold">
-              Group
-            </Typography>
-            <Box display="flex">
-              <IconButton onClick={handleOpenGroup} color="primary">
-                <AddBoxIcon />
-              </IconButton>
-              <IconButton onClick={handleFilterGroup} color="primary">
-                {filterGroup ? (
-                  <ArrowDropUpIcon />
-                ) : (
-                  <ArrowDropDownIcon />
-                )}
-              </IconButton>
-            </Box> */}
-          </Box>
-          <Divider />
-          {!loading ? (
-            <Box display="flex" flexDirection="column">
-              <Box mt={2} />
-              <Avatar
-                src={`${groupOwner.image}`}
-                alt=""
-                sx={{
-                  width: '100%',
-                  height: '150px',
-                }}
-                variant="rounded"
-                onClick={() => history.push(`/profile/${groupProjectData.uid}`)}
-                className={classes.AvatarBtn}
-              />
+        <Hidden smDown>
+          <Box className={classes.pageLeft} fullWidth>
+            <Box className={classes.listBox}>
+              <Typography variant="h4" fontWeight="bold">
+                Detail
+              </Typography>
+              {/* <Typography variant="h4" fontWeight="bold">
+                Group
+              </Typography>
+              <Box display="flex">
+                <IconButton onClick={handleOpenGroup} color="primary">
+                  <AddBoxIcon />
+                </IconButton>
+                <IconButton onClick={handleFilterGroup} color="primary">
+                  {filterGroup ? (
+                    <ArrowDropUpIcon />
+                  ) : (
+                    <ArrowDropDownIcon />
+                  )}
+                </IconButton>
+              </Box> */}
+            </Box>
+            <Divider />
+            {!loading ? (
               <Box display="flex" flexDirection="column">
                 <Box mt={2} />
-                <Divider />
-                <Box mt={2} />
-                <Grid container spacing={1}>
-                  <Grid item xs={12}>
-                    <Typography variant="h6">Properties</Typography>
+                <Avatar
+                  src={`${groupOwner.image}`}
+                  alt=""
+                  sx={{
+                    width: '100%',
+                    height: '150px',
+                  }}
+                  variant="rounded"
+                  onClick={() => history.push(`/profile/${groupProjectData.uid}`)}
+                  className={classes.AvatarBtn}
+                />
+                <Box display="flex" flexDirection="column">
+                  <Box mt={2} />
+                  <Divider />
+                  <Box mt={2} />
+                  <Grid container spacing={1}>
+                    <Grid item xs={12}>
+                      <Typography variant="h6">Properties</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <Typography variant="body2" color="secondary">Owner</Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <Typography variant="body2">{groupOwner.name}</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <Typography variant="body2" color="secondary">Group</Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <Typography variant="body2">{groupProjectData.name}</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <Typography variant="body2" color="secondary">Note</Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <Typography variant="body2">{groupProjectData.note}</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <Typography variant="body2" color="secondary">Permission</Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <Typography variant="body2">{_capitalize(groupProjectData.permission)}</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <Typography variant="body2" color="secondary">Created</Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <Typography variant="body2">{formatCreateAtDate}</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <Typography variant="body2" color="secondary">Updated</Typography>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <Typography variant="body2">{formatUpdateAtDate}</Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={5}>
-                    <Typography variant="body2" color="secondary">Owner</Typography>
-                  </Grid>
-                  <Grid item xs={7}>
-                    <Typography variant="body2">{groupOwner.name}</Typography>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <Typography variant="body2" color="secondary">Group</Typography>
-                  </Grid>
-                  <Grid item xs={7}>
-                    <Typography variant="body2">{groupProjectData.name}</Typography>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <Typography variant="body2" color="secondary">Note</Typography>
-                  </Grid>
-                  <Grid item xs={7}>
-                    <Typography variant="body2">{groupProjectData.note}</Typography>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <Typography variant="body2" color="secondary">Permission</Typography>
-                  </Grid>
-                  <Grid item xs={7}>
-                    <Typography variant="body2">{_capitalize(groupProjectData.permission)}</Typography>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <Typography variant="body2" color="secondary">Created</Typography>
-                  </Grid>
-                  <Grid item xs={7}>
-                    <Typography variant="body2">{formatCreateAtDate}</Typography>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <Typography variant="body2" color="secondary">Updated</Typography>
-                  </Grid>
-                  <Grid item xs={7}>
-                    <Typography variant="body2">{formatUpdateAtDate}</Typography>
-                  </Grid>
-                </Grid>
+                </Box>
               </Box>
-            </Box>
-          ) : (
-            <Loading />
-          )}
-          {/* <Divider />
-          <Stack spacing={4} className={classes.listStack}>
-            <Box />
-            <Link to="/project" className={classes.link}>
-              My Project
-            </Link>
-            {_map(groupProject, (data) => (
-              <Link to={`/group-project/${data.id}`} className={classes.link}>
-                {data.name}
+            ) : (
+              <Loading />
+            )}
+            {/* <Divider />
+            <Stack spacing={4} className={classes.listStack}>
+              <Box />
+              <Link to="/project" className={classes.link}>
+                My Project
               </Link>
-            ))}
-          </Stack> */}
-          {/* <Divider /> */}
-        </Box>
+              {_map(groupProject, (data) => (
+                <Link to={`/group-project/${data.id}`} className={classes.link}>
+                  {data.name}
+                </Link>
+              ))}
+            </Stack> */}
+            {/* <Divider /> */}
+          </Box>
+        </Hidden>
         <Box className={classes.pageRight} fullWidth>
           {!loading ? (
             <>
@@ -913,12 +530,86 @@ function GroupProject(props) {
                   >
                     {groupProjectData.name}
                   </Typography>
-                  {/* <Box ml={1} />
-                  <Tooltip title={groupProjectData.note}>
-                    <IconButton size="small">
-                      <InfoIcon fontSize="inherit" />
-                    </IconButton>
-                  </Tooltip> */}
+                  <Hidden smUp>
+                    <Box ml={1}>
+                      <IconButton size="small" onClick={handleOpenAnchor}>
+                        <InfoIcon fontSize="inherit" />
+                      </IconButton>
+                      <SwipeableDrawer
+                        anchor="top"
+                        open={anchor}
+                        onClose={handleCloseAnchor}
+                        onOpen={handleOpenAnchor}
+                      >
+                        <Box sx={{ padding: '0 16px 16px 16px' }}>
+                          {!loading ? (
+                            <Box display="flex" flexDirection="column">
+                              <Box mt={2} />
+                              <Avatar
+                                src={`${groupOwner.image}`}
+                                alt=""
+                                sx={{
+                                  width: '100%',
+                                  height: '250px',
+                                }}
+                                variant="rounded"
+                                onClick={() => history.push(`/profile/${groupProjectData.uid}`)}
+                                className={classes.AvatarBtn}
+                              />
+                              <Box display="flex" flexDirection="column">
+                                <Box mt={2} />
+                                <Divider />
+                                <Box mt={2} />
+                                <Grid container spacing={1}>
+                                  <Grid item xs={12}>
+                                    <Typography variant="h6">Properties</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <Typography variant="body2" color="secondary">Owner</Typography>
+                                  </Grid>
+                                  <Grid item xs={7}>
+                                    <Typography variant="body2">{groupOwner.name}</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <Typography variant="body2" color="secondary">Group</Typography>
+                                  </Grid>
+                                  <Grid item xs={7}>
+                                    <Typography variant="body2">{groupProjectData.name}</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <Typography variant="body2" color="secondary">Note</Typography>
+                                  </Grid>
+                                  <Grid item xs={7}>
+                                    <Typography variant="body2">{groupProjectData.note}</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <Typography variant="body2" color="secondary">Permission</Typography>
+                                  </Grid>
+                                  <Grid item xs={7}>
+                                    <Typography variant="body2">{_capitalize(groupProjectData.permission)}</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <Typography variant="body2" color="secondary">Created</Typography>
+                                  </Grid>
+                                  <Grid item xs={7}>
+                                    <Typography variant="body2">{formatCreateAtDate}</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <Typography variant="body2" color="secondary">Updated</Typography>
+                                  </Grid>
+                                  <Grid item xs={7}>
+                                    <Typography variant="body2">{formatUpdateAtDate}</Typography>
+                                  </Grid>
+                                </Grid>
+                              </Box>
+                            </Box>
+                          ) : (
+                            <Loading />
+                          )}
+                        </Box>
+                      </SwipeableDrawer>
+                    </Box>
+                  </Hidden>
                 </Box>
                 {groupProjectData.permission === 'editor' && (
                 <Box display="flex" justifyContent="center" alignItems="center">

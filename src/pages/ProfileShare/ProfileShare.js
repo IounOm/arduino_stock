@@ -50,36 +50,41 @@ const useStyles = makeStyles((theme) => ({
     // justifyContent: 'center',
     marginTop: '64px',
     height: 'auto',
+    minHeight: 'calc(100vh - 182px)',
     // height: 'calc(100vh - 64px)',
     flexDirection: 'column',
-    marginBottom: '32px',
-    padding: '0 120px 0 120px',
+    // marginBottom: '32px',
+    // padding: '0 120px 0 120px',
+    padding: '40px 15%',
     [theme.breakpoints.down('lg')]: {
-      padding: '0 40px 0 40px',
+      padding: '20px 12%',
+      minHeight: 'calc(100vh - 142px)',
       // height: '100%',
     },
     [theme.breakpoints.down('md')]: {
-      marginTop: '84px',
-      marginBottom: '0px',
-      padding: '20px',
+      // marginTop: '84px',
+      // marginBottom: '0px',
+      padding: '20px 10%',
       height: '100%',
+      minHeight: 'calc(100vh - 142px)',
     },
     [theme.breakpoints.down('sm')]: {
       marginTop: '56px',
       padding: '16px',
       height: 'auto',
+      minHeight: 'calc(100vh - 123px)',
     },
   },
   profile: {
-    padding: '0 24px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%',
-      padding: '16px 0',
-    },
-    [theme.breakpoints.down('sm')]: {
-      width: '100%',
-      padding: '8px 0',
-    },
+    // padding: '0 24px',
+    // [theme.breakpoints.down('sm')]: {
+    //   width: '100%',
+    //   padding: '16px 0',
+    // },
+    // [theme.breakpoints.down('sm')]: {
+    //   width: '100%',
+    //   padding: '8px 0',
+    // },
   },
   title: {
     display: 'flex',
@@ -268,11 +273,17 @@ function ProfileShare(props) {
                 <Hidden mdUp>
                   <Divider />
                 </Hidden>
-                <Box className={classes.title} mt={2}>
+                {/* <Box className={classes.title} mt={2}>
                   <Typography variant="h4">User Profile</Typography>
-                </Box>
-                <Box width="100%" fullWidth>
-                  <TextField
+                </Box> */}
+                <Box width="100%" fullWidth mt={2}>
+                  <Typography variant="h4">
+                    {values.name}
+                  </Typography>
+                  <Typography variant="body2">
+                    {values.note}
+                  </Typography>
+                  {/* <TextField
                     variant="outlined"
                     fullWidth
                     label="Username"
@@ -289,7 +300,7 @@ function ProfileShare(props) {
                     value={values.note}
                     style={{ marginTop: '16px' }}
                     disabled={!editUser}
-                  />
+                  /> */}
                 </Box>
               </Box>
               <Box className={classes.profile}>
@@ -348,8 +359,11 @@ function ProfileShare(props) {
           <Box mt={2}>
             <Divider />
           </Box>
+          <Box mt={2}>
+            <Typography variant="h4">Publish Projects</Typography>
+          </Box>
           <Box>
-            <Grid container spacing={2} mt={2}>
+            <Grid container spacing={2} mt={1}>
               {!loading && (
               <>
                 {_map(projectData, (data) => (
