@@ -171,7 +171,7 @@ function Header() {
             <Grid item xs={12} md={12}>
               <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
                 <Typography variant="body2" color="#fff">
-                  Copyright 2022 Arduino Stock
+                  Copyright© 2022 Arduino Stock
                   {/* Copyright 2022 Arduino Stock. Design By Ioun | Boonyupin | Thanadol */}
                 </Typography>
               </Box>

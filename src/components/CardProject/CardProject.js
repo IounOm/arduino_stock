@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { styled } from '@mui/material/styles'
 import { makeStyles } from '@mui/styles'
@@ -73,6 +73,8 @@ function CardProject(props) {
   } = props
   const classes = useStyles()
   const history = useHistory()
+  const location = useLocation()
+  const { pathname } = location
   const [anchorEl, setAnchorEl] = useState(false)
   const [deleteMenuOpen, setDeleteMenuOpen] = useState(false)
   const [deleteGroupMenuOpen, setDeleteGroupMenuOpen] = useState(false)
@@ -248,8 +250,8 @@ function CardProject(props) {
 
   return (
     <Box>
-      <Hidden lgDown>
-        <Card>
+      <Hidden mdDown>
+        <Card sx={{ boxShadow: '0px 0px 10px 1px #E0E0E0' }}>
           <CardHeader
             avatar={(
               <IconButton
@@ -317,10 +319,10 @@ function CardProject(props) {
           </CardActionArea>
           <CardActions disableSpacing sx={{ justifyContent: 'space-between' }}>
             <Chip
-              label="Entertainment"
-              onClick={[]}
+              label={values.tag}
+              onClick={() => history.push(`/home/tag/${values.tag}/page/1`)}
             />
-            {groupId === 'null' && (
+            {pathname === '/project' && (
               <Chip
                 label={values.publish ? 'Publish' : 'Draft'}
                 color={values.publish ? 'success' : 'secondary'}
@@ -331,7 +333,7 @@ function CardProject(props) {
         </Card>
       </Hidden>
       {/* {ipad & mobile} */}
-      <Hidden lgUp>
+      <Hidden mdUp>
         <Box>
           <Box display="flex" alignItems="center">
             <Avatar
@@ -425,9 +427,9 @@ function CardProject(props) {
           </Box>
           <Box display="flex" alignItems="center" justifyContent="space-between" mt={1} mb={1}>
             <Box display="flex" alignItems="center">
-              <Chip label={values.tag} size="small" onClick={[]} />
+              <Chip label={values.tag} size="small" onClick={() => history.push(`/home/tag/${values.tag}/page/1`)} />
               <Box ml={1} />
-              {groupId === 'null' && (
+              {pathname === '/project' && (
                 <Chip
                   label={values.publish ? 'Publish' : 'Draft'}
                   color={values.publish ? 'success' : 'secondary'}

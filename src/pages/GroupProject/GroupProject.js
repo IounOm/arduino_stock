@@ -98,6 +98,7 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
+    backgroundColor: '#F8FFFF',
     minHeight: 'calc(100vh - 182px)',
     marginTop: '64px',
     padding: '40px 120px 40px 120px',
@@ -927,7 +928,7 @@ function GroupProject(props) {
                     <Grid container spacing={2} className={classes.gridProject}>
                       {_map(myProjectData, (data) => (
                         <>
-                          <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
+                          <Grid item lg={4} md={6} sm={12} sx={{ flexGrow: 1 }}>
                             <CardProject
                               values={data}
                               loading={loading}
@@ -1027,7 +1028,7 @@ function GroupProject(props) {
                     <Grid container spacing={2} className={classes.gridProject}>
                       {_map(myProjectData, (data) => (
                         <>
-                          <Grid item lg={4} md={12} sm={12} sx={{ flexGrow: 1 }}>
+                          <Grid item lg={4} md={6} sm={12} sx={{ flexGrow: 1 }}>
                             <CardProject
                               values={data}
                               loading={loading}

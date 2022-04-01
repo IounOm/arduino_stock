@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     // height: 'calc(100vh)',
     marginTop: '64px',
+    backgroundColor: '#F8FFFF',
     minHeight: 'calc(100vh - 102px)',
     [theme.breakpoints.down('sm')]: {
       width: '90%',
@@ -55,7 +56,8 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     width: '500px',
     padding: '32px',
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#FFF',
+    boxShadow: '0px 0px 10px 1px #E0E0E0',
     borderRadius: '25px',
     [theme.breakpoints.down('sm')]: {
       width: '90%',
@@ -145,68 +147,66 @@ function SignUp() {
   }
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center">
-      <Box className={classes.box}>
-        <Box className={classes.img}>
+    <Box className={classes.box}>
+      <Box className={classes.card}>
+        <Box className={classes.img} mb={4}>
           <img src="/images/arduinoStock2.png" alt="arduino_stock" width="100%" />
         </Box>
-        <Box className={classes.card} mt={4}>
-          <Typography variant="h5" fontWeight="bold" color="primary">
-            SIGN UP
-          </Typography>
-          <TextField
-            variant="outlined"
-            fullWidth
-            label="Name"
-            onChange={handleChange('name')}
-            error={values.name ? false : values.errorName}
-            value={values.name}
-            style={{ margin: '16px' }}
-          />
-          <TextField
-            variant="outlined"
-            fullWidth
-            label="Email"
-            onChange={handleChange('email')}
-            error={values.email ? false : values.errorEmail}
-            value={values.email}
-          />
-          <FormControl variant="outlined" style={{ margin: '16px' }} fullWidth>
-            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-            <OutlinedInput
-              id="outlined-adornment-password"
-              type={values.showPassword ? 'text' : 'password'}
-              value={values.password}
-              onChange={handleChange('password')}
-              error={values.password ? false : values.errorPassword}
-              endAdornment={(
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge="end"
-                  >
-                    {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
+        <Typography variant="h5" fontWeight="bold" color="primary">
+          SIGN UP
+        </Typography>
+        <TextField
+          variant="outlined"
+          fullWidth
+          label="Name"
+          onChange={handleChange('name')}
+          error={values.name ? false : values.errorName}
+          value={values.name}
+          style={{ margin: '16px' }}
+        />
+        <TextField
+          variant="outlined"
+          fullWidth
+          label="Email"
+          onChange={handleChange('email')}
+          error={values.email ? false : values.errorEmail}
+          value={values.email}
+        />
+        <FormControl variant="outlined" style={{ margin: '16px' }} fullWidth>
+          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+          <OutlinedInput
+            id="outlined-adornment-password"
+            type={values.showPassword ? 'text' : 'password'}
+            value={values.password}
+            onChange={handleChange('password')}
+            error={values.password ? false : values.errorPassword}
+            endAdornment={(
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
             )}
-              label="Password"
-            />
-          </FormControl>
-          <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="body1">
-              Have an account yet ?
-              <Link to="/login" className={classes.link}>
-                <Button>
-                  Sign In
-                </Button>
-              </Link>
-            </Typography>
-            <Button variant="outlined" color="primary" onClick={handleSubmit}>Submit</Button>
-          </Box>
-
+            label="Password"
+          />
+        </FormControl>
+        <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="body1">
+            Have an account yet ?
+            <Link to="/login" className={classes.link}>
+              <Button>
+                Sign In
+              </Button>
+            </Link>
+          </Typography>
+          <Button variant="outlined" color="primary" onClick={handleSubmit}>Submit</Button>
         </Box>
+
       </Box>
     </Box>
   )

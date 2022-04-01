@@ -48,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
     // flexDirection: 'column',
     // alignItems: 'center',
     // justifyContent: 'center',
+    backgroundColor: '#F8FFFF',
     marginTop: '64px',
     height: 'auto',
     minHeight: 'calc(100vh - 182px)',

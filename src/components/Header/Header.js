@@ -45,13 +45,15 @@ import * as userAction from '../../redux/actions/user.action'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
-  borderRadius: '10px 0px 0px 10px',
+  // borderRadius: '10px 0px 0px 10px',
+  borderRadius: '5px',
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   '&:hover': {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
   // marginRight: theme.spacing(2),
   marginLeft: 0,
+  display: 'flex',
   width: '100%',
   [theme.breakpoints.up('sm')]: {
     marginLeft: theme.spacing(3),
@@ -61,6 +63,7 @@ const Search = styled('div')(({ theme }) => ({
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
+  width: '100%',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
@@ -68,8 +71,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingRight: `calc(1em + ${theme.spacing(0)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
+    color: '#fff',
     [theme.breakpoints.up('md')]: {
-      width: '20ch',
+      width: '30ch',
     },
   },
 }))
@@ -230,6 +234,25 @@ function Header(props) {
     setAnchorEl(false)
   }
 
+  const [searchValue, setSearchValue] = useState('')
+  const handleChangeSearch = (e) => {
+    setSearchValue(e.target.value)
+  }
+  const handleClickSearch = () => {
+    if (!_isEmpty(searchValue)) {
+      history.push(`/home/search/${searchValue}`)
+    } else {
+      history.push('/home')
+    }
+  }
+  const onKeyPress = (e) => {
+    if (!_isEmpty(e.target.value) && e.key === 'Enter') {
+      history.push(`/home/search/${e.target.value}`)
+    } else if (_isEmpty(e.target.value) && e.key === 'Enter') {
+      history.push('/home')
+    }
+  }
+
   // saveMenu
   // const handleSaveMenuOpen = (event) => {
   //   setAnchorElSave(event.currentTarget)
@@ -322,7 +345,7 @@ function Header(props) {
             (pathname === '/project/create'
             || pathname === `/project/edit/${pId}`
             || pathname === `/group-project/${gId}/project/edit/${gpId}`)
-              ? '#fff' : 'primary'
+              ? '#F8FFFF' : 'primary'
           }`,
           boxShadow: `${
             (pathname === '/project/create'
@@ -361,7 +384,7 @@ function Header(props) {
           && pathname !== `/project/edit/${pId}`
           && pathname !== `/group-project/${gId}/project/edit/${gpId}`) && (
             <>
-              <Search>
+              {/* <Search>
                 <StyledInputBase
                   placeholder="Search..."
                   inputProps={{
@@ -374,7 +397,19 @@ function Header(props) {
                 <IconButton color="search" borderRadius="0" size="small">
                   <SearchIcon />
                 </IconButton>
-              </Box>
+              </Box> */}
+              <Search>
+                <StyledInputBase
+                  // sx={{ ml: 1, flex: 1 }}
+                  placeholder="Search..."
+                  inputProps={{ 'aria-label': 'search project' }}
+                  onKeyPress={onKeyPress}
+                  onChange={handleChangeSearch}
+                />
+                <IconButton sx={{ p: '10px' }} aria-label="search" onClick={handleClickSearch}>
+                  <SearchIcon />
+                </IconButton>
+              </Search>
             </>
           )}
           <Box sx={{ flexGrow: 1 }} />

@@ -36,6 +36,9 @@ function App() {
             <Redirect to="/home" />
           </Route>
           <AuthRoute exact path="/home" layout={Header} component={Home} />
+          <AuthRoute exact path="/home/page/:pageId" layout={Header} component={Home} />
+          <AuthRoute exact path="/home/:searchType/:searchId" layout={Header} component={Home} />
+          <AuthRoute exact path="/home/:searchType/:searchId/page/:pageId" layout={Header} component={Home} />
           <AuthRoute exact path="/login" layout={Header} component={Login} />
           <AuthRoute exact path="/signup" layout={Header} component={SignUp} />
           <AuthRoute exact path="/loading" layout={Header} component={Loading} />

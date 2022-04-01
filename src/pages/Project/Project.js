@@ -96,6 +96,7 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     // height: 'calc(100vh - 72px)',
+    backgroundColor: '#F8FFFF',
     minHeight: 'calc(100vh - 182px)',
     marginTop: '64px',
     padding: '40px 25% 40px 25%',
@@ -564,7 +565,7 @@ function Project(props) {
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, groupId])
+  }, [projectId, groupId, actionType])
   useEffect(() => {
     handleQueryComment()
   // eslint-disable-next-line react-hooks/exhaustive-deps
