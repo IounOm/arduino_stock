@@ -18,6 +18,7 @@ import _capitalize from 'lodash/capitalize'
 import _toInteger from 'lodash/toInteger'
 import _ceil from 'lodash/ceil'
 import _parseInt from 'lodash/parseInt'
+import _orderBy from 'lodash/orderBy'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -164,6 +165,7 @@ function Home(props) {
   const [tagData, setTagData] = useState(tagList)
   // const [tagSelect, setTagSelect] = useState('')
   const [projectData, setProjectData] = useState([])
+  const [filterProjectData, setFilterProjectData] = useState([])
   const [searchData, setSearchData] = useState([])
   // const [filterSearch, setFilterSearch] = useState([])
 
@@ -172,11 +174,13 @@ function Home(props) {
 
   const indexOfLastProject = currentPage * projectPerPage
   const indexOfFirstProject = indexOfLastProject - projectPerPage
-  const currentProject = projectData.slice(indexOfFirstProject, indexOfLastProject)
-  const numOfProject = projectData.length // num of all project
+  const currentProject = filterProjectData.slice(indexOfFirstProject, indexOfLastProject)
+  const numOfProject = filterProjectData.length // num of all project
   console.log('numOfProject', numOfProject)
   console.log('projectData', projectData)
   const totalPage = _ceil(numOfProject / projectPerPage) // number of all page
+
+  console.log('filterProjectData', filterProjectData)
 
   const handleChangePage = (event, value) => {
     console.log('valueaaaa', value)
@@ -199,7 +203,7 @@ function Home(props) {
       if (!searchType && !searchId) {
         const getProject = await db.collection('project')
           .where('publish', '==', true)
-          .orderBy('createAt', 'asc')
+          // .orderBy('createAt', 'desc')
           .get()
         if (_isEmpty(getProject.docs)) {
           setProjectData([])
@@ -219,7 +223,7 @@ function Home(props) {
         const getProject = await db.collection('project')
           .where('publish', '==', true)
           .where('tag', '==', searchId)
-          .orderBy('createAt', 'asc')
+          // .orderBy('createAt', 'desc')
           .get()
         if (_isEmpty(getProject.docs)) {
           setProjectData([])
@@ -239,7 +243,7 @@ function Home(props) {
       } else if (searchType === 'search') {
         const getSearch = await db.collection('project')
           .where('publish', '==', true)
-          .orderBy('createAt', 'desc')
+          // .orderBy('createAt', 'desc')
           .get()
         getSearch.docs.forEach((doc) => {
           doc.data().uidRef.get().then((res) => {
@@ -307,6 +311,12 @@ function Home(props) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchData, searchId])
+
+  useEffect(() => {
+    setFilterProjectData(
+      projectData.sort((a, b) => b.createAt.seconds - a.createAt.seconds),
+    )
+  }, [projectData])
 
   return (
     <Box className={classes.box}>

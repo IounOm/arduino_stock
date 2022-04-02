@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, useHistory } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -10,6 +10,7 @@ import _get from 'lodash/get'
 import _forEach from 'lodash/forEach'
 import _words from 'lodash/words'
 import _split from 'lodash/split'
+import _repeat from 'lodash/repeat'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -44,6 +45,7 @@ import LanguageIcon from '@mui/icons-material/Language'
 import FacebookIcon from '@mui/icons-material/Facebook'
 import TwitterIcon from '@mui/icons-material/Twitter'
 
+import { getAuth, updatePassword } from 'firebase/auth'
 import { getUser } from '../../redux/selectors/user.selector'
 import Header from '../../components/Header/Header'
 import Loading from '../../components/Loading'
@@ -182,6 +184,9 @@ function Profile() {
     userId,
     userType,
   } = myUser
+  const auth = getAuth()
+  const user = auth.currentUser
+  const history = useHistory()
   const db = firebase.firestore()
   // const { currentUser } = useContext(AuthContext)
   // const uid = _get(currentUser, 'user.uid')
@@ -196,6 +201,7 @@ function Profile() {
     note: '',
     email: '',
     password: '',
+    confirmPassword: '',
     contact: {
       website: '',
       facebook: '',
@@ -208,6 +214,8 @@ function Profile() {
     },
     errorEmail: false,
     errorPassword: false,
+    errorName: false,
+    errorConfirmPassword: false,
   })
   const [contact, setContact] = useState({
     websiteName: '',
@@ -217,15 +225,19 @@ function Profile() {
   })
   const [projectData, setProjectData] = useState([])
 
+  console.log(values)
+
   const handleQuery = async () => {
     try {
       setLoading(true)
       await setValues({
+        ...values,
         image: userImage || '',
         name: userName,
         note: userNote || '',
         email: userEmail,
         password: userPassword,
+        confirmPassword: '',
         contact: {
           website: userContact.website || '',
           facebook: userContact.facebook || '',
@@ -234,6 +246,7 @@ function Profile() {
         },
         errorEmail: false,
         errorPassword: false,
+        errorConfirmPassword: false,
       })
       setContact({
         websiteName: _split(userContact.website, '/'),
@@ -310,12 +323,16 @@ function Profile() {
   }
   const handleSaveUserEdit = async () => {
     try {
-      await db.collection('users').doc(userId).update({
-        name: values.name,
-        note: values.note,
-      })
-      dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact, userType))
-      setEditUser(false)
+      if (_isEmpty(values.name)) {
+        setValues({ ...values, errorName: true })
+      } else {
+        await db.collection('users').doc(userId).update({
+          name: values.name,
+          note: values.note,
+        })
+        dispatch(userAction.updateUserData(values.name, values.email, values.password, values.image, values.note, values.contact, userType))
+        setEditUser(false)
+      }
     } catch (err) {
       console.log(err)
     }
@@ -323,6 +340,13 @@ function Profile() {
 
   // TODO edit account
   const handleClickAccountEdit = () => {
+    setValues({
+      ...values,
+      password: '',
+      confirmPassword: '',
+      errorPassword: false,
+      errorConfirmPassword: false,
+    })
     setEditAccount(true)
   }
   const handleCloseAccountEdit = () => {
@@ -330,27 +354,46 @@ function Profile() {
       ...values,
       email: userEmail,
       password: userPassword,
+      errorPassword: false,
+      errorConfirmPassword: false,
     })
     setEditAccount(false)
   }
   const handleSaveAccountEdit = async () => {
-    // try {
-    //   firebase.auth()
-    //     .signInWithEmailAndPassword('you@domain.com', 'correcthorsebatterystaple')
-    //     .then((userCredential) => {
-    //       userCredential.user.updateEmail('newyou@domain.com')
-    //     })
-    //   setEditAccount(false)
-    // } catch (err) {
-    //   console.log(err)
-    // }
+    try {
+      if (_isEmpty(values.password)) {
+        setValues({ ...values, errorPassword: true })
+      } else if (_isEmpty(values.confirmPassword)) {
+        setValues({ ...values, errorConfirmPassword: true })
+      } else if (values.password !== values.confirmPassword) {
+        setValues({ ...values, errorPassword: true, errorConfirmPassword: true })
+      } else {
+        // firebase.auth()
+        //   .signInWithEmailAndPassword('you@domain.com', 'correcthorsebatterystaple')
+        //   .then((userCredential) => {
+        //     userCredential.user.updateEmail('newyou@domain.com')
+        //   })
+        const passNum = values.password.length
+        await updatePassword(user, values.password).then(async () => {
+          await db.collection('users').doc(userId).update({
+            password: _repeat('*', passNum),
+          })
+          dispatch(userAction.updateUserData(values.name, values.email, _repeat('*', passNum), values.image, values.note, values.contact, userType))
+          setEditAccount(false)
+        }).catch((error) => {
+          console.log(error)
+        })
+      }
+    } catch (err) {
+      console.log(err)
+    }
   }
   console.log('website', contact.websiteName[contact.websiteName.length - 1])
 
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myUser])
+  }, [myUser, userPassword])
 
   console.log('projectData', projectData)
 
@@ -389,21 +432,34 @@ function Profile() {
                   fullWidth
                   label="Email"
                   onChange={handleChange('email')}
-                  onClick={() => editAccount && setValues({ ...values, email: '' })}
+                  // onClick={() => editAccount && setValues({ ...values, email: '' })}
                   value={values.email}
                   style={{ marginTop: '16px' }}
-                  disabled={!editAccount}
+                  // disabled={!editAccount}
+                  disabled
                 />
                 <TextField
                   variant="outlined"
                   fullWidth
-                  label="Password"
+                  label={editAccount ? 'New password' : 'Password'}
                   onChange={handleChange('password')}
-                  onClick={() => editAccount && setValues({ ...values, password: '' })}
                   value={values.password}
+                  error={values.errorPassword}
                   style={{ marginTop: '16px' }}
                   disabled={!editAccount}
                 />
+                {editAccount && (
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    label="Confirm password"
+                    onChange={handleChange('confirmPassword')}
+                    value={values.confirmPassword}
+                    error={values.errorConfirmPassword}
+                    style={{ marginTop: '16px' }}
+                    disabled={!editAccount}
+                  />
+                )}
                 {editAccount && (
                   <Box className={classes.btSave}>
                     <Button variant="outlined" color="primary" onClick={handleCloseAccountEdit}>Cancel</Button>
@@ -432,6 +488,7 @@ function Profile() {
                     label="Username"
                     onChange={handleChange('name')}
                     value={values.name}
+                    error={values.name ? false : values.errorName}
                     style={{ marginTop: '16px' }}
                     disabled={!editUser}
                   />
@@ -557,6 +614,16 @@ function Profile() {
                     </Box>
                   </Box>
                   )}
+                </Box>
+              </Box>
+              <Box className={classes.profile}>
+                <Box mt={2}>
+                  <Divider />
+                </Box>
+                <Box mt={2} mb={1}>
+                  <Button variant="contained" color="primary" fullWidth onClick={() => history.push(`/profile/${userId}`)}>
+                    View your profile
+                  </Button>
                 </Box>
               </Box>
             </Box>

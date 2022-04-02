@@ -288,7 +288,7 @@ function CardProject(props) {
               alt="Arduino Project Image"
               // className={classes.cardMedia}
             />
-            <CardContent sx={{ height: 80, maxHeight: 80 }}>
+            <CardContent sx={{ height: 64, maxHeight: 80 }}>
               <Typography
                 variant="body1"
                 fontWeight="bold"

@@ -84,10 +84,13 @@ function SignUp() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     showPassword: false,
+    showConfirmPassword: false,
     errorName: false,
     errorEmail: false,
     errorPassword: false,
+    errorConfirmPassword: false,
   })
 
   const handleChange = (prop) => (event) => {
@@ -98,6 +101,12 @@ function SignUp() {
     setValues({
       ...values,
       showPassword: !values.showPassword,
+    })
+  }
+  const handleClickShowConfirmPassword = () => {
+    setValues({
+      ...values,
+      showConfirmPassword: !values.showConfirmPassword,
     })
   }
 
@@ -113,6 +122,8 @@ function SignUp() {
         setValues({ ...values, errorEmail: true })
       } else if (_isEmpty(values.password)) {
         setValues({ ...values, errorPassword: true })
+      } else if (values.password !== values.confirmPassword) {
+        setValues({ ...values, errorPassword: true, errorConfirmPassword: true })
       } else {
         const myUser = await firebase.auth().createUserWithEmailAndPassword(values.email, values.password)
         const uId = _get(myUser, 'user.uid')
@@ -172,14 +183,14 @@ function SignUp() {
           error={values.email ? false : values.errorEmail}
           value={values.email}
         />
-        <FormControl variant="outlined" style={{ margin: '16px' }} fullWidth>
+        <FormControl variant="outlined" style={{ marginTop: '16px' }} fullWidth>
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
           <OutlinedInput
             id="outlined-adornment-password"
             type={values.showPassword ? 'text' : 'password'}
             value={values.password}
             onChange={handleChange('password')}
-            error={values.password ? false : values.errorPassword}
+            error={values.errorPassword}
             endAdornment={(
               <InputAdornment position="end">
                 <IconButton
@@ -193,6 +204,29 @@ function SignUp() {
               </InputAdornment>
             )}
             label="Password"
+          />
+        </FormControl>
+        <FormControl variant="outlined" style={{ margin: '16px 0' }} fullWidth>
+          <InputLabel htmlFor="outlined-adornment-confirm-password">Confirm Password</InputLabel>
+          <OutlinedInput
+            id="outlined-adornment-confirm-password"
+            type={values.showConfirmPassword ? 'text' : 'password'}
+            value={values.confirmPassword}
+            onChange={handleChange('confirmPassword')}
+            error={values.errorConfirmPassword}
+            endAdornment={(
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle confirm password visibility"
+                  onClick={handleClickShowConfirmPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {values.showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            )}
+            label="Confirm Password"
           />
         </FormControl>
         <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">

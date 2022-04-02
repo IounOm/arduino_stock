@@ -194,6 +194,7 @@ function Header(props) {
 
   const isMenuOpen = Boolean(anchorEl)
   const isSaveMenuOpen = Boolean(anchorElSave)
+  console.log('pathname', pathname)
 
   const handleClickSaveList = () => {
     // if (type === 'Draft') {
@@ -363,7 +364,7 @@ function Header(props) {
               color="inherit"
               aria-label="open drawer"
               // sx={{ mr: 2 }}
-              onClick={() => history.push('/home')}
+              onClick={() => pathname !== '/home' && history.push('/home')}
             >
               <img src="/images/arduinoStock2.png" alt="arduinoStock" width="125px" />
             </IconButton>
@@ -375,7 +376,7 @@ function Header(props) {
               color="inherit"
               aria-label="open drawer"
               sx={{ mr: 2 }}
-              onClick={() => history.push('/home')}
+              onClick={() => pathname !== '/home' && history.push('/home')}
             >
               <img src="/images/arduinoStock.png" alt="arduinoStock" width="30px" />
             </IconButton>
@@ -401,7 +402,7 @@ function Header(props) {
               <Search>
                 <StyledInputBase
                   // sx={{ ml: 1, flex: 1 }}
-                  placeholder="Search..."
+                  placeholder="Search project"
                   inputProps={{ 'aria-label': 'search project' }}
                   onKeyPress={onKeyPress}
                   onChange={handleChangeSearch}

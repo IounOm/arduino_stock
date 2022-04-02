@@ -776,20 +776,20 @@ function GroupProject(props) {
                 </MenuItem>
               ))}
             </TextField>
-            {shareGroupPermission !== _lowerCase('personal') && (
+            {_lowerCase(shareGroupPermission) !== 'personal' && (
               <>
                 <Box mt={1} />
                 <Box display="flex">
                   <TextField
                     label="link"
-                    value={`http://localhost:3000/group-project/${groupId}/share`}
+                    value={`http://arduinostock.web.app/group-project/${groupId}/share`}
                     variant="outlined"
                     fullWidth
                     disabled
                   />
                   <Box ml={1} />
                   <Button
-                    onClick={() => navigator.clipboard.writeText(`http://localhost:3000/group-project/${groupId}/share`)}
+                    onClick={() => navigator.clipboard.writeText(`http://arduinostock.web.app/group-project/${groupId}/share`)}
                     variant="outlined"
                   >
                     Copy
@@ -819,7 +819,7 @@ function GroupProject(props) {
           <Button onClick={handleCloseShareGroup} color="secondary" variant="outlined">Cancel</Button>
         </Box>
         <Box mr={2} mb={1}>
-          <Button onClick={handleSaveShareGroup} color="primary" variant="contained">Add</Button>
+          <Button onClick={handleSaveShareGroup} color="primary" variant="contained">Save</Button>
         </Box>
       </DialogActions>
     </Dialog>

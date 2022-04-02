@@ -130,6 +130,7 @@ function UploadImage(props) {
               db.collection(collection).doc(doc).update({
                 [updateKey]: imgUrl,
               })
+              dispatch(userAction.uploadImage(imgUrl))
             }
           })
         },

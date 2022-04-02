@@ -146,7 +146,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '0 9.6px',
+    padding: '0 9.6px o 4.6px',
     // margin: '40px 250px 0 250px',
     // [theme.breakpoints.down('lg')]: {
     //   margin: '40px 80px 0px 89.6px',
@@ -445,6 +445,8 @@ function Project(props) {
       dispatch(userAction.saveProject(false))
     }
   }
+  console.log('uploadImg', uploadImg)
+  console.log('value', value)
 
   // menuSave
   const handleOpenSave = async () => {
@@ -527,35 +529,39 @@ function Project(props) {
   }
   const handleSaveComment = async () => {
     try {
-      setLoadingComment(true)
-      const DateCreate = new Date()
-      if (_isEmpty(writeComment)) {
-        setErrorComment(true)
-      } else if (projectId && !groupId) {
-        await db.collection('project').doc(projectId).collection('comment').doc()
-          .set({
-            comment: writeComment,
-            createAt: DateCreate,
-            updateAt: DateCreate,
-            uid: userId,
-            uidRef: db.doc(`users/${userId}`),
-          })
-        handleQueryComment()
-      } else if (projectId && groupId) {
-        await db.collection('groupProject').doc(groupId).collection('project').doc(projectId)
-          .collection('comment')
-          .doc()
-          .set({
-            comment: writeComment,
-            createAt: DateCreate,
-            updateAt: DateCreate,
-            uid: userId,
-            uidRef: db.doc(`users/${userId}`),
-          })
-        handleQueryComment()
+      if (userId) {
+        setLoadingComment(true)
+        const DateCreate = new Date()
+        if (_isEmpty(writeComment)) {
+          setErrorComment(true)
+        } else if (projectId && !groupId) {
+          await db.collection('project').doc(projectId).collection('comment').doc()
+            .set({
+              comment: writeComment,
+              createAt: DateCreate,
+              updateAt: DateCreate,
+              uid: userId,
+              uidRef: db.doc(`users/${userId}`),
+            })
+          handleQueryComment()
+        } else if (projectId && groupId) {
+          await db.collection('groupProject').doc(groupId).collection('project').doc(projectId)
+            .collection('comment')
+            .doc()
+            .set({
+              comment: writeComment,
+              createAt: DateCreate,
+              updateAt: DateCreate,
+              uid: userId,
+              uidRef: db.doc(`users/${userId}`),
+            })
+          handleQueryComment()
+        }
+        setWriteComment('')
+        setLoadingComment(false)
+      } else {
+        history.push('/login')
       }
-      setWriteComment('')
-      setLoadingComment(false)
     } catch (err) {
       setLoadingComment(false)
       console.log(err)
@@ -585,7 +591,7 @@ function Project(props) {
   useEffect(() => {
     setValue({ ...value, image: uploadImg })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadImg])
+  }, [uploadImg, projectId, groupId])
 
   useEffect(() => {
     if (pathname === '/project/create') {
@@ -780,11 +786,13 @@ function Project(props) {
             {!loading ? (
               <>
                 <Box className={classes.headerLeft}>
-                  <Avatar
-                    alt={value.uidRef.name}
-                    src={value.uidRef.image}
-                    sx={{ width: 48, height: 48 }}
-                  />
+                  <IconButton size="small" onClick={() => (value.uid !== userId ? history.push(`/profile/${value.uid}`) : history.push('/profile'))}>
+                    <Avatar
+                      alt={value.uidRef.name}
+                      src={value.uidRef.image}
+                      sx={{ width: 48, height: 48 }}
+                    />
+                  </IconButton>
                   <Box ml={2}>
                     <Typography variant="body2">
                       {value.uidRef.name}
