@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Redirect, useHistory, useLocation } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { makeStyles } from '@mui/styles'
 import PropTypes from 'prop-types'
@@ -7,7 +7,6 @@ import { styled, alpha } from '@mui/material/styles'
 
 import _map from 'lodash/map'
 import _kebabCase from 'lodash/kebabCase'
-import _get from 'lodash/get'
 import _split from 'lodash/split'
 import _isEmpty from 'lodash/isEmpty'
 
@@ -18,27 +17,17 @@ import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import InputBase from '@mui/material/InputBase'
 import Hidden from '@mui/material/Hidden'
-import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
 import Avatar from '@mui/material/Avatar'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Switch from '@mui/material/Switch'
 
-import MenuIcon from '@mui/icons-material/Menu'
 import SearchIcon from '@mui/icons-material/Search'
-import AccountCircle from '@mui/icons-material/AccountCircle'
-import MailIcon from '@mui/icons-material/Mail'
-import NotificationsIcon from '@mui/icons-material/Notifications'
-import MoreIcon from '@mui/icons-material/MoreVert'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import MemoryIcon from '@mui/icons-material/Memory'
 import LogoutIcon from '@mui/icons-material/Logout'
-import PublishIcon from '@mui/icons-material/Publish'
-import DraftsIcon from '@mui/icons-material/Drafts'
 
 import { getUser } from '../../redux/selectors/user.selector'
 import * as userAction from '../../redux/actions/user.action'
@@ -146,14 +135,14 @@ function Header(props) {
 
   const projectId = _split(pathname, '/', 4)
   const pId = projectId[projectId.length - 1]
-  console.log('pathname55555', pId)
+  // console.log('pathname55555', pId)
 
   const groupId = _split(pathname, '/', 3)
   const groupProjectId = _split(pathname, '/', 6)
   const gId = projectId[groupId.length - 1]
   const gpId = groupProjectId[groupProjectId.length - 1]
-  console.log('groupIdgroupId', gId)
-  console.log('projectId5555', gpId)
+  // console.log('groupIdgroupId', gId)
+  // console.log('projectId5555', gpId)
 
   const classes = useStyles({
     pathname, pId, gId, gpId,
@@ -178,34 +167,16 @@ function Header(props) {
   const [userData, setUserData] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // const [switchClick, setSwitchClick] = useState(false)
-  // const [saveProject, setSaveProject] = useState(false)
-
   const userLists = [
     { name: 'Profile', icon: <AccountBoxIcon fontSize="small" /> },
     { name: 'Project', icon: <MemoryIcon fontSize="small" /> },
     { name: 'Logout', icon: <LogoutIcon fontSize="small" /> },
   ]
 
-  // const saveLists = [
-  //   { name: 'Draft', icon: <DraftsIcon fontSize="small" /> },
-  //   { name: 'Publish', icon: <PublishIcon fontSize="small" /> },
-  // ]
-
   const isMenuOpen = Boolean(anchorEl)
   const isSaveMenuOpen = Boolean(anchorElSave)
-  console.log('pathname', pathname)
 
   const handleClickSaveList = () => {
-    // if (type === 'Draft') {
-    //   setAnchorElSave(false)
-    //   dispatch(userAction.saveProject(true))
-    //   // history.push('/project')
-    // } else if (type === 'Publish') {
-    //   setAnchorElSave(false)
-    //   dispatch(userAction.saveProject(true))
-    //   // history.push('/project')
-    // }
     dispatch(userAction.saveProject(true))
   }
 
@@ -254,22 +225,12 @@ function Header(props) {
     }
   }
 
-  // saveMenu
-  // const handleSaveMenuOpen = (event) => {
-  //   setAnchorElSave(event.currentTarget)
-  // }
-
-  // const handleSaveMenuClose = () => {
-  //   setAnchorElSave(false)
-  // }
-
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myUser])
 
   const menuId = 'munuDestop'
-  const menuId1 = 'saveMunuDestop'
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -302,39 +263,6 @@ function Header(props) {
       ))}
     </Menu>
   )
-
-  // const renderSave = (
-  //   <Menu
-  //     anchorEl={anchorElSave}
-  //     anchorOrigin={{
-  //       vertical: 'bottom',
-  //       horizontal: 'center',
-  //     }}
-  //     id={menuId1}
-  //     keepMounted
-  //     transformOrigin={{
-  //       vertical: 'top',
-  //       horizontal: 'center',
-  //     }}
-  //     open={isSaveMenuOpen}
-  //     onClose={handleSaveMenuClose}
-  //     PaperProps={{
-  //       sx: { mt: '8px' },
-  //     }}
-  //   >
-  //     {_map(saveLists, (list) => (
-  //       <MenuItem
-  //         key={list}
-  //         onClick={() => handleClickSaveList(list.name)}
-  //       >
-  //         <ListItemIcon>
-  //           {list.icon}
-  //         </ListItemIcon>
-  //         <ListItemText>{list.name}</ListItemText>
-  //       </MenuItem>
-  //     ))}
-  //   </Menu>
-  // )
 
   return (
     <Box sx={{ flexGrow: 1 }} className={classes.root}>
@@ -385,20 +313,6 @@ function Header(props) {
           && pathname !== `/project/edit/${pId}`
           && pathname !== `/group-project/${gId}/project/edit/${gpId}`) && (
             <>
-              {/* <Search>
-                <StyledInputBase
-                  placeholder="Search..."
-                  inputProps={{
-                    'aria-label': 'search',
-                    // maxLength: 50,
-                  }}
-                />
-              </Search>
-              <Box className={classes.searchIcon}>
-                <IconButton color="search" borderRadius="0" size="small">
-                  <SearchIcon />
-                </IconButton>
-              </Box> */}
               <Search>
                 <StyledInputBase
                   // sx={{ ml: 1, flex: 1 }}
@@ -471,7 +385,6 @@ function Header(props) {
         </Toolbar>
       </AppBar>
       {renderMenu}
-      {/* {renderSave} */}
       {children}
     </Box>
   )

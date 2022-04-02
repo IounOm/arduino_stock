@@ -1,88 +1,23 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { Redirect, Link, useHistory } from 'react-router-dom'
-// import { createTheme } from '@mui/material/styles'
-// import createBreakpoints from '@material-ui/core/styles/createBreakpoints'
+import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
-// import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { format } from 'date-fns'
 
 import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
 import _get from 'lodash/get'
-import _forEach from 'lodash/forEach'
-import _filter from 'lodash/filter'
-import _differenceBy from 'lodash/differenceBy'
-import _lowerCase from 'lodash/lowerCase'
-import _capitalize from 'lodash/capitalize'
-import _toInteger from 'lodash/toInteger'
 import _ceil from 'lodash/ceil'
 import _parseInt from 'lodash/parseInt'
-import _orderBy from 'lodash/orderBy'
 
 import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
-import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
-// import Link from '@mui/material/Link'
 import Chip from '@mui/material/Chip'
-// import theme from '../../Theme/theme'
-import InputLabel from '@mui/material/InputLabel'
-import InputAdornment from '@mui/material/InputAdornment'
-import FormControl from '@mui/material/FormControl'
-import Visibility from '@mui/icons-material/Visibility'
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import IconButton from '@mui/material/IconButton'
-import OutlinedInput from '@mui/material/OutlinedInput'
-import Divider from '@mui/material/Divider'
-import Hidden from '@mui/material/Hidden'
-import Tooltip from '@mui/material/Tooltip'
-import Autocomplete from '@mui/material/Autocomplete'
-import Stack from '@mui/material/Stack'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import Avatar from '@mui/material/Avatar'
-import MenuItem from '@mui/material/MenuItem'
-import Menu from '@mui/material/Menu'
-import Switch from '@mui/material/Switch'
-import FormGroup from '@mui/material/FormGroup'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Paper from '@mui/material/Paper'
-import Badge from '@mui/material/Badge'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
 import Pagination from '@mui/material/Pagination'
 
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
-import GitHubIcon from '@mui/icons-material/GitHub'
-import LanguageIcon from '@mui/icons-material/Language'
-import FacebookIcon from '@mui/icons-material/Facebook'
-import TwitterIcon from '@mui/icons-material/Twitter'
-import AddIcon from '@mui/icons-material/Add'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import AddBoxIcon from '@mui/icons-material/AddBox'
-import PeopleIcon from '@mui/icons-material/People'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
-import InfoIcon from '@mui/icons-material/Info'
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
-
 import { getUser } from '../../redux/selectors/user.selector'
-import Header from '../../components/Header/Header'
-import UploadImage from '../../components/UploadImage/UploadImage'
 import CardProject from '../../components/CardProject/CardProject'
-import Loading from '../../components/Loading'
 import { AuthContext } from '../../components/Auth'
-import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
 
 const useStyles = makeStyles((theme) => ({
@@ -97,9 +32,6 @@ const useStyles = makeStyles((theme) => ({
   box: {
     display: 'flex',
     flexDirection: 'column',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // height: 'calc(100vh - 72px)',
     backgroundColor: '#F8FFFF',
     minHeight: 'calc(100vh - 182px)',
     marginTop: '64px',
@@ -163,11 +95,9 @@ function Home(props) {
 
   const [loading, setLoading] = useState(false)
   const [tagData, setTagData] = useState(tagList)
-  // const [tagSelect, setTagSelect] = useState('')
   const [projectData, setProjectData] = useState([])
   const [filterProjectData, setFilterProjectData] = useState([])
   const [searchData, setSearchData] = useState([])
-  // const [filterSearch, setFilterSearch] = useState([])
 
   const [currentPage, setCurrentPage] = useState(_parseInt(pathPageId) || 1)
   const [projectPerPage, setProjectPerPage] = useState(30) // num of project in 1 page
@@ -176,11 +106,11 @@ function Home(props) {
   const indexOfFirstProject = indexOfLastProject - projectPerPage
   const currentProject = filterProjectData.slice(indexOfFirstProject, indexOfLastProject)
   const numOfProject = filterProjectData.length // num of all project
-  console.log('numOfProject', numOfProject)
-  console.log('projectData', projectData)
+  // console.log('numOfProject', numOfProject)
+  // console.log('projectData', projectData)
   const totalPage = _ceil(numOfProject / projectPerPage) // number of all page
 
-  console.log('filterProjectData', filterProjectData)
+  // console.log('filterProjectData', filterProjectData)
 
   const handleChangePage = (event, value) => {
     console.log('valueaaaa', value)
@@ -228,7 +158,7 @@ function Home(props) {
         if (_isEmpty(getProject.docs)) {
           setProjectData([])
         } else {
-          console.log('getProject', getProject.docs)
+          // console.log('getProject', getProject.docs)
           getProject.docs.forEach((doc) => {
             doc.data().uidRef.get().then((res) => {
               output.push({
@@ -255,42 +185,15 @@ function Home(props) {
             setSearchData([...output])
           })
         })
+      } else {
+        history.push('/404')
       }
-      // else {
-      //   history.push('/404')
-      // }
       setLoading(false)
     } catch (err) {
       console.log(err)
       history.push('/404')
     }
   }
-  console.log('searchData', searchData)
-
-  // const handleSearch = async () => {
-  //   try {
-  //     setLoading(true)
-  //     const output = []
-  //     if (!searchType && !searchId) {
-  //       const getSearch = await db.collection('project')
-  //         .where('publish', '==', true)
-  //       // .orderBy('updateAt', 'desc')
-  //         .get()
-  //       getSearch.docs.forEach((doc) => {
-  //         doc.data().uidRef.get().then((res) => {
-  //           output.push({
-  //             id: doc.id,
-  //             ...doc.data(),
-  //             uidRef: res.data(),
-  //           })
-  //           setSearchData([...output])
-  //         })
-  //       })
-  //     }
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // }
 
   useEffect(() => {
     handleQuery()

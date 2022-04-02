@@ -1,14 +1,12 @@
 import React, { useState } from 'react'
 import { Redirect, Link } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
-import { useSelector, useDispatch } from 'react-redux'
 
 import _isEmpty from 'lodash/isEmpty'
 import _get from 'lodash/get'
 import _repeat from 'lodash/repeat'
 
 import Box from '@mui/material/Box'
-// import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
@@ -19,9 +17,6 @@ import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
 import OutlinedInput from '@mui/material/OutlinedInput'
-
-import { getUser } from '../../redux/selectors/user.selector'
-import * as userAction from '../../redux/actions/user.action'
 
 import firebase from '../../config'
 
@@ -45,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
     minHeight: 'calc(100vh - 102px)',
     [theme.breakpoints.down('sm')]: {
       width: '90%',
-      // height: 'calc(100vh - 56px)',
       minHeight: 'calc(100vh - 99px)',
     },
   },
@@ -77,8 +71,6 @@ const useStyles = makeStyles((theme) => ({
 
 function SignUp() {
   const classes = useStyles()
-  const dispatch = useDispatch()
-  const user = useSelector(getUser)
   const [currentUser, setCurrentUser] = useState(null)
   const [values, setValues] = useState({
     name: '',
@@ -151,10 +143,6 @@ function SignUp() {
 
   if (currentUser) {
     return <Redirect to="/profile" />
-  }
-
-  const handleLogin = () => {
-    <Redirect to="/login" />
   }
 
   return (

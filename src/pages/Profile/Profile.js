@@ -1,45 +1,19 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { Redirect, useHistory } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
-import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
 
 import _isEmpty from 'lodash/isEmpty'
-import _map from 'lodash/map'
 import _get from 'lodash/get'
-import _forEach from 'lodash/forEach'
-import _words from 'lodash/words'
 import _split from 'lodash/split'
 import _repeat from 'lodash/repeat'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
-import Link from '@mui/material/Link'
-import Chip from '@mui/material/Chip'
-// import theme from '../../Theme/theme'
-import InputLabel from '@mui/material/InputLabel'
-import InputAdornment from '@mui/material/InputAdornment'
-import FormControl from '@mui/material/FormControl'
-import Visibility from '@mui/icons-material/Visibility'
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import IconButton from '@mui/material/IconButton'
-import OutlinedInput from '@mui/material/OutlinedInput'
 import Divider from '@mui/material/Divider'
 import Hidden from '@mui/material/Hidden'
-import Tooltip from '@mui/material/Tooltip'
-import Autocomplete from '@mui/material/Autocomplete'
-import Stack from '@mui/material/Stack'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import Avatar from '@mui/material/Avatar'
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import LanguageIcon from '@mui/icons-material/Language'
 import FacebookIcon from '@mui/icons-material/Facebook'
@@ -47,17 +21,10 @@ import TwitterIcon from '@mui/icons-material/Twitter'
 
 import { getAuth, updatePassword } from 'firebase/auth'
 import { getUser } from '../../redux/selectors/user.selector'
-import Header from '../../components/Header/Header'
 import Loading from '../../components/Loading'
 import UploadImage from '../../components/UploadImage/UploadImage'
-import CardProject from '../../components/CardProject/CardProject'
-import { AuthContext } from '../../components/Auth'
 import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
-
-const Input = styled('input')({
-  display: 'none',
-})
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,26 +37,16 @@ const useStyles = makeStyles((theme) => ({
   },
   box: {
     display: 'flex',
-    // flexDirection: 'column',
-    // alignItems: 'center',
-    // justifyContent: 'center',
     backgroundColor: '#F8FFFF',
     marginTop: '64px',
-    // height: 'calc(100vh - 64px)',
     minHeight: 'calc(100vh - 182px)',
-    // height: 'calc(100vh - 64px)',
     flexDirection: 'row',
-    // marginBottom: '0px',
     padding: '40px 12%',
-    // padding: '0 120px 0 120px',
     [theme.breakpoints.down('lg')]: {
       padding: '0 40px 0 40px',
-      // height: '100%',
       minHeight: 'calc(100vh - 102px)',
     },
     [theme.breakpoints.down('md')]: {
-      // marginTop: '84px',
-      // marginBottom: '0px',
       padding: '20px 10%',
       height: '100%',
       minHeight: 'calc(100vh - 142px)',
@@ -188,9 +145,6 @@ function Profile() {
   const user = auth.currentUser
   const history = useHistory()
   const db = firebase.firestore()
-  // const { currentUser } = useContext(AuthContext)
-  // const uid = _get(currentUser, 'user.uid')
-  // console.log('currentUid', uid)
   const [loading, setLoading] = useState(false)
   const [editContact, setEditContact] = useState(false)
   const [editUser, setEditUser] = useState(false)
@@ -223,9 +177,6 @@ function Profile() {
     twitterName: '',
     gitName: '',
   })
-  const [projectData, setProjectData] = useState([])
-
-  console.log(values)
 
   const handleQuery = async () => {
     try {
@@ -307,7 +258,6 @@ function Profile() {
       console.log(err)
     }
   }
-  // console.log('contact', contact)
 
   // edit userProfile
   const handleClickUserEdit = () => {
@@ -368,11 +318,6 @@ function Profile() {
       } else if (values.password !== values.confirmPassword) {
         setValues({ ...values, errorPassword: true, errorConfirmPassword: true })
       } else {
-        // firebase.auth()
-        //   .signInWithEmailAndPassword('you@domain.com', 'correcthorsebatterystaple')
-        //   .then((userCredential) => {
-        //     userCredential.user.updateEmail('newyou@domain.com')
-        //   })
         const passNum = values.password.length
         await updatePassword(user, values.password).then(async () => {
           await db.collection('users').doc(userId).update({
@@ -388,14 +333,12 @@ function Profile() {
       console.log(err)
     }
   }
-  console.log('website', contact.websiteName[contact.websiteName.length - 1])
+  // console.log('website', contact.websiteName[contact.websiteName.length - 1])
 
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myUser, userPassword])
-
-  console.log('projectData', projectData)
 
   return (
     <Box className={classes.box}>

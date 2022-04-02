@@ -1,20 +1,17 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { Redirect, useHistory } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
 import { styled } from '@mui/material/styles'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 
-import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
 import _get from 'lodash/get'
 import _split from 'lodash/split'
 
 import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Hidden from '@mui/material/Hidden'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -26,13 +23,7 @@ import { getUser } from '../../redux/selectors/user.selector'
 import Loading from '../../components/Loading'
 import UploadImage from '../../components/UploadImage/UploadImage'
 import CardProject from '../../components/CardProject/CardProject'
-import { AuthContext } from '../../components/Auth'
-import * as userAction from '../../redux/actions/user.action'
 import firebase from '../../config'
-
-const Input = styled('input')({
-  display: 'none',
-})
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,17 +36,11 @@ const useStyles = makeStyles((theme) => ({
   },
   box: {
     display: 'flex',
-    // flexDirection: 'column',
-    // alignItems: 'center',
-    // justifyContent: 'center',
     backgroundColor: '#F8FFFF',
     marginTop: '64px',
     height: 'auto',
     minHeight: 'calc(100vh - 182px)',
-    // height: 'calc(100vh - 64px)',
     flexDirection: 'column',
-    // marginBottom: '32px',
-    // padding: '0 120px 0 120px',
     padding: '40px 15%',
     [theme.breakpoints.down('lg')]: {
       padding: '20px 12%',
@@ -63,8 +48,6 @@ const useStyles = makeStyles((theme) => ({
       // height: '100%',
     },
     [theme.breakpoints.down('md')]: {
-      // marginTop: '84px',
-      // marginBottom: '0px',
       padding: '20px 10%',
       height: '100%',
       minHeight: 'calc(100vh - 142px)',
@@ -163,7 +146,6 @@ function ProfileShare(props) {
   } = myUser
   const db = firebase.firestore()
   const [loading, setLoading] = useState(false)
-  const [editUser, setEditUser] = useState(false)
   const [values, setValues] = useState({
     image: '',
     name: '',
@@ -274,9 +256,6 @@ function ProfileShare(props) {
                 <Hidden mdUp>
                   <Divider />
                 </Hidden>
-                {/* <Box className={classes.title} mt={2}>
-                  <Typography variant="h4">User Profile</Typography>
-                </Box> */}
                 <Box width="100%" fullWidth mt={2}>
                   <Typography variant="h4">
                     {values.name}
@@ -284,24 +263,6 @@ function ProfileShare(props) {
                   <Typography variant="body2">
                     {values.note}
                   </Typography>
-                  {/* <TextField
-                    variant="outlined"
-                    fullWidth
-                    label="Username"
-                    value={values.name}
-                    style={{ marginTop: '16px' }}
-                    disabled={!editUser}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Say something about yourself"
-                    multiline
-                    rows={1}
-                    defaultValue=""
-                    value={values.note}
-                    style={{ marginTop: '16px' }}
-                    disabled={!editUser}
-                  /> */}
                 </Box>
               </Box>
               <Box className={classes.profile}>

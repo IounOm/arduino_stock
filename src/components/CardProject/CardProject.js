@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { styled } from '@mui/material/styles'
 import { makeStyles } from '@mui/styles'
 import { format } from 'date-fns'
-import { enGB, th } from 'date-fns/locale'
+// import { enGB, th } from 'date-fns/locale'
 
 import _isEqual from 'lodash/isEqual'
 import _toInteger from 'lodash/toInteger'
 import _get from 'lodash/get'
-import _kebabCase from 'lodash/kebabCase'
 import _map from 'lodash/map'
 import _lowerCase from 'lodash/lowerCase'
-import _isEmpty from 'lodash/isEmpty'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -22,7 +19,6 @@ import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import CardActionArea from '@mui/material/CardActionArea'
 import Button from '@mui/material/Button'
-import Collapse from '@mui/material/Collapse'
 import Avatar from '@mui/material/Avatar'
 import Chip from '@mui/material/Chip'
 import Hidden from '@mui/material/Hidden'
@@ -39,27 +35,12 @@ import DialogTitle from '@mui/material/DialogTitle'
 
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import { red } from '@mui/material/colors'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-import ShareIcon from '@mui/icons-material/Share'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 
 import firebase from '../../config'
-
-// const ExpandMore = styled((props) => {
-//   const { expand, ...other } = props
-//   return <IconButton {...other} />
-// })(({ theme, expand }) => ({
-//   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-//   marginLeft: 'auto',
-//   transition: theme.transitions.create('transform', {
-//     duration: theme.transitions.duration.shortest,
-//   }),
-// }))
 
 const useStyles = makeStyles((theme) => ({
   cardHeader: {
@@ -78,7 +59,6 @@ function CardProject(props) {
   const [anchorEl, setAnchorEl] = useState(false)
   const [deleteMenuOpen, setDeleteMenuOpen] = useState(false)
   const [deleteGroupMenuOpen, setDeleteGroupMenuOpen] = useState(false)
-  // const [expanded, setExpanded] = useState(false)
 
   const db = firebase.firestore()
 
@@ -95,11 +75,6 @@ function CardProject(props) {
     },
   ]
 
-  // const handleExpandClick = () => {
-  //   setExpanded(!expanded)
-  // }
-
-  // const formatUpdateAtDate = format(_toInteger(`${_get(values, 'createAt.seconds')}000`), 'dd LLLL yyyy')
   const formatCreateAtDate = format(_toInteger(`${_get(values, 'createAt.seconds')}000`), 'dd LLLL yyyy')
 
   const handleCheckId = () => {
@@ -129,7 +104,6 @@ function CardProject(props) {
     setDeleteMenuOpen(false)
     setDeleteGroupMenuOpen(false)
   }
-  console.log('values111', values)
   const handleDeleteProject = async (type) => {
     setLoading(true)
     try {
@@ -283,10 +257,8 @@ function CardProject(props) {
             <CardMedia
               component="img"
               height="194"
-            // width="100%"
               image={values.image}
               alt="Arduino Project Image"
-              // className={classes.cardMedia}
             />
             <CardContent sx={{ height: 64, maxHeight: 80 }}>
               <Typography

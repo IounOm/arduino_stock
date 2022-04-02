@@ -1,41 +1,22 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
-import { styled } from '@mui/material/styles'
 import { useSelector, useDispatch } from 'react-redux'
 import { format } from 'date-fns'
-import { enGB, th } from 'date-fns/locale'
 import { customAlphabet } from 'nanoid'
 
 import _isEmpty from 'lodash/isEmpty'
 import _map from 'lodash/map'
 import _get from 'lodash/get'
-import _forEach from 'lodash/forEach'
-import _filter from 'lodash/filter'
 import _toInteger from 'lodash/toInteger'
 import _lowerCase from 'lodash/lowerCase'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
-// import Link from '@mui/material/Link'
-import Chip from '@mui/material/Chip'
-// import theme from '../../Theme/theme'
-import InputLabel from '@mui/material/InputLabel'
-import InputAdornment from '@mui/material/InputAdornment'
-import FormControl from '@mui/material/FormControl'
-import Visibility from '@mui/icons-material/Visibility'
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
-import OutlinedInput from '@mui/material/OutlinedInput'
 import Divider from '@mui/material/Divider'
-import Hidden from '@mui/material/Hidden'
-import Tooltip from '@mui/material/Tooltip'
-import Autocomplete from '@mui/material/Autocomplete'
-import Stack from '@mui/material/Stack'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -47,34 +28,21 @@ import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import Menu from '@mui/material/Menu'
 import Switch from '@mui/material/Switch'
-import FormGroup from '@mui/material/FormGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import Paper from '@mui/material/Paper'
 import CircularProgress from '@mui/material/CircularProgress'
 import Card from '@mui/material/Card'
-import CardActions from '@mui/material/CardActions'
+// import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
 
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
-import GitHubIcon from '@mui/icons-material/GitHub'
-import LanguageIcon from '@mui/icons-material/Language'
-import FacebookIcon from '@mui/icons-material/Facebook'
-import TwitterIcon from '@mui/icons-material/Twitter'
-import AddIcon from '@mui/icons-material/Add'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import AddBoxIcon from '@mui/icons-material/AddBox'
-import PeopleIcon from '@mui/icons-material/People'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
-import InfoIcon from '@mui/icons-material/Info'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 
 import RichText from '../../components/RichText/RichText'
 
 import { getUser } from '../../redux/selectors/user.selector'
-import Loading from '../../components/Loading'
 import UploadImage from '../../components/UploadImage/UploadImage'
 // import CardProject from '../../components/CardProject/CardProject'
 import CommentBox from '../../components/CommentBox/CommentBox'
@@ -92,10 +60,6 @@ const useStyles = makeStyles((theme) => ({
   },
   box: {
     display: 'flex',
-    // flexDirection: 'column',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // height: 'calc(100vh - 72px)',
     backgroundColor: '#F8FFFF',
     minHeight: 'calc(100vh - 182px)',
     marginTop: '64px',
@@ -130,33 +94,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   richText: {
-    // margin: '0px 240.4px',
     fontFamily: 'serif',
-    // [theme.breakpoints.down('lg')]: {
-    //   margin: '0px 80px',
-    // },
-    // [theme.breakpoints.down('md')]: {
-    //   margin: '0px 40px',
-    // },
-    // [theme.breakpoints.down('sm')]: {
-    //   margin: '0px 10px',
-    // },
   },
   headerText: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 9.6px o 4.6px',
-    // margin: '40px 250px 0 250px',
-    // [theme.breakpoints.down('lg')]: {
-    //   margin: '40px 80px 0px 89.6px',
-    // },
-    // [theme.breakpoints.down('md')]: {
-    //   margin: '40px 40px 0px 49.6px',
-    // },
-    // [theme.breakpoints.down('sm')]: {
-    //   margin: '20px 10px 0px 19.6px',
-    // },
   },
   headerLeft: {
     display: 'flex',
@@ -170,10 +114,8 @@ function Project(props) {
   const projectId = path.id
   const actionType = path.type
   const groupId = path.gid
-  console.log('groupId', !_isEmpty(groupId))
   const location = useLocation()
   const { pathname } = location
-  console.log('pathname', pathname)
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
@@ -195,7 +137,6 @@ function Project(props) {
   const [loading, setLoading] = useState(false)
   const [loadingComment, setLoadingComment] = useState(false)
   const [docId, setDocId] = useState('')
-  // const [article, setArticle] = useState('')
   const [value, setValue] = useState({
     article: '',
     createAt: '',
@@ -219,19 +160,13 @@ function Project(props) {
 
   const [openSaveMenu, setOpenSaveMenu] = useState(false)
   const [checkSwitch, setCheckSwitch] = useState(false)
-  // const [saveMenuData, setSaveMenuData] = useState({
-  //   image: '',
-  //   title: '',
-  //   subtitle: '',
-  //   tag: '',
-  // })
+
   const [errorSave, setErrorSave] = useState({
     image: false,
     title: false,
     subtitle: false,
     tag: false,
   })
-  console.log('comment1', comment)
 
   const [anchorEl, setAnchorEl] = useState(false)
   const [deleteMenuOpen, setDeleteMenuOpen] = useState(false)
@@ -247,8 +182,6 @@ function Project(props) {
       icon: <DeleteIcon fontSize="small" color="error" />,
     },
   ]
-
-  console.log('docId', docId)
 
   const tag = [
     { value: 'Entertainment', label: 'Entertainment' },
@@ -367,9 +300,6 @@ function Project(props) {
     }
   }
 
-  console.log('uploadImg', uploadImg)
-  console.log('value', value)
-
   const handleSave = async () => {
     try {
       setLoading(true)
@@ -436,8 +366,6 @@ function Project(props) {
         dispatch(userAction.saveProject(false))
         history.push(`/group-project/${groupId}/project/view/${projectId}`)
       }
-      // dispatch(userAction.uploadImage(''))
-      // dispatch(userAction.saveProject(false))
       setLoading(false)
     } catch (err) {
       console.log(err)
@@ -445,8 +373,6 @@ function Project(props) {
       dispatch(userAction.saveProject(false))
     }
   }
-  console.log('uploadImg', uploadImg)
-  console.log('value', value)
 
   // menuSave
   const handleOpenSave = async () => {
@@ -609,8 +535,6 @@ function Project(props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comment])
 
-  console.log('errorSave', errorSave)
-
   const renderMunuSave = (
     <Dialog open={openSaveMenu} onClose={handleCloseSave}>
       <DialogTitle display="flex" justifyContent="space-between" alignItems="center">
@@ -725,7 +649,6 @@ function Project(props) {
         <MenuItem
           // key={values.id}
           onClick={() => handleClickList(list.name)}
-          // onClick={[]}
         >
           <ListItemIcon>
             {list.icon}
@@ -773,10 +696,6 @@ function Project(props) {
       </DialogActions>
     </Dialog>
   )
-
-  console.log('loading', loading)
-  console.log('writeComment', writeComment)
-  console.log('commentData', commentData)
 
   return (
     <Box className={classes.box}>

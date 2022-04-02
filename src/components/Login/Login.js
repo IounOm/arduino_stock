@@ -1,19 +1,13 @@
 import React, { useState, useContext } from 'react'
 import { Redirect, Link } from 'react-router-dom'
 import { makeStyles } from '@mui/styles'
-// import { makeStyles } from '@material-ui/core'
-// import { styled } from '@mui/material/styles'
 
 import _isEmpty from 'lodash/isEmpty'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
-// import Link from '@mui/material/Link'
-// import theme from '../../Theme/theme'
 import InputLabel from '@mui/material/InputLabel'
 import InputAdornment from '@mui/material/InputAdornment'
 import FormControl from '@mui/material/FormControl'
@@ -22,7 +16,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
 import OutlinedInput from '@mui/material/OutlinedInput'
 
-import Header from '../Header/Header'
 import { AuthContext } from '../Auth'
 import firebase from '../../config'
 
@@ -30,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     minHeight: '100vh',
-    // backgroundColor: '#eaeff1',
     backgroundColor: '#F8FFFF',
     [theme.breakpoints.down('sm')]: {
       display: 'block',

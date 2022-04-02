@@ -1,31 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { styled } from '@mui/material/styles'
 import { makeStyles } from '@mui/styles'
 import { format } from 'date-fns'
-import { enGB, th } from 'date-fns/locale'
 
-import _isEqual from 'lodash/isEqual'
 import _toInteger from 'lodash/toInteger'
 import _get from 'lodash/get'
-import _kebabCase from 'lodash/kebabCase'
 import _map from 'lodash/map'
 import _lowerCase from 'lodash/lowerCase'
-import _isEmpty from 'lodash/isEmpty'
 
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
-import CardMedia from '@mui/material/CardMedia'
-import CardContent from '@mui/material/CardContent'
-import CardActions from '@mui/material/CardActions'
-import CardActionArea from '@mui/material/CardActionArea'
 import Button from '@mui/material/Button'
-import Collapse from '@mui/material/Collapse'
 import Avatar from '@mui/material/Avatar'
-import Chip from '@mui/material/Chip'
-import Hidden from '@mui/material/Hidden'
 import Divider from '@mui/material/Divider'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -41,12 +27,7 @@ import TextField from '@mui/material/TextField'
 
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import { red } from '@mui/material/colors'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-import ShareIcon from '@mui/icons-material/Share'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 
@@ -73,8 +54,6 @@ function CommentBox(props) {
 
   const [commentData, setCommentData] = useState(values.comment)
 
-  console.log('comment11111', commentData)
-
   const commentLists = [
     {
       name: <Typography>Edit</Typography>,
@@ -90,7 +69,6 @@ function CommentBox(props) {
 
   const updateDate = values.updateAt.seconds + values.updateAt.nanoseconds
   const createDate = values.createAt.seconds + values.createAt.nanoseconds
-  console.log('updateCreate', updateDate, createDate)
 
   const handleChangeComment = (event) => {
     setCommentData(event.target.value)
