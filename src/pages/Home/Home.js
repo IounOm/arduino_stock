@@ -106,14 +106,9 @@ function Home(props) {
   const indexOfFirstProject = indexOfLastProject - projectPerPage
   const currentProject = filterProjectData.slice(indexOfFirstProject, indexOfLastProject)
   const numOfProject = filterProjectData.length // num of all project
-  // console.log('numOfProject', numOfProject)
-  // console.log('projectData', projectData)
   const totalPage = _ceil(numOfProject / projectPerPage) // number of all page
 
-  // console.log('filterProjectData', filterProjectData)
-
   const handleChangePage = (event, value) => {
-    console.log('valueaaaa', value)
     if (value !== pathPageId) {
       setCurrentPage(value)
       if (searchType && searchId) {
@@ -123,8 +118,6 @@ function Home(props) {
       }
     }
   }
-
-  console.log('currentPage', currentPage)
 
   const handleQuery = async () => {
     try {
@@ -200,7 +193,6 @@ function Home(props) {
     setCurrentPage(pageId || 1)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, pageId])
-  console.log('path', path)
 
   useEffect(() => {
     if (!_isEmpty(searchId) && searchType === 'search') {

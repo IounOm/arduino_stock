@@ -191,8 +191,6 @@ function Project(props) {
     { value: 'Other', label: 'Other' },
   ]
 
-  console.log('value', value)
-
   const formatCreateAtDate = format(_toInteger(`${_get(value, 'createAt.seconds')}000`), 'dd LLLL yyyy')
   // const formatUpdateAtDate = format(_toInteger(`${_get(value, 'updateAt.seconds')}000`), 'dd LLLL yyyy')
 

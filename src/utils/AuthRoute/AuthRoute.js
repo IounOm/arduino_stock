@@ -33,20 +33,9 @@ function AuthRoute(props) {
     output = <Layout><Component {...props} /></Layout>
   }
 
-  // if (user.loading) {
-  //   output = <Loading />
-  //   // output = <Layout><Component {...props} /></Layout>
-  // } else if (!user.isLogin && loginRequired) {
-  //   output = <Redirect to="/login" />
-  // } else if (user.isLogin && !loginRequired) {
-  //   output = <Redirect to="/" />
-  // } else if ((user.isLogin && loginRequired) || (!user.isLogin && !loginRequired)) {
-  //   output = <Layout><Component {...props} /></Layout>
-  // }
-
-  useEffect(() => {
-    console.log(user)
-  }, [user])
+  // useEffect(() => {
+  //   console.log(user)
+  // }, [user])
 
   return (
     <Route

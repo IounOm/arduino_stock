@@ -333,7 +333,6 @@ function Profile() {
       console.log(err)
     }
   }
-  // console.log('website', contact.websiteName[contact.websiteName.length - 1])
 
   useEffect(() => {
     handleQuery()
