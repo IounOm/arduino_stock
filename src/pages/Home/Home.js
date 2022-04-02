@@ -208,7 +208,8 @@ function Home(props) {
         searchData.filter(
           (project) => project.title.toLowerCase().includes(searchId.toLowerCase())
             || project.subtitle.toLowerCase().includes(searchId.toLowerCase())
-            || project.uidRef.name.toLowerCase().includes(searchId.toLowerCase()),
+            || project.uidRef.name.toLowerCase().includes(searchId.toLowerCase())
+            || project.tag.toLowerCase().includes(searchId.toLowerCase()),
         ),
       )
     }
