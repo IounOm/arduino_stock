@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#F8FFFF',
     minHeight: 'calc(100vh - 102px)',
     [theme.breakpoints.down('sm')]: {
-      width: '90%',
+      width: '100%',
       minHeight: 'calc(100vh - 99px)',
     },
   },
@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: '0px 0px 10px 1px #E0E0E0',
     borderRadius: '25px',
     [theme.breakpoints.down('sm')]: {
-      width: '90%',
+      width: '80%',
       padding: '16px',
     },
   },

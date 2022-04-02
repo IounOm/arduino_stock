@@ -730,14 +730,14 @@ function GroupProject(props) {
                 <Box display="flex">
                   <TextField
                     label="link"
-                    value={`http://arduinostock.web.app/group-project/${groupId}/share`}
+                    value={`${process.env.REACT_APP_API_URL}/group-project/${groupId}/share`}
                     variant="outlined"
                     fullWidth
                     disabled
                   />
                   <Box ml={1} />
                   <Button
-                    onClick={() => navigator.clipboard.writeText(`http://arduinostock.web.app/group-project/${groupId}/share`)}
+                    onClick={() => navigator.clipboard.writeText(`${process.env.REACT_APP_API_URL}/group-project/${groupId}/share`)}
                     variant="outlined"
                   >
                     Copy
