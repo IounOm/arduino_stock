@@ -218,14 +218,14 @@ function SignUp() {
           />
         </FormControl>
         <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="body1">
-            Have an account yet ?
-            <Link to="/login" className={classes.link}>
-              <Button>
-                Sign In
-              </Button>
-            </Link>
-          </Typography>
+          <Box display="flex">
+            <Typography variant="body1">Have an account yet?</Typography>
+            <Box ml={1}>
+              <Link to="/login" className={classes.link}>
+                <Typography variant="body1" color="primary">Sign In</Typography>
+              </Link>
+            </Box>
+          </Box>
           <Button variant="outlined" color="primary" onClick={handleSubmit}>Submit</Button>
         </Box>
 

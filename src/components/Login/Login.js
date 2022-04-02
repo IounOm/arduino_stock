@@ -159,14 +159,14 @@ function Login() {
           />
         </FormControl>
         <Box width="100%" display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="body1">
-            Do not have an account yet ?
-            <Link to="/signup" className={classes.link}>
-              <Button>
-                Create one
-              </Button>
-            </Link>
-          </Typography>
+          <Box display="flex">
+            <Typography variant="body1">{'Don\'t have account ?'}</Typography>
+            <Box ml={1}>
+              <Link to="/signup" className={classes.link}>
+                <Typography variant="body1" color="primary">Create one</Typography>
+              </Link>
+            </Box>
+          </Box>
           <Button
             variant="outlined"
             color="primary"
