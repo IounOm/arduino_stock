@@ -42,7 +42,7 @@ function RichText(props) {
       'indent',
       'outdent',
       '|',
-      'imageUpload',
+      // 'imageUpload',
       'blockQuote',
       'horizontalLine',
       'codeBlock',
