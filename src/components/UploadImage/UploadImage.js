@@ -81,7 +81,8 @@ function UploadImage(props) {
   }
   const handleSaveImageEdit = () => {
     try {
-      const uploadTask = storage.ref(`${collection}/${doc}/${userImages.name}`).put(userImages)
+      const date = new Date().getTime()
+      const uploadTask = storage.ref(`${collection}/${doc}/${userImages.name}.${date}`).put(userImages)
       uploadTask.on(
         'state_changed',
         (snapshot) => {
