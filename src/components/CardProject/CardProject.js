@@ -260,7 +260,7 @@ function CardProject(props) {
               image={values.image}
               alt="Arduino Project Image"
             />
-            <CardContent sx={{ height: 64, maxHeight: 80 }}>
+            <CardContent sx={{ height: 70, maxHeight: 80 }}>
               <Typography
                 variant="body1"
                 fontWeight="bold"

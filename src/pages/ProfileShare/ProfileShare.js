@@ -329,7 +329,7 @@ function ProfileShare(props) {
               {!loading && (
               <>
                 {_map(projectData, (data) => (
-                  <Grid item lg={4} md={6} sm={12} sx={{ flexGrow: 1 }}>
+                  <Grid item lg={4} md={6} sm={12} xs={12} sx={{ flexGrow: 1 }}>
                     <CardProject
                       values={data}
                       loading={loading}

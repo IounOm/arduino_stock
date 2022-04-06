@@ -82,7 +82,7 @@ function UploadImage(props) {
   const handleSaveImageEdit = () => {
     try {
       const date = new Date().getTime()
-      const uploadTask = storage.ref(`${collection}/${doc}/${userImages.name}.${date}`).put(userImages)
+      const uploadTask = storage.ref(`${collection}/${doc}/${date}.${userImages.name}`).put(userImages)
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -93,7 +93,7 @@ function UploadImage(props) {
           console.log(err)
         },
         () => {
-          storage.ref(`${collection}/${doc}`).child(userImages.name).getDownloadURL().then((imgUrl) => {
+          storage.ref(`${collection}/${doc}`).child(`${date}.${userImages.name}`).getDownloadURL().then((imgUrl) => {
             if (page === 'createProject') {
               dispatch(userAction.uploadImage(imgUrl))
             } else {

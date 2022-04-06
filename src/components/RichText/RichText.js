@@ -84,7 +84,8 @@ function RichText(props) {
           // const uploadTask = storage
           //   .child(file.name)
           //   .put(file, metadata)
-          const uploadTask = storage.ref(`project/${docId}/${file.name}`).put(file)
+          const date = new Date().getTime()
+          const uploadTask = storage.ref(`project/${docId}/${date}.${file.name}`).put(file)
           uploadTask.on(
             'state_changed',
             (snapshot) => {

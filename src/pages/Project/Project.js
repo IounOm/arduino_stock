@@ -94,7 +94,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   richText: {
-    fontFamily: 'serif',
+    // fontFamily: 'serif',
+    fontFamily: 'IBM Plex Sans Thai',
   },
   headerText: {
     display: 'flex',
