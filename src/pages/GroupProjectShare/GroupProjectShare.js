@@ -227,7 +227,7 @@ function GroupProject(props) {
         if (doc.data().uid === userId) {
           history.push(`/group-project/${groupId}`)
         } else if (doc.data().permission === 'personal') {
-          history.push('/404') // this is private group
+          history.push('/401') // this is private group
         } else {
           groupOutput.push({
             id: doc.id,

@@ -23,11 +23,14 @@ import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
 import ListItemText from '@mui/material/ListItemText'
 import ListItemIcon from '@mui/material/ListItemIcon'
+import Chip from '@mui/material/Chip'
+import SwipeableDrawer from '@mui/material/SwipeableDrawer'
 
 import SearchIcon from '@mui/icons-material/Search'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import MemoryIcon from '@mui/icons-material/Memory'
 import LogoutIcon from '@mui/icons-material/Logout'
+import HelpIcon from '@mui/icons-material/Help'
 
 import { getUser } from '../../redux/selectors/user.selector'
 import * as userAction from '../../redux/actions/user.action'
@@ -225,6 +228,15 @@ function Header(props) {
     }
   }
 
+  // toturial
+  const [anchor, setAnchor] = useState(false)
+  const handleOpenAnchor = () => {
+    setAnchor(true)
+  }
+  const handleCloseAnchor = () => {
+    setAnchor(false)
+  }
+
   useEffect(() => {
     handleQuery()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -264,6 +276,98 @@ function Header(props) {
     </Menu>
   )
 
+  const drawerToturial = (
+    <Box ml={1}>
+      <SwipeableDrawer
+        anchor="bottom"
+        open={anchor}
+        onClose={handleCloseAnchor}
+        onOpen={handleOpenAnchor}
+      >
+        <Box sx={{ maxHeight: '500px' }}>
+          <Box display="flex" justifyContent="center" sx={{ padding: '0 16px 16px 16px', backgroundColor: '#F8FFFF' }}>
+            <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+              <Box mt={6} />
+              <Typography variant="h4" fontWeight="bold">Guide</Typography>
+              <Box mt={2} />
+              {/* header 1 */}
+              <img src="/images/toturial5.png" alt="arduinoStock" width="280px" />
+              <Box mt={2}>
+                <Typography variant="h6" fontWeight="bold">Write your project, add photos, videos, or change your design</Typography>
+              </Box>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial6.png" alt="arduinoStock" width="130px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Change inline text heading</Typography>
+                </Box>
+              </Box>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial7.png" alt="arduinoStock" width="80px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Add bulleted list or numbered list</Typography>
+                </Box>
+              </Box>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial8.png" alt="arduinoStock" width="80px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Increase indent or decrease indent in this line</Typography>
+                </Box>
+              </Box>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial9.png" alt="arduinoStock" width="130px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Add block quote, horizontal line or code block</Typography>
+                </Box>
+              </Box>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial10.png" alt="arduinoStock" width="110px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Insert image url or image in your computer and video url</Typography>
+                </Box>
+              </Box>
+              {/* header 2 */}
+              <Box mt={6} />
+              <img src="/images/toturial11.png" alt="arduinoStock" width="250px" />
+              <Typography variant="h6" fontWeight="bold">Customize text When selected</Typography>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial12.png" alt="arduinoStock" width="250px" />
+                {/* <Box ml={1}>
+                  <Typography variant="body1">Toturial</Typography>
+                </Box> */}
+              </Box>
+              <Box mt={1}>
+                <Typography variant="body1">Bold / Italic / Link / code / Font size</Typography>
+              </Box>
+              {/* header 3 */}
+              <Box mt={12} />
+              <Typography variant="h6" fontWeight="bold">Customize your picture</Typography>
+              <img src="/images/toturial3.png" alt="arduinoStock" width="200px" />
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial13.png" alt="arduinoStock" width="80px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Change image text alternative or change image caption</Typography>
+                </Box>
+              </Box>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial14.png" alt="arduinoStock" width="130px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Inline | center | side image</Typography>
+                </Box>
+              </Box>
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                <img src="/images/toturial15.png" alt="arduinoStock" width="50px" />
+                <Box ml={1}>
+                  <Typography variant="body1">Link image to other website when click</Typography>
+                </Box>
+              </Box>
+              <Box mt={2} />
+            </Box>
+          </Box>
+        </Box>
+      </SwipeableDrawer>
+    </Box>
+  )
+
   return (
     <Box sx={{ flexGrow: 1 }} className={classes.root}>
       <AppBar
@@ -296,6 +400,18 @@ function Header(props) {
             >
               <img src="/images/arduinoStock2.png" alt="arduinoStock" width="125px" />
             </IconButton>
+            {pathname === '/project/create' && (
+              <>
+                <Box ml={1} />
+                <Chip
+                  icon={<HelpIcon />}
+                  label="Guide"
+                  color="secondary"
+                  onClick={handleOpenAnchor}
+                />
+                {drawerToturial}
+              </>
+            )}
           </Hidden>
           <Hidden smUp>
             <IconButton
@@ -308,6 +424,14 @@ function Header(props) {
             >
               <img src="/images/arduinoStock.png" alt="arduinoStock" width="30px" />
             </IconButton>
+            {pathname === '/project/create' && (
+              <>
+                <IconButton size="small" color="secondary" onClick={handleOpenAnchor}>
+                  <HelpIcon />
+                </IconButton>
+                {drawerToturial}
+              </>
+            )}
           </Hidden>
           {(pathname !== '/project/create'
           && pathname !== `/project/edit/${pId}`

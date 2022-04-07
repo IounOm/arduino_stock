@@ -10,6 +10,7 @@ import * as userAction from './redux/actions/user.action'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import NotFoundPage from './components/NotFoundPage'
+import PrivateGroup from './components/PrivateGroup'
 
 import Home from './pages/Home'
 import Loading from './components/Loading'
@@ -51,6 +52,7 @@ function App() {
           <AuthRoute exact path="/project" layout={Header} component={GroupProject} loginRequired />
           <AuthRoute exact path="/project/create" layout={Header} component={Project} loginRequired />
           <AuthRoute exact path="/project/:type/:id" layout={Header} component={Project} />
+          <Route path="/401" component={PrivateGroup} />
           <Route path="/404" component={NotFoundPage} />
           <Redirect to="/404" />
         </Switch>

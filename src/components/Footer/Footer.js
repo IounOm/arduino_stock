@@ -21,7 +21,7 @@ function Header() {
 
   return (
     <>
-      {(pathname === '/project/create' || pathname === `/project/edit/${pId}` || pathname === `/group-project/${gId}/project/edit/${gpId}` || pathname === '/404') ? (
+      {(pathname === '/project/create' || pathname === `/project/edit/${pId}` || pathname === `/group-project/${gId}/project/edit/${gpId}` || pathname === '/404' || pathname === '/401') ? (
         <>
         </>
       ) : (
