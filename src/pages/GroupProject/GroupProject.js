@@ -192,6 +192,7 @@ function GroupProject(props) {
     userNote,
     userContact,
     userId,
+    userType,
   } = myUser
   const db = firebase.firestore()
   const [loading, setLoading] = useState(false)
@@ -870,6 +871,7 @@ function GroupProject(props) {
                               setLoading={setLoading}
                               handleQuery={handleQuery}
                               actionType="edit"
+                              userType={userType}
                             />
                           </Grid>
                         </>

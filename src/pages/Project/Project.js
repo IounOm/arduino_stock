@@ -131,6 +131,7 @@ function Project(props) {
     userId,
     save,
     uploadImg,
+    userType,
   } = myUser
   const db = firebase.firestore()
   // const storage = firebase.storage()
@@ -204,12 +205,12 @@ function Project(props) {
             const data = doc.data()
             setValue({ ...value, article: data.article })
             data.uidRef.get().then((res) => {
-              if (actionType === 'edit' && doc.data().uid !== userId) {
+              if (actionType === 'edit' && doc.data().uid !== userId && userType !== 'admin') {
                 history.push('/404') // you cant edit other project
-              } else if (actionType === 'view' && doc.data().uid !== userId && doc.data().publish !== true) {
+              } else if (actionType === 'view' && doc.data().uid !== userId && doc.data().publish !== true && userType !== 'admin') {
                 history.push('/404') // this project not publish
               } else {
-                if (actionType === 'view' && doc.data().uid !== userId) {
+                if (actionType === 'view' && doc.data().uid !== userId && userType !== 'admin') {
                   setDisable(true)
                 }
                 setValue({
@@ -235,8 +236,8 @@ function Project(props) {
             const data = doc.data()
             setValue({ ...value, article: data.article })
             data.uidRef.get().then((res) => {
-              if ((actionType === 'edit' && doc.data().uid !== userId && groupUserId !== userId)
-              || (actionType === 'edit' && doc.data().uid === userId && groupUserId !== userId && permission === 'viewer')) {
+              if ((actionType === 'edit' && doc.data().uid !== userId && groupUserId !== userId && userType !== 'admin')
+              || (actionType === 'edit' && doc.data().uid === userId && groupUserId !== userId && permission === 'viewer' && userType !== 'admin')) {
                 history.push('/404')
               } else {
                 if ((actionType === 'view' && doc.data().uid !== userId && groupUserId !== userId)
@@ -722,7 +723,7 @@ function Project(props) {
                     </Typography>
                   </Box>
                 </Box>
-                {Disable === false && (
+                {(userType === 'admin' || Disable === false) && (
                   <IconButton onClick={handleMenuOpen} size="small">
                     <MoreVertIcon />
                   </IconButton>
@@ -815,6 +816,7 @@ function Project(props) {
                 projectId={projectId}
                 groupId={groupId}
                 userId={userId}
+                userType={userType}
               />
             ))}
           </Box>

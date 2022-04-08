@@ -81,6 +81,7 @@ function Home(props) {
     userNote,
     userContact,
     userId,
+    userType,
   } = myUser
   const db = firebase.firestore()
 
@@ -243,6 +244,7 @@ function Home(props) {
                   setLoading={setLoading}
                   handleQuery={handleQuery}
                   actionType="view"
+                  userType={userType}
                 />
               </Grid>
             </>

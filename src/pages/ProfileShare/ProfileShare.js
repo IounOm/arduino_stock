@@ -338,6 +338,7 @@ function ProfileShare(props) {
                       setLoading={setLoading}
                       handleQuery={handleQuery}
                       actionType="view"
+                      userType={userType}
                     />
                   </Grid>
                 ))}

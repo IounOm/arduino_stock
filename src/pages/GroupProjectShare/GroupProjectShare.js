@@ -185,6 +185,7 @@ function GroupProject(props) {
     userNote,
     userContact,
     userId,
+    userType,
   } = myUser
   const db = firebase.firestore()
   const [loading, setLoading] = useState(false)
@@ -226,7 +227,7 @@ function GroupProject(props) {
       await db.collection('groupProject').doc(groupId).get().then(async (doc) => {
         if (doc.data().uid === userId) {
           history.push(`/group-project/${groupId}`)
-        } else if (doc.data().permission === 'personal') {
+        } else if (userType !== 'admin' && doc.data().permission === 'personal') {
           history.push('/401') // this is private group
         } else {
           groupOutput.push({
@@ -560,6 +561,7 @@ function GroupProject(props) {
                           setLoading={setLoading}
                           handleQuery={handleQuery}
                           actionType={(data.uid === userId && groupProjectData.permission === 'editor') ? 'edit' : 'view'}
+                          userType={userType}
                         />
                       </Grid>
                     </>

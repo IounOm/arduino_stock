@@ -75,6 +75,7 @@ function reducer(state = initialState, action) {
         loading: false,
         errorMessage: [...state.errorMessage, action.payload.errorMessage],
         userId: null,
+        userType: '',
       }
     }
     default: {

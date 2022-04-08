@@ -173,8 +173,12 @@ function Header(props) {
   const userLists = [
     { name: 'Profile', icon: <AccountBoxIcon fontSize="small" /> },
     { name: 'Project', icon: <MemoryIcon fontSize="small" /> },
-    { name: 'Logout', icon: <LogoutIcon fontSize="small" /> },
+    // { name: 'Logout', icon: <LogoutIcon fontSize="small" /> },
   ]
+
+  if (userId) {
+    userLists.push({ name: 'Logout', icon: <LogoutIcon fontSize="small" /> })
+  }
 
   const isMenuOpen = Boolean(anchorEl)
   const isSaveMenuOpen = Boolean(anchorElSave)
@@ -189,10 +193,10 @@ function Header(props) {
     setLoading(false)
   }
 
-  const handleClickUserList = (type) => {
+  const handleClickUserList = async (type) => {
     if (type === 'Logout') {
       setAnchorEl(false)
-      dispatch(userAction.logout())
+      await dispatch(userAction.logout())
       history.push('/login')
     } else {
       setAnchorEl(false)

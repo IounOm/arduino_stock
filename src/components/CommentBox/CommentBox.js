@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CommentBox(props) {
   const {
-    values, loading, handleQuery, projectId, groupId, userId,
+    values, loading, handleQuery, projectId, groupId, userId, userType,
   } = props
   const classes = useStyles()
   const history = useHistory()
@@ -263,7 +263,7 @@ function CommentBox(props) {
                 )}
               </Box>
             </Box>
-            {userId === values.uid && (
+            {(userType === 'admin' || userId === values.uid) && (
               <IconButton onClick={handleMenuOpen} size="small">
                 <MoreVertIcon />
               </IconButton>
@@ -299,6 +299,7 @@ CommentBox.propTypes = {
   projectId: PropTypes.string.isRequired,
   groupId: PropTypes.string.isRequired,
   userId: PropTypes.string.isRequired,
+  userType: PropTypes.string.isRequired,
 }
 
 CommentBox.defaultProps = {

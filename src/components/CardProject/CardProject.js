@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 function CardProject(props) {
   const {
-    values, loading, userId, groupId, setLoading, handleQuery, actionType,
+    values, loading, userId, groupId, setLoading, handleQuery, actionType, userType,
   } = props
   const classes = useStyles()
   const history = useHistory()
@@ -242,7 +242,7 @@ function CardProject(props) {
           )}
             action={(
               <>
-                {actionType !== 'view' && (
+                {(userType === 'admin' || actionType !== 'view') && (
                   <IconButton size="small" onClick={handleMenuOpen}>
                     <MoreVertIcon />
                   </IconButton>
@@ -410,7 +410,7 @@ function CardProject(props) {
                 />
               )}
             </Box>
-            {actionType !== 'view' && (
+            {(userType === 'admin' || actionType !== 'view') && (
               <IconButton size="small" onClick={handleMenuOpen}>
                 <MoreHorizIcon />
               </IconButton>
@@ -435,6 +435,7 @@ CardProject.propTypes = {
   setLoading: PropTypes.func.isRequired,
   handleQuery: PropTypes.func,
   actionType: PropTypes.string,
+  userType: PropTypes.string.isRequired,
 }
 
 CardProject.defaultProps = {
