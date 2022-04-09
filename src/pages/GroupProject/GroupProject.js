@@ -403,7 +403,6 @@ function GroupProject(props) {
   const handleDeleteGroup = async () => {
     await db.collection('groupProject').doc(groupId).delete()
     handleCloseDeleteGroup()
-    handleQuery()
     history.push('/project')
   }
 
