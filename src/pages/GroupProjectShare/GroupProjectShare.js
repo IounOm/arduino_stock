@@ -210,8 +210,8 @@ function GroupProject(props) {
     setAnchor(false)
   }
 
-  const formatCreateAtDate = format(_toInteger(`${_get(groupOwner, 'createAt.seconds')}000`), 'dd LLL yyyy')
-  const formatUpdateAtDate = format(_toInteger(`${_get(groupOwner, 'updateAt.seconds')}000`), 'dd LLL yyyy')
+  const formatCreateAtDate = format(_toInteger(`${_get(groupProjectData, 'createAt.seconds')}000`), 'dd LLL yyyy')
+  const formatUpdateAtDate = format(_toInteger(`${_get(groupProjectData, 'updateAt.seconds')}000`), 'dd LLL yyyy')
 
   // Add project
   const [addProjectOpen, setAddProjectOpen] = useState(false)
