@@ -218,8 +218,6 @@ function GroupProject(props) {
   const [addProject, setAddProject] = useState([])
   const [addProjectData, setAddProjectData] = useState([])
 
-  console.log(555555)
-  console.log(444444)
   // query
   const handleQuery = async () => {
     try {
