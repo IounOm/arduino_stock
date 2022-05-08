@@ -477,9 +477,12 @@ function Header(props) {
                 </>
               )}
               <Box sx={{ display: { xs: 'none', md: 'flex', marginLeft: '16px' } }}>
+                {!userId && (
+                  <Button variant="outlined" color="button" onClick={() => history.push('/login')}>Login</Button>
+                )}
                 <IconButton
                   onClick={handleProfileMenuOpen}
-                  sx={{ p: 0 }}
+                  sx={{ p: 0, marginLeft: '16px' }}
                       // edge="end"
                   aria-label="account of current user"
                   aria-controls={menuId}
@@ -492,12 +495,16 @@ function Header(props) {
                 </IconButton>
               </Box>
               <Box sx={{ display: { xs: 'flex', md: 'none', marginLeft: '16px' } }}>
+                {!userId && (
+                  <Button variant="text" color="button" onClick={() => history.push('/login')}>Login</Button>
+                )}
                 <IconButton
                   size="large"
                   aria-label="show more"
                   aria-controls={menuId}
                   aria-haspopup="true"
                   onClick={handleProfileMenuOpen}
+                  sx={{ marginLeft: '6px' }}
                   color="inherit"
                   edge="end"
                 >
