@@ -8,6 +8,8 @@ import _map from 'lodash/map'
 import _get from 'lodash/get'
 import _ceil from 'lodash/ceil'
 import _parseInt from 'lodash/parseInt'
+import _camelCase from 'lodash/camelCase'
+import _lowerCase from 'lodash/lowerCase'
 
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -87,11 +89,11 @@ function Home(props) {
 
   const tagList = [
     { name: 'All' },
-    { name: 'Entertainment' },
-    { name: 'Instrument' },
-    { name: 'Iot' },
-    { name: 'Machine' },
-    { name: 'Other' },
+    { name: 'Creative' },
+    { name: 'Hardware' },
+    { name: 'Software' },
+    { name: 'Human Perception' },
+    { name: 'More' },
   ]
 
   const [loading, setLoading] = useState(false)
@@ -202,7 +204,7 @@ function Home(props) {
           (project) => project.title.toLowerCase().includes(searchId.toLowerCase())
             || project.subtitle.toLowerCase().includes(searchId.toLowerCase())
             || project.uidRef.name.toLowerCase().includes(searchId.toLowerCase())
-            || project.tag.toLowerCase().includes(searchId.toLowerCase()),
+            || _lowerCase(_camelCase(project.tag)).includes(searchId.toLowerCase()),
         ),
       )
     }
@@ -223,8 +225,8 @@ function Home(props) {
             <Box ml={1} mr={1} pb={1}>
               <Chip
                 label={data.name}
-                onClick={data.name === 'All' ? () => history.push('/home') : () => history.push(`/home/tag/${data.name}`)}
-                variant={searchId === data.name || (data.name === 'All' && !searchType) ? 'contained' : 'outlined'}
+                onClick={data.name === 'All' ? () => history.push('/home') : () => history.push(`/home/tag/${_camelCase(data.name)}`)}
+                variant={searchId === _camelCase(data.name) || (data.name === 'All' && !searchType) ? 'contained' : 'outlined'}
                 color="primary"
               />
             </Box>

@@ -10,6 +10,7 @@ import _map from 'lodash/map'
 import _get from 'lodash/get'
 import _toInteger from 'lodash/toInteger'
 import _lowerCase from 'lodash/lowerCase'
+import _camelCase from 'lodash/camelCase'
 
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
@@ -186,11 +187,11 @@ function Project(props) {
   ]
 
   const tag = [
-    { value: 'Entertainment', label: 'Entertainment' },
-    { value: 'Instrument', label: 'Instrument' },
-    { value: 'Iot', label: 'Iot' },
-    { value: 'Machine', label: 'Machine' },
-    { value: 'Other', label: 'Other' },
+    { value: 'Creative', label: 'Creative' },
+    { value: 'Hardware', label: 'Hardware' },
+    { value: 'Software', label: 'Software' },
+    { value: 'Human Perception', label: 'Human Perception' },
+    { value: 'More', label: 'More' },
   ]
 
   const formatCreateAtDate = format(_toInteger(`${_get(value, 'createAt.seconds')}000`), 'dd LLLL yyyy')
@@ -336,7 +337,7 @@ function Project(props) {
             image: uploadImg,
             title: value.title,
             subtitle: value.subtitle,
-            tag: value.tag,
+            tag: _camelCase(value.tag),
           })
         dispatch(userAction.uploadImage(''))
         dispatch(userAction.saveProject(false))
@@ -349,7 +350,7 @@ function Project(props) {
             publish: value.publish,
             title: value.title,
             subtitle: value.subtitle,
-            tag: value.tag,
+            tag: _camelCase(value.tag),
           })
         dispatch(userAction.uploadImage(''))
         dispatch(userAction.saveProject(false))
@@ -362,7 +363,7 @@ function Project(props) {
             publish: value.publish,
             title: value.title,
             subtitle: value.subtitle,
-            tag: value.tag,
+            tag: _camelCase(value.tag),
           })
         dispatch(userAction.uploadImage(''))
         dispatch(userAction.saveProject(false))
@@ -600,14 +601,14 @@ function Project(props) {
           select
           margin="dense"
           label="Add a tag"
-          value={value.tag}
+          value={_camelCase(value.tag)}
           onChange={handleChange('tag')}
           error={value.tag ? false : errorSave.tag}
           variant="outlined"
           fullWidth
         >
           {tag.map((option) => (
-            <MenuItem value={option.value}>
+            <MenuItem value={_camelCase(option.value)}>
               {option.label}
             </MenuItem>
           ))}

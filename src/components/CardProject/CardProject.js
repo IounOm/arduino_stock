@@ -10,6 +10,7 @@ import _toInteger from 'lodash/toInteger'
 import _get from 'lodash/get'
 import _map from 'lodash/map'
 import _lowerCase from 'lodash/lowerCase'
+import _startCase from 'lodash/startCase'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -291,7 +292,7 @@ function CardProject(props) {
           </CardActionArea>
           <CardActions disableSpacing sx={{ justifyContent: 'space-between' }}>
             <Chip
-              label={values.tag}
+              label={_startCase(values.tag)}
               onClick={() => history.push(`/home/tag/${values.tag}/page/1`)}
             />
             {pathname === '/project' && (
@@ -399,7 +400,7 @@ function CardProject(props) {
           </Box>
           <Box display="flex" alignItems="center" justifyContent="space-between" mt={1} mb={1}>
             <Box display="flex" alignItems="center">
-              <Chip label={values.tag} size="small" onClick={() => history.push(`/home/tag/${values.tag}/page/1`)} />
+              <Chip label={_startCase(values.tag)} size="small" onClick={() => history.push(`/home/tag/${values.tag}/page/1`)} />
               <Box ml={1} />
               {pathname === '/project' && (
                 <Chip
